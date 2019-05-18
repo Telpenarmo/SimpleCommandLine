@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleCommandLine.Tokenization.Tokens
 {
@@ -20,5 +21,8 @@ namespace SimpleCommandLine.Tokenization.Tokens
         /// Gets option tokens that form this group.
         /// </summary>
         public IEnumerable<ShortOptionToken> Tokens { get; }
+
+        public bool Equals(IArgumentToken other)
+            => other is OptionsGroupToken token ? token.Tokens.SequenceEqual(Tokens) : false;
     }
 }

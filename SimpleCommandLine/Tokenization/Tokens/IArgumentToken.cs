@@ -5,7 +5,7 @@
     /// </summary>
     /// <seealso cref="IOptionToken"/>
     /// <seealso cref="ValueToken"/>
-    public interface IArgumentToken
+    public interface IArgumentToken : System.IEquatable<IArgumentToken>
     {
     }
 }

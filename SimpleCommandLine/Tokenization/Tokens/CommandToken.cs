@@ -19,5 +19,8 @@ namespace SimpleCommandLine.Tokenization.Tokens
         /// Gets this command.
         /// </summary>
         public string Alias { get; }
+
+        public bool Equals(IArgumentToken other)
+            => other is CommandToken token ? token.Alias == Alias : false;
     }
 }

@@ -20,6 +20,9 @@ namespace SimpleCommandLine.Tokenization.Tokens
         /// </summary>
         public string Value { get; }
 
+        public bool Equals(IArgumentToken other)
+            => other is ValueToken token ? token.Value == Value : false;
+
         public override string ToString() => Value;
     }
 }
