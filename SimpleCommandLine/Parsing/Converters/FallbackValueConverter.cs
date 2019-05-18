@@ -53,7 +53,7 @@ namespace SimpleCommandLine.Parsing.Converters
 
             public object Convert(string str, IFormatProvider formatProvider) =>
                 stringAndFormatConstructor?.Invoke(new object[] { str, formatProvider })
-                    ?? stringAndFormatConstructor?.Invoke(new object[] { formatProvider, str })
+                    ?? formatAndStringConstructor?.Invoke(new object[] { formatProvider, str })
                     ?? stringConstructor?.Invoke(new object[] { str });
         }
     }

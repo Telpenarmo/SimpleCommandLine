@@ -1,7 +1,6 @@
 ﻿using System;
-using SimpleCommandLine.Parsing;
 
-namespace SimpleCommandLine
+namespace SimpleCommandLine.Parsing.Converters
 {
     internal class StringValueConverter : IValueConverter<string>
     {
