@@ -45,7 +45,7 @@ namespace SimpleCommandLine.Parsing
         }
 
         private TokensParser BuildTypeParser(ParsingTypeInfo typeInfo, IValueConvertersFactory convertersFactory)
-            => new TokensParser(new ObjectBuilder(typeInfo, convertersFactory));
+            => new TokensParser(typeInfo, convertersFactory);
 
         private void CacheTypeParser(TokensParser typeParser, IEnumerable<string> names)
         {
