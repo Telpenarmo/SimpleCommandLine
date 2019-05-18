@@ -23,6 +23,22 @@ namespace SimpleCommandLine.Registration
         public Type PropertyType => propertyInfo.PropertyType;
 
         /// <summary>
+        /// Determines whether this argument may get multiple arguments.
+        /// </summary>
+        public bool IsCollection
+            => PropertyType != typeof(string) && (PropertyType.IsArray || typeof(System.Collections.IEnumerable).IsAssignableFrom(PropertyType));
+
+        /// <summary>
+        /// If this argument is a collection, gets or sets the minimal number of values it may get; otherwise ignored.
+        /// </summary>
+        public int Minimum { get; set; } = 1;
+
+        /// <summary>
+        /// If this argument is a collection, gets or sets the maximal number of values it may get; otherwise ignored.
+        /// </summary>
+        public int? Maximum { get; set; } = null;
+
+        /// <summary>
         /// Sets the property value for a specified object.
         /// </summary>
         /// <param name="obj">The object whose property value will be set.</param>
