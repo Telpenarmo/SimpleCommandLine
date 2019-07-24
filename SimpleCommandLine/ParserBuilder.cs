@@ -17,11 +17,12 @@ namespace SimpleCommandLine
     {
         private readonly List<ParsingTypeInfo> types;
         private readonly ITypeRegisterer typeRegisterer;
-        private readonly IValueConvertersFactory convertersFactory = new ValueConvertersFactory();
+        private readonly IConvertersFactory convertersFactory = new ConvertersFactory();
         private readonly IFinalValidator finalVerifier = new FinalValidator();
         private readonly ITypeValidator typeValidator;
         private readonly IPropertyValidator argumentValidator = new PropertyValidator();
         private ITokenizerBuilder tokenizerBuilder;
+        private IFormatProvider formatProvider;
                 
         public ParserBuilder()
         {
@@ -82,11 +83,21 @@ namespace SimpleCommandLine
         /// <typeparam name="T">Type to which string values are converted.</typeparam>
         /// <param name="converter">Object that will convert string values to <typeparamref name="T"/>.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="converter"/> is null.</exception>
-        public void RegisterValueConverter<T>(IValueConverter<T> converter)
+        public void RegisterConverter<T>(IValueConverter<T> converter)
         {
             if (converter == null)
                 throw new ArgumentNullException(nameof(converter));
-            convertersFactory.Register(converter, typeof(T));
+            convertersFactory.RegisterConverter(converter, typeof(T));
+        }
+
+        /// <summary>
+        /// Registers a custom <see cref="IFormatProvider"/> that is being used in conversion.
+        /// </summary>
+        /// <param name="formatProvider">A custom <see cref="IFormatProvider"/> to be used.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="formatProvider"/> is null.</exception>
+        public void UseFormatProvider(IFormatProvider formatProvider)
+        {
+            this.formatProvider = formatProvider ?? throw new ArgumentNullException(nameof(formatProvider));
         }
 
         private ChainTokenizer PrepareTokenizer()
@@ -97,28 +108,29 @@ namespace SimpleCommandLine
         }
 
         private ITokensParserFactory PrepareTypeParserFactory()
-            => new TokensParserFactory(types, convertersFactory);
+            => new TokensParserFactory(types, convertersFactory, formatProvider);
 
         private void LoadDefaultConverters()
         {
-            RegisterValueConverter(new StringValueConverter());
-            RegisterValueConverter(new BoolValueConverter());
-            RegisterValueConverter(new ByteValueConverter());
-            RegisterValueConverter(new DateTimeValueConverter());
-            RegisterValueConverter(new DecimalValueConverter());
-            RegisterValueConverter(new DoubleValueConverter());
-            RegisterValueConverter(new FloatValueConverter());
-            RegisterValueConverter(new GuidValueConverter());
-            RegisterValueConverter(new IntValueConverter());
-            RegisterValueConverter(new IPAddressValueConverter());
-            RegisterValueConverter(new LongValueConverter());
-            RegisterValueConverter(new SByteValueConverter());
-            RegisterValueConverter(new ShortValueConverter());
-            RegisterValueConverter(new TimeSpanValueConverter());
-            RegisterValueConverter(new UIntValueConverter());
-            RegisterValueConverter(new ULongValueConverter());
-            RegisterValueConverter(new URIValueConverter());
-            RegisterValueConverter(new UShortValueConverter());
+            RegisterConverter(StockConverters.StringConverter);
+            RegisterConverter(new BoolValueConverter());
+            RegisterConverter(NumericValueConverters.ByteConverter);
+            RegisterConverter(NumericValueConverters.SByteConverter);
+            RegisterConverter(NumericValueConverters.DoubleConverter);
+            RegisterConverter(NumericValueConverters.FloatConverter);
+            RegisterConverter(NumericValueConverters.DecimalConverter);
+            RegisterConverter(NumericValueConverters.Int16Converter);
+            RegisterConverter(NumericValueConverters.Int32Converter);
+            RegisterConverter(NumericValueConverters.Int64Converter);
+            RegisterConverter(NumericValueConverters.UInt16Converter);
+            RegisterConverter(NumericValueConverters.UInt32Converter);
+            RegisterConverter(NumericValueConverters.UInt64Converter);
+            RegisterConverter(StockConverters.GuidConverter);
+            RegisterConverter(StockConverters.IPAdressConverter);
+            RegisterConverter(StockConverters.DateTimeConverter);
+            RegisterConverter(StockConverters.DateTimeOffsetConverter);
+            RegisterConverter(StockConverters.TimeSpanConverter);
+            RegisterConverter(StockConverters.URIConverter);
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace SimpleCommandLine.Parsing.Converters
 {
-    class FallbackValueConverter : IValueConverter
+    internal class FallbackValueConverter : IValueConverter
     {
         readonly TypeConverter converter;
         readonly ReflectionConverter reflectionConverter;
