@@ -6,6 +6,6 @@ namespace SimpleCommandLine.Registration.Validation
 {
     internal interface IFinalValidator
     {
-        void Verify(IEnumerable<ParsingTypeInfo> types, IValueConvertersFactory convertersFactory);
+        void Verify(IEnumerable<ParsingTypeInfo> types, IConvertersFactory convertersFactory);
     }
 }

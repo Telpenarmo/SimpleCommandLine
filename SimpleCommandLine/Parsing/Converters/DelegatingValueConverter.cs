@@ -20,8 +20,8 @@ namespace SimpleCommandLine.Parsing.Converters
 
             this.converter = (value, format) =>
             {
-                if (value == null)
-                    return default;
+                if (string.IsNullOrEmpty(value))
+                    throw new ArgumentNullException("The value must not be empty.");
                 var (isSuccess, result) = converter(value, format);
                 return isSuccess ? result : throw errorSelector(value); 
             };

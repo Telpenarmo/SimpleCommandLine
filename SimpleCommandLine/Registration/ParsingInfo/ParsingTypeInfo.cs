@@ -44,7 +44,6 @@ namespace SimpleCommandLine.Registration
         /// </summary>
         /// <param name="index">Index of the <see cref="ParsingValueInfo"/> to be found.</param>
         /// <returns><see cref="ParsingValueInfo"/> at the given position.</returns>
-        public ParsingValueInfo GetValueInfoAt(int index)
-            => Values.ElementAt(index);
+        public ParsingValueInfo GetValueInfoAt(int index) => index < Values.Count() ? Values.ElementAt(index) : null;
     }
 }

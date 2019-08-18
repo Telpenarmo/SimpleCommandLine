@@ -37,7 +37,7 @@ namespace SimpleCommandLine.Parsing
                     || typeof(IReadOnlyCollection<>) == typeDef
                     || typeof(IReadOnlyList<>) == typeDef
                     || typeof(List<>) == typeDef)
-                    return new GenericCollectionConverter(elementType, valueConverter);
+                    return new GenericCollectionConverter(type, valueConverter);
 
                 if (typeof(ISet<>) == typeDef
                   || typeof(HashSet<>) == typeDef)
@@ -48,7 +48,7 @@ namespace SimpleCommandLine.Parsing
                 if (typeof(Stack<>) == typeDef)
                     return new GenericCollectionConverter(type, valueConverter);
                 if (typeof(LinkedList<>) == typeDef)
-                    return new GenericCollectionConverter(type, elementType, valueConverter);
+                    return new GenericCollectionConverter(type, valueConverter);
 
                 var enumerableDef = typeof(IEnumerable<>).MakeGenericType(elementType);
                 var constructor = type.GetConstructor(new[] { enumerableDef });

@@ -13,8 +13,12 @@ namespace SimpleCommandLine.Registration.Validation
             var propertyType = propertyInfo.PropertyType;
             if (!propertyInfo.CanWrite)
                 throw new InvalidOperationException("Argument property must have \"set\" accesor.");
-            else if (propertyType.IsAbstract)
+            if (propertyType.IsAbstract)
                 throw new InvalidOperationException("Type of the property must not be abstract.");
+            if (propertyType.GetCollectionElementType()?.IsCollection() ?? false)
+                throw new NotSupportedException("Nested collections are not supported.");
+            if (propertyType.GetCustomAttribute<FlagsAttribute>() != null)
+                throw new NotSupportedException("Flag enumerations are not supported.");
             else
                 return true;
         }
