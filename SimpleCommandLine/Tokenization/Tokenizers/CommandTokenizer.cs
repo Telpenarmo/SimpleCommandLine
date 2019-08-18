@@ -5,7 +5,7 @@ using SimpleCommandLine.Tokenization.Tokens;
 
 namespace SimpleCommandLine.Tokenization.Tokenizers
 {
-    internal class CommandTokenizer : ChainTokenizer
+    public class CommandTokenizer : ChainTokenizer
     {
         private readonly IEnumerable<string> commandNames;
 

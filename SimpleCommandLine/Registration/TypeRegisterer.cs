@@ -8,9 +8,9 @@ namespace SimpleCommandLine.Registration
 {
     internal class TypeRegisterer : ITypeRegisterer
     {
-        readonly ITypeValidator typeValidator;
-        readonly IPropertyValidator propertyValidator;
-        readonly IList<OptionAttribute> optionAttributes = new List<OptionAttribute>();
+        private readonly ITypeValidator typeValidator;
+        private readonly IPropertyValidator propertyValidator;
+        private readonly IList<OptionAttribute> optionAttributes = new List<OptionAttribute>();
 
         public TypeRegisterer(ITypeValidator typeValidator, IPropertyValidator propertyValidator)
         {

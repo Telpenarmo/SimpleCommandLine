@@ -11,11 +11,11 @@ namespace SimpleCommandLine.Parsing.Converters
 
         public static IValueConverter<Guid> GuidConverter
             => new DelegatingValueConverter<Guid>((value, format) => Guid.TryParse(value, out var result) ? (true, result) : default,
-            (value) => new FormatException($"\"{value}\" is not a valid GUID."));
+                value => new FormatException($"\"{value}\" is not a valid GUID."));
 
         public static IValueConverter<IPAddress> IPAdressConverter
             => new DelegatingValueConverter<IPAddress>((value, format) => IPAddress.TryParse(value, out var result) ? (true, result) : default,
-                    (value) => new FormatException($"\"{value}\" is not a valid IP address."));
+                value => new FormatException($"\"{value}\" is not a valid IP address."));
 
         public static IValueConverter<Uri> URIConverter
             => new DelegatingValueConverter<Uri>((value, format) => new Uri(value));
@@ -28,11 +28,11 @@ namespace SimpleCommandLine.Parsing.Converters
                 out T result) ? (true, result) : default, errorSelector);
 
         public static IValueConverter<DateTime> DateTimeConverter
-            => CreateDateTimeConverter<DateTime>(DateTime.TryParse, (value) => throw new FormatException($"\"{value}\" is not a valid date nor time."));
+            => CreateDateTimeConverter<DateTime>(DateTime.TryParse, value => throw new FormatException($"\"{value}\" is not a valid date nor time."));
         public static IValueConverter<DateTimeOffset> DateTimeOffsetConverter
-            => CreateDateTimeConverter<DateTimeOffset>(DateTimeOffset.TryParse, (value) => throw new FormatException($"\"{value}\" is not a valid date ot time offset."));
+            => CreateDateTimeConverter<DateTimeOffset>(DateTimeOffset.TryParse, value => throw new FormatException($"\"{value}\" is not a valid date ot time offset."));
         public static IValueConverter<TimeSpan> TimeSpanConverter
             => new DelegatingValueConverter<TimeSpan>((value, format) => TimeSpan.TryParse(value, format, out var result) ? (true, result) : default,
-                (value) => new FormatException($"\"{value}\" is not a valid time span value."));
+                value => new FormatException($"\"{value}\" is not a valid time span value."));
     }
 }

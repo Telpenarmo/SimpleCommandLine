@@ -30,7 +30,7 @@ namespace SimpleCommandLine.Registration.Validation
         }
     }
 
-    public static class EnumerableExtensions
+    internal static class EnumerableExtensions
     {
         public static bool HasDuplicates<T>(this IEnumerable<T> subjects)
         {
