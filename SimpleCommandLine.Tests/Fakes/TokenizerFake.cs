@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using SimpleCommandLine.Tokenization.Tokenizers;
+﻿using SimpleCommandLine.Tokenization.Tokenizers;
 using SimpleCommandLine.Tokenization.Tokens;
 
 namespace SimpleCommandLine.Tests.Fakes
 {
     public class TokenizerFake : IArgumentTokenizer
     {
-        public bool Invoked { get;private set; }
+        public bool Invoked { get; private set; }
         public string Argument { get; private set; }
         public IArgumentToken TokenizeArgument(string arg)
         {
@@ -24,7 +22,8 @@ namespace SimpleCommandLine.Tests.Fakes
 
         private class TokenFake : IArgumentToken
         {
-
+            public bool Equals(IArgumentToken other)
+                => ReferenceEquals(this, other);
         }
     }
 }

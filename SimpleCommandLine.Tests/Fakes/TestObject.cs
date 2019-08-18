@@ -32,8 +32,11 @@ namespace SimpleCommandLine.Tests.Fakes
         [Option(LongName = "lOption", ShortName = 'l')]
         public List<string> ListOption { get; set; }
 
-        [Option(LongName = "aOption", ShortName = 'a')]
+        [Option(LongName = "aOption", ShortName = 'a', Minimum = 3, Maximum = 4)]
         public string[] ArrayOption { get; set; }
+
+        [Option(LongName = "eOption", ShortName = 'e')]
+        public AnEnum EnumOption { get; set; }
 
         public static IEnumerable<ParsingValueInfo> ValueInfos => new[]
             {
@@ -48,8 +51,18 @@ namespace SimpleCommandLine.Tests.Fakes
                 new ParsingOptionInfo(typeof(TestObject).GetProperty(nameof(IntOption))),
                 new ParsingOptionInfo(typeof(TestObject).GetProperty(nameof(BoolOption1))),
                 new ParsingOptionInfo(typeof(TestObject).GetProperty(nameof(BoolOption2))),
-                //new ParsingOptionInfo(typeof(TestObject).GetProperty(nameof(ListOption))),
-                //new ParsingOptionInfo(typeof(TestObject).GetProperty(nameof(ArrayOption))),
+                new ParsingOptionInfo(typeof(TestObject).GetProperty(nameof(ListOption))),
+                new ParsingOptionInfo(typeof(TestObject).GetProperty(nameof(ArrayOption))),
+                new ParsingOptionInfo(typeof(TestObject).GetProperty(nameof(EnumOption))),
             };
+    }
+
+    [System.Flags]
+    public enum AnEnum
+    {
+        first,
+        second,
+        third,
+        another
     }
 }

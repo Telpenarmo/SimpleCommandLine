@@ -39,7 +39,7 @@ namespace SimpleCommandLine.Tests.Parsing.Converters
         public void With_not_supported_type_Convert_throws(Type type)
         {
             var converter = new FallbackValueConverter(type);
-            Assert.Throws<InvalidOperationException>(() => converter.Convert("", culture));
+            Assert.Throws<InvalidOperationException>(() => converter.Convert(string.Empty, culture));
         }
 
         [Fact]
@@ -48,19 +48,13 @@ namespace SimpleCommandLine.Tests.Parsing.Converters
             Assert.Throws<ArgumentNullException>(() => new FallbackValueConverter(null));
         }
 
-        [Theory, MemberData(nameof(NullAndEmptyStrings))]
-        internal void With_null_Convert_returns_null(string str)
-        {
-            var converter = new FallbackValueConverter(typeof(string));
-            Assert.Null(converter.Convert(str, culture));
-        }
-
         public static IEnumerable<object[]> SupportedTypes()
         {
             yield return new[] { typeof(Uri) };
             yield return new[] { typeof(A) };
             yield return new[] { typeof(TimeSpan) };
             yield return new[] { typeof(string) };
+            yield return new[] { typeof(int) };
         }
 
         public static IEnumerable<object[]> UnsupportedTypes()
@@ -78,8 +72,6 @@ namespace SimpleCommandLine.Tests.Parsing.Converters
             yield return new object[] { typeof(TimeSpan), new TimeSpan(1, 20, 0), "1:20" };
         }
 
-        public static IEnumerable<object[]> NullAndEmptyStrings => TestData.GetNullAndEmptyStrings();
-
         private class A
         {
             public A(string s) { this.s = s; }
@@ -89,6 +81,7 @@ namespace SimpleCommandLine.Tests.Parsing.Converters
                 var a = obj as A;
                 return a.s?.Equals(s) ?? false;
             }
+            public override int GetHashCode() => base.GetHashCode();
         }
     }
 }

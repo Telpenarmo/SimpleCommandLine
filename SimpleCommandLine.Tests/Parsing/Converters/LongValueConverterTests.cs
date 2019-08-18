@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using Xunit;
 using SimpleCommandLine.Parsing.Converters;
+using SimpleCommandLine.Parsing;
 
 namespace SimpleCommandLine.Tests.Parsing.Converters
 {
     public class LongValueConverterTests
     {
-        private readonly LongValueConverter obj = new LongValueConverter();
+        private readonly IValueConverter<long> obj = NumericValueConverters.Int64Converter;
         private readonly IFormatProvider culture = System.Globalization.CultureInfo.InvariantCulture;
 
         [Theory, MemberData(nameof(AllowedNumbersStrings))]
@@ -20,7 +21,7 @@ namespace SimpleCommandLine.Tests.Parsing.Converters
         [Theory, MemberData(nameof(NullAndEmptyStrings))]
         public void WithNullOrEmptyStringThrows(string str)
         {
-            Assert.Throws<FormatException>(() => obj.Convert(str, culture));
+            Assert.Throws<ArgumentNullException>(() => obj.Convert(str, culture));
         }
 
         [Fact]

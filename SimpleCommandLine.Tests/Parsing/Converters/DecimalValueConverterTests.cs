@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using Xunit;
+using SimpleCommandLine.Parsing;
 using SimpleCommandLine.Parsing.Converters;
 
 namespace SimpleCommandLine.Tests.Parsing.Converters
 {
     public class DecimalValueConverterTests
     {
-        private readonly DecimalValueConverter obj = new DecimalValueConverter();
+        private readonly IValueConverter<decimal> obj = NumericValueConverters.DecimalConverter;
         private readonly IFormatProvider culture = System.Globalization.CultureInfo.InvariantCulture;
 
         [Theory, MemberData(nameof(AllowedNumbersStrings))]
@@ -20,7 +21,7 @@ namespace SimpleCommandLine.Tests.Parsing.Converters
         [Theory, MemberData(nameof(NullAndEmptyStrings))]
         public void WithNullOrEmptyStringThrows(string str)
         {
-            Assert.Throws<FormatException>(() => obj.Convert(str, culture));
+            Assert.Throws<ArgumentNullException>(() => obj.Convert(str, culture));
         }
 
         [Fact]

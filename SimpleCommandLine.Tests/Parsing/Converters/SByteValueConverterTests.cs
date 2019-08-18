@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using Xunit;
 using SimpleCommandLine.Parsing.Converters;
+using SimpleCommandLine.Parsing;
 
 namespace SimpleCommandLine.Tests.Parsing.Converters
 {
     public class SByteValueConverterTests
     {
-        private readonly SByteValueConverter obj = new SByteValueConverter();
+        private readonly IValueConverter<sbyte> obj = NumericValueConverters.SByteConverter;
         private readonly IFormatProvider culture = System.Globalization.CultureInfo.InvariantCulture;
 
         [Theory, InlineData(" 1 ", 1), InlineData("-1", -1)]
@@ -20,7 +21,7 @@ namespace SimpleCommandLine.Tests.Parsing.Converters
         [Theory, MemberData(nameof(NullAndEmptyStrings))]
         public void WithNullOrEmptyStringThrows(string str)
         {
-            Assert.Throws<FormatException>(() => obj.Convert(str, culture));
+            Assert.Throws<ArgumentNullException>(() => obj.Convert(str, culture));
         }
 
         [Fact]
