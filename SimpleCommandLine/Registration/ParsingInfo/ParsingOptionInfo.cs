@@ -31,7 +31,7 @@ namespace SimpleCommandLine.Registration
 
         public bool IsImplicit => PropertyType == typeof(bool);
 
-        private readonly OptionAttribute attribute;
+        private OptionAttribute Attribute => attribute as OptionAttribute;
 
         /// <summary>
         /// Checks if given token matches current option.
@@ -56,13 +56,13 @@ namespace SimpleCommandLine.Registration
         /// </summary>
         /// <param name="token">The token to match.</param>
         /// <returns>True, if given token matches this option; false otherwise.</returns>
-        public bool MatchToken(ShortOptionToken token) => token.Value == attribute.ShortName;
+        public bool MatchToken(ShortOptionToken token) => token.Value == Attribute.ShortName;
 
         /// <summary>
         /// Checks if given token matches current option.
         /// </summary>
         /// <param name="token">The token to match.</param>
         /// <returns>True, if given token matches this option; false otherwise.</returns>
-        public bool MatchToken(LongOptionToken token) => token.Value == attribute?.LongName;
+        public bool MatchToken(LongOptionToken token) => token.Value == Attribute.LongName;
     }
 }

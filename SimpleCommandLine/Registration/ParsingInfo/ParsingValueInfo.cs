@@ -26,11 +26,11 @@ namespace SimpleCommandLine.Registration
         public ParsingValueInfo(PropertyInfo propertyInfo, ValueAttribute attribute) : this(propertyInfo)
             => this.attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
 
-        private readonly ValueAttribute attribute;
+        private ValueAttribute Attribute => attribute as ValueAttribute;
 
         /// <summary>
         /// Gets the place of this value in the order of values.
         /// </summary>
-        public uint Index => attribute.Index;
+        public uint Index => Attribute.Index;
     }
 }

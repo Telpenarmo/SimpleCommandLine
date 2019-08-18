@@ -9,6 +9,7 @@ namespace SimpleCommandLine.Registration
     internal abstract class ParsingArgumentInfo
     {
         protected PropertyInfo propertyInfo;
+        protected ArgumentAttribute attribute;
 
         /// <summary>
         /// Creates a new instance of <see cref="ParsingArgumentInfo"/>.
@@ -17,26 +18,14 @@ namespace SimpleCommandLine.Registration
         protected ParsingArgumentInfo(PropertyInfo propertyInfo)
             => this.propertyInfo = propertyInfo ?? throw new ArgumentNullException(nameof(propertyInfo));
 
-        /// <summary>
-        /// This property's <see cref="Type"/>.
-        /// </summary>
-        public Type PropertyType => propertyInfo.PropertyType;
+        protected Type PropertyType => propertyInfo.PropertyType;
 
         /// <summary>
         /// Determines whether this argument may get multiple arguments.
         /// </summary>
-        public bool IsCollection
-            => PropertyType != typeof(string) && (PropertyType.IsArray || typeof(System.Collections.IEnumerable).IsAssignableFrom(PropertyType));
-
-        /// <summary>
-        /// If this argument is a collection, gets or sets the minimal number of values it may get; otherwise ignored.
-        /// </summary>
-        public int Minimum { get; set; } = 1;
-
-        /// <summary>
-        /// If this argument is a collection, gets or sets the maximal number of values it may get; otherwise ignored.
-        /// </summary>
-        public int? Maximum { get; set; } = null;
+        public bool IsCollection => PropertyType.IsCollection();
+        public int Minimum => attribute.Minimum;
+        public int Maximum => attribute.Maximum;
 
         /// <summary>
         /// Sets the property value for a specified object.
@@ -44,5 +33,13 @@ namespace SimpleCommandLine.Registration
         /// <param name="obj">The object whose property value will be set.</param>
         /// <param name="value">The new property value.</param>
         public void SetValue(object obj, object value) => propertyInfo.SetValue(obj, value);
+
+        /// <summary>
+        /// Gets converter that operates the type of this property.
+        /// </summary>
+        /// <param name="convertersFactory">Used to get the applicable converter.</param>
+        /// <returns>Object converting string to this property's type; null if no suitable converter was registered.</returns>
+        public Parsing.IConverter ChooseConverter(Parsing.IConvertersFactory convertersFactory)
+            => convertersFactory.GetConverter(PropertyType);
     }
 }
