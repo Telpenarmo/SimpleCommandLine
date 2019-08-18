@@ -21,7 +21,7 @@ namespace SimpleCommandLine.Parsing
             if (type.IsCollection())
                 return collectionConvertersFactory.GetConverter(type);
             else
-                return valueConverters.ContainsKey(type) || Fallback(type) ? valueConverters[type] : null;
+                return valueConverters.ContainsKey(type) || TryBuild(type) ? valueConverters[type] : null;
         }
 
         public void RegisterConverter(IValueConverter converter, Type type)
@@ -34,16 +34,17 @@ namespace SimpleCommandLine.Parsing
             valueConverters.Add(type, converter);
         }
 
-        private bool Fallback(Type type)
+        private bool TryBuild(Type type)
         {
-            var fallbackConverter = new FallbackValueConverter(type);
-            if (fallbackConverter.CanConvert)
-            {
-                valueConverters.Add(type, fallbackConverter);
-                return true;
-            }
+            if (type.IsEnum)
+                valueConverters.Add(type, new EnumConverter(type));
             else
-                return false;
+            {
+                var fallbackConverter = new FallbackValueConverter(type);
+                if (fallbackConverter.CanConvert)
+                    valueConverters.Add(type, fallbackConverter);
+            }
+            return valueConverters.ContainsKey(type);
         }
     }
 }
