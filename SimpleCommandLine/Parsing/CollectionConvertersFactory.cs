@@ -16,38 +16,30 @@ namespace SimpleCommandLine.Parsing
 
         public CollectionConverter GetConverter(Type type)
         {
-            Type elementType;
-            IValueConverter valueConverter;
+            Type elementType = type.GetCollectionElementType();
+            if (!(convertersFactory.GetConverter(elementType) is IValueConverter valueConverter))
+                return null;
+
             if (type.IsArray)
-            {
-                elementType = type.GetElementType();
-                valueConverter = convertersFactory.GetConverter(elementType) as IValueConverter;
                 return new ArrayConverter(elementType, valueConverter);
-            }
 
             if (type.IsGenericType)
             {
                 var typeDef = type.GetGenericTypeDefinition();
-                elementType = type.GetGenericArguments().First();
-                valueConverter = convertersFactory.GetConverter(elementType) as IValueConverter;
 
                 if (typeof(IList<>) == typeDef
                     || typeof(IEnumerable<>) == typeDef
                     || typeof(ICollection<>) == typeDef
                     || typeof(IReadOnlyCollection<>) == typeDef
                     || typeof(IReadOnlyList<>) == typeDef
-                    || typeof(List<>) == typeDef)
-                    return new GenericCollectionConverter(type, valueConverter);
+                    || typeof(List<>) == typeDef
+                    
+                    || typeof(LinkedList<>) == typeDef                    
+                    || typeof(Queue<>) == typeDef
+                    || typeof(Stack<>) == typeDef
 
-                if (typeof(ISet<>) == typeDef
-                  || typeof(HashSet<>) == typeDef)
-                    return new GenericCollectionConverter(type, valueConverter);
-
-                if (typeof(Queue<>) == typeDef)
-                    return new GenericCollectionConverter(type, valueConverter);
-                if (typeof(Stack<>) == typeDef)
-                    return new GenericCollectionConverter(type, valueConverter);
-                if (typeof(LinkedList<>) == typeDef)
+                    || typeof(HashSet<>) == typeDef
+                    || typeof(ISet<>) == typeDef)
                     return new GenericCollectionConverter(type, valueConverter);
 
                 var enumerableDef = typeof(IEnumerable<>).MakeGenericType(elementType);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Xunit;
 using SimpleCommandLine.Parsing;
@@ -13,7 +14,7 @@ namespace SimpleCommandLine.Tests.Parsing
     public class TokensParsingTests
     {
         private TokensParser GetTypeParser =>
-            new TokensParser(new ObjectBuilder(
+            new TokensParser(() => new ObjectBuilder(
                 new Registration.ParsingTypeInfo(TestObject.ValueInfos, TestObject.OptionsInfos, new Func<TestObject>(() => new TestObject())),
                 CreateValuesConvertersFactory(),
                 System.Globalization.CultureInfo.InvariantCulture));

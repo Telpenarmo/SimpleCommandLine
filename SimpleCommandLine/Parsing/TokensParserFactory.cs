@@ -26,7 +26,7 @@ namespace SimpleCommandLine.Parsing
             {
                 var typeInfo = registeredTypes.SingleOrDefault(x => !(x is ParsingCommandTypeInfo))
                     ?? throw new InvalidOperationException("No generic types were declared.");
-                cachedGenericParser = new TokensParser(new ObjectBuilder(typeInfo, convertersFactory, formatProvider));
+                cachedGenericParser = new TokensParser(() => new ObjectBuilder(typeInfo, convertersFactory, formatProvider));
             }
             return cachedGenericParser;
         }
@@ -40,7 +40,7 @@ namespace SimpleCommandLine.Parsing
             {
                 var typeInfo = registeredTypes.OfType<ParsingCommandTypeInfo>().SingleOrDefault(x => x.Aliases.Contains(commandName))
                       ?? throw new InvalidOperationException("This command was not declared.");
-                CacheTypeParser(new TokensParser(new ObjectBuilder(typeInfo, convertersFactory, formatProvider)), typeInfo.Aliases);
+                CacheTypeParser(new TokensParser(() => new ObjectBuilder(typeInfo, convertersFactory, formatProvider)), typeInfo.Aliases);
             }
 
             return cachedVerbParsers[commandName];

@@ -7,15 +7,18 @@ namespace SimpleCommandLine.Parsing
 {
     internal class TokensParser : ITokensParser
     {
-        private readonly IObjectBuilder builder;
+        private readonly Func<IObjectBuilder> builderFactory;
+        private IObjectBuilder builder;
         
-        public TokensParser(IObjectBuilder builder)
+        public TokensParser(Func<IObjectBuilder> builderFactory)
         {
-            this.builder = builder ?? throw new ArgumentNullException(nameof(builder));
+            this.builderFactory = builderFactory ?? throw new ArgumentNullException(nameof(builderFactory));
         }
 
         public object Parse(IEnumerable<IArgumentToken> tokens)
         {
+            builder = builderFactory.Invoke();
+
             var argumentsQueue = new Queue<IArgumentToken>(tokens);
             while (argumentsQueue.Any())
             {
@@ -34,18 +37,14 @@ namespace SimpleCommandLine.Parsing
                 }
             }
 
-            if (builder.LastOption?.RequiresValue ?? false)
-                throw new ArgumentException("Value was not provided for a token.");
-
+            EnsureLastOptionSet();
             return builder.Parse();
         }
 
         protected void HandleOption(IOptionToken token)
         {
-            if (builder.LastOption?.RequiresValue ?? false)
-                throw new ArgumentException("Value was not provided for a token.");
-            else
-                builder.AddOption(token);
+            EnsureLastOptionSet();
+            builder.AddOption(token);
         }
 
         private void HandleOptionsGroup(OptionsGroupToken group)
@@ -59,9 +58,15 @@ namespace SimpleCommandLine.Parsing
             if (builder.LastOption?.AcceptsValue ?? false)
                 builder.LastOption.AddValue(token);
             else if (builder.AwaitsValue)
-                    builder.AddValue(token);
+                builder.AddValue(token);
             else
                 throw new ArgumentException("This type does not accept any more values.");
+        }
+
+        private void EnsureLastOptionSet()
+        {
+            if (builder.LastOption?.RequiresValue ?? false)
+                throw new ArgumentException("Value was not provided for a token.");
         }
     }
 }
