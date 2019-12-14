@@ -94,7 +94,7 @@ namespace SimpleCommandLine.Tests.Parsing
         [Fact]
         public void Given_too_many_values_throws()
         {
-            Assert.Throws<ArgumentException>(() => GetTypeParser.Parse(GetTokens(new ValueToken("content"), new ValueToken("12"), new ValueToken("wrong"))));
+            Assert.Throws<ArgumentException>(() => GetTypeParser.Parse(ProduceValueTokens("content", "12", "wrong")));
         }
 
         [Fact]
@@ -113,7 +113,7 @@ namespace SimpleCommandLine.Tests.Parsing
         [Fact]
         public void Given_arrayOption_and_valid_number_of_values_sets_corresponding()
         {
-            var result = GetTypeParser.Parse(GetTokens(new ShortOptionToken('a'), new ValueToken("first"), new ValueToken("second"), new ValueToken("third")));
+            var result = GetTypeParser.Parse(GetTokens(new ShortOptionToken('a')).Concat(ProduceValueTokens("first", "second", "third")));
             Assert.IsType<TestObject>(result);
             Assert.Equal(new[] { "first", "second", "third" }, (result as TestObject).ArrayOption);
         }
@@ -121,7 +121,7 @@ namespace SimpleCommandLine.Tests.Parsing
         [Fact]
         public void Given_listOption_and_valid_number_of_values_sets_corresponding()
         {
-            var result = GetTypeParser.Parse(GetTokens(new ShortOptionToken('l'), new ValueToken("first"), new ValueToken("second"), new ValueToken("third")));
+            var result = GetTypeParser.Parse(GetTokens(new ShortOptionToken('l')).Concat(ProduceValueTokens("first", "second", "third")));
             Assert.IsType<TestObject>(result);
             Assert.Equal(new List<string> { "first", "second", "third" }, (result as TestObject).ListOption);
         }
@@ -129,8 +129,8 @@ namespace SimpleCommandLine.Tests.Parsing
         [Fact]
         public void Given_arrayOption_and_maximal_number_of_values_and_value_sets_corresponding()
         {
-            var result = GetTypeParser.Parse(GetTokens(new ShortOptionToken('a'), new ValueToken("first"), new ValueToken("second"),
-                       new ValueToken("third"), new ValueToken("fourth"), new ValueToken("value")));
+            var result = GetTypeParser.Parse(GetTokens(
+                new ShortOptionToken('a')).Concat(ProduceValueTokens("first", "second", "third", "fourth", "value")));
             Assert.IsType<TestObject>(result);
             Assert.Equal(new[] { "first", "second", "third", "fourth" }, (result as TestObject).ArrayOption);
             Assert.Equal("value", (result as TestObject).StringValue);
@@ -139,7 +139,47 @@ namespace SimpleCommandLine.Tests.Parsing
         [Fact]
         public void Given_arrayOption_and_too_few_values_throws()
         {
-            Assert.Throws<ArgumentException>(() => GetTypeParser.Parse(GetTokens(new ShortOptionToken('a'), new ValueToken("first"), new ValueToken("second"))));
+            Assert.Throws<ArgumentException>(() => GetTypeParser.Parse(GetTokens(
+                new ShortOptionToken('a')).Concat(ProduceValueTokens("first", "second"))));
+        }
+
+        [Fact]
+        public void Given_arrayOption_and_too_many_values_throws()
+        {
+            Assert.Throws<ArgumentException>(() => GetTypeParser.Parse(GetTokens(
+                new ShortOptionToken('a')).Concat(ProduceValueTokens("first", "second", "third", "fourth", "fifth"))));
+        }
+
+        [Fact]
+        public void Given_arrayOption_and_valuesGroup_sets_corresponding()
+        {
+            var result = GetTypeParser.Parse(GetTokens(new ShortOptionToken('a'),
+                new ValuesGroupToken(ProduceValueTokens("first", "second", "third"))));
+            Assert.IsType<TestObject>(result);
+            Assert.Equal(new[] { "first", "second", "third" }, (result as TestObject).ArrayOption);
+        }
+
+        [Fact]
+        public void Given_arrayOption_and_too_small_valuesGroup_and_value_sets_corresponding()
+        {
+            var result = GetTypeParser.Parse(GetTokens(new ShortOptionToken('a'),
+                new ValuesGroupToken(ProduceValueTokens("first", "second")), new ValueToken("third")));
+            Assert.IsType<TestObject>(result);
+            Assert.Equal(new[] { "first", "second", "third" }, (result as TestObject).ArrayOption);
+        }
+
+        [Fact]
+        public void Given_arrayOption_and_too_small_valuesGroup_throws()
+        {
+            Assert.Throws<ArgumentException>(() => GetTypeParser.Parse(GetTokens(
+                new ShortOptionToken('a'), new ValuesGroupToken(ProduceValueTokens("first", "second")))));
+        }
+
+        [Fact]
+        public void Given_arrayOption_and_too_big_valuesGroup_throws()
+        {
+            Assert.Throws<ArgumentException>(() => GetTypeParser.Parse(GetTokens(
+                new ShortOptionToken('a'), new ValuesGroupToken(ProduceValueTokens("first", "second", "third", "fourth", "fifth")))));
         }
 
         [Fact]
@@ -157,5 +197,6 @@ namespace SimpleCommandLine.Tests.Parsing
         }
 
         private IEnumerable<IArgumentToken> GetTokens(params IArgumentToken[] arguments) => arguments;
+        private IEnumerable<ValueToken> ProduceValueTokens(params string[] values) => values.Select(v => new ValueToken(v));
     }
 }

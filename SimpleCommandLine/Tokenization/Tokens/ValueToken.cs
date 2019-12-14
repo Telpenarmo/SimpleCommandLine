@@ -11,9 +11,7 @@ namespace SimpleCommandLine.Tokenization.Tokens
         /// Creates a new instance of <see cref="ValueToken"/>.
         /// </summary>
         /// <param name="value">The value of this argument.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="value"/> is null.</exception>
-        public ValueToken(string value)
-            => Value = value ?? throw new ArgumentNullException(nameof(value));
+        public ValueToken(string value) => Value = value;
 
         /// <summary>
         /// Gets this value.
