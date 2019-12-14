@@ -10,7 +10,7 @@ namespace SimpleCommandLine.Tests.Tokenization.Tokenizers
 {
     public class ValuesGroupTokenizerTests
     {
-        public ValuesGroupTokenizer Tokenizer => new ValuesGroupTokenizer(new []{';', ','}){Next = new TokenizerFake()};
+        public ValuesGroupTokenizer Tokenizer => new ValuesGroupTokenizer(new []{';', ',', '&'}){Next = new TokenizerFake()};
 
         [Fact]
         public void Given_single_word_invokes_Next()
@@ -39,36 +39,47 @@ namespace SimpleCommandLine.Tests.Tokenization.Tokenizers
         {
             var result = Tokenizer.TokenizeArgument("first,second");
             Assert.IsType<ValuesGroupToken>(result);
-
             var tokenResult = result as ValuesGroupToken;
             Assert.IsType<ValuesGroupToken>(tokenResult);
-            Assert.Equal(1, tokenResult.Tokens.Count);
-
-            var member = tokenResult.Tokens[0] as ValuesGroupToken;
-            Assert.Equal(2, member.Tokens.Count);
-            Assert.Equal(new ValueToken("first"), member.Tokens[0]);
+            Assert.Equal(2, tokenResult.Tokens.Count);
+            Assert.Equal(new ValueToken("first"), tokenResult.Tokens[0]);
             Assert.Equal(new ValueToken("second"), tokenResult.Tokens[1]);
         }
 
         [Fact]
-        public void Given_two_words_with_two_nested_each_returns_two_groups_with_two_members()
+        public void Given_words_with_double_nested_returns_nested_groups()
         {
-            var result = Tokenizer.TokenizeArgument("first,second;third,fourth");
+            var result = Tokenizer.TokenizeArgument("first&second,third,fourth&fifth&sixth,;seventh&eighth");
             Assert.IsType<ValuesGroupToken>(result);
 
             var tokenResult = result as ValuesGroupToken;
             Assert.IsType<ValuesGroupToken>(tokenResult);
             Assert.Equal(2, tokenResult.Tokens.Count);
             
+            // first&second,third,fourth&fifth&sixth,
             var member = tokenResult.Tokens[0] as ValuesGroupToken;
-            Assert.Equal(2, member.Tokens.Count);
-            Assert.Equal(new ValueToken("first"), member.Tokens[0]);
-            Assert.Equal(new ValueToken("second"), tokenResult.Tokens[1]);
-            
+            Assert.Equal(4, member.Tokens.Count);
+            // first&second
+            var subMember = member.Tokens[0] as ValuesGroupToken;
+            Assert.Equal(2, subMember.Tokens.Count);
+            Assert.Equal(new ValueToken("first"), subMember.Tokens[0]);
+            Assert.Equal(new ValueToken("second"), subMember.Tokens[1]);
+            // third
+            Assert.Equal(new ValueToken("third"), member.Tokens[1]);
+            // fourth&fifth&sixth
+            subMember = member.Tokens[2] as ValuesGroupToken;
+            Assert.Equal(3, subMember.Tokens.Count);
+            Assert.Equal(new ValueToken("fourth"), subMember.Tokens[0]);
+            Assert.Equal(new ValueToken("fifth"), subMember.Tokens[1]);
+            Assert.Equal(new ValueToken("sixth"), subMember.Tokens[2]);
+            // null
+            Assert.Equal(new ValueToken(string.Empty), member.Tokens[3]);
+
+            // seven&eight
             member = tokenResult.Tokens[1] as ValuesGroupToken;
             Assert.Equal(2, member.Tokens.Count);
-            Assert.Equal(new ValueToken("third"), member.Tokens[0]);
-            Assert.Equal(new ValueToken("fourth"), tokenResult.Tokens[1]);
+            Assert.Equal(new ValueToken("seventh"), member.Tokens[0]);
+            Assert.Equal(new ValueToken("eighth"), member.Tokens[1]);
         }
 
         [Fact]
@@ -81,6 +92,6 @@ namespace SimpleCommandLine.Tests.Tokenization.Tokenizers
             Assert.Equal(2, tokenResult.Tokens.Count);
             Assert.Equal(new ValueToken("value"), tokenResult.Tokens[0]);
             Assert.Equal(new ValueToken(string.Empty), tokenResult.Tokens[1]);
-        } 
+        }
     }
 }
