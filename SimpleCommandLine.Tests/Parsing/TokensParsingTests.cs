@@ -62,6 +62,7 @@ namespace SimpleCommandLine.Tests.Parsing
             Assert.True((result as TestObject).BoolOption1);
             Assert.False((result as TestObject).BoolOption2);
             Assert.False((result as TestObject).BoolOption3);
+            Assert.Equal("true", (result as TestObject).StringValue);
         }
 
         [Fact]
@@ -154,6 +155,24 @@ namespace SimpleCommandLine.Tests.Parsing
         public void Given_enumOption_and_invalid_value_throws()
         {
             Assert.Throws<FormatException>(() => GetTypeParser.Parse(GetTokens(new ShortOptionToken('e'), new ValueToken("invalid"))));
+        }
+
+        [Fact]
+        public void Given_args_twice_processess_twice()
+        {
+            var parser = GetTypeParser;
+            
+            var firstResult = parser.Parse(GetTokens(new ShortOptionToken('1'), new ShortOptionToken('s'), new ValueToken("content"), new ValueToken("value")));
+            Assert.True((firstResult as TestObject).BoolOption1);
+            Assert.Equal("content", (firstResult as TestObject).StringOption);
+            Assert.Equal("value", (firstResult as TestObject).StringValue);
+
+            var secondResult = parser.Parse(GetTokens(new ShortOptionToken('s'), new ValueToken("content"), new ValueToken("value")));
+            Assert.False((secondResult as TestObject).BoolOption1);
+            Assert.Equal("content", (secondResult as TestObject).StringOption);
+            Assert.Equal("value", (secondResult as TestObject).StringValue);
+
+            Assert.NotSame(firstResult, secondResult);
         }
 
         private IEnumerable<IArgumentToken> GetTokens(params IArgumentToken[] arguments) => arguments;
