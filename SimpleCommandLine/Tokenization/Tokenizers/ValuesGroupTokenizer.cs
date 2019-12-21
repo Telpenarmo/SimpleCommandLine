@@ -23,17 +23,17 @@ namespace SimpleCommandLine.Tokenization.Tokenizers
 
         protected override IArgumentToken Handle(string arg)
         {
-            return HandleByRecursion(arg.Split(separators[0]), 1);
+            return HandleRecursively(arg.Split(separators[0]), 1);
         }
 
-        private IArgumentToken HandleByRecursion(string[] args, int sepIndex)
+        private IValueToken HandleRecursively(string[] args, int sepIndex)
         {
-            IEnumerable<IArgumentToken> tokens;
+            IEnumerable<IValueToken> tokens;
 
             if (separators.Length == sepIndex)
-                tokens = args.Select(a => DefaultTokenizer.TokenizeArgument(a));
+                tokens = args.Select(a => DefaultTokenizer.TokenizeArgument(a) as IValueToken);
             else
-                tokens = args.Select(arg => HandleByRecursion(arg.Split(separators[sepIndex]), sepIndex+1));
+                tokens = args.Select(arg => HandleRecursively(arg.Split(separators[sepIndex]), sepIndex+1));
 
             return tokens.Count() == 1 ? tokens.Single() : new ValuesGroupToken(tokens);
         }
