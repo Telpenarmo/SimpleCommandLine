@@ -7,12 +7,10 @@ namespace SimpleCommandLine.Tokenization.Tokenizers
     /// </summary>
     public abstract class ChainTokenizer : IArgumentTokenizer
     {
-        protected IArgumentTokenizer DefaultTokenizer { get; } = new ValueTokenizer();
-
         /// <summary>
         /// Gets or sets the next tokenizer in chain.
         /// </summary>
-        public IArgumentTokenizer Next { get; set; }
+        public IArgumentTokenizer Next { get; set; } = new ValueTokenizer();
 
         /// <summary>
         /// Tokenizes the provided argument using the current instance or the <see cref="Next"/> tokenizer.
@@ -24,7 +22,15 @@ namespace SimpleCommandLine.Tokenization.Tokenizers
             if (string.IsNullOrWhiteSpace(arg))
                 return null;
             if (CanHandle(arg)) return Handle(arg);
-            else return Next?.TokenizeArgument(arg) ?? DefaultTokenizer.TokenizeArgument(arg);
+            else return Next.TokenizeArgument(arg);
+        }
+
+        public void AddLink(ChainTokenizer link)
+        {
+            var current = this;
+            while (current.Next is ChainTokenizer next)
+                current = next;
+            link.Next = current.Next;
         }
 
         protected abstract bool CanHandle(string arg);

@@ -31,7 +31,7 @@ namespace SimpleCommandLine.Tokenization.Tokenizers
             IEnumerable<IValueToken> tokens;
 
             if (separators.Length == sepIndex)
-                tokens = args.Select(a => DefaultTokenizer.TokenizeArgument(a) as IValueToken);
+                tokens = args.Select(arg => Next.TokenizeArgument(arg) as IValueToken);
             else
                 tokens = args.Select(arg => HandleRecursively(arg.Split(separators[sepIndex]), sepIndex+1));
 

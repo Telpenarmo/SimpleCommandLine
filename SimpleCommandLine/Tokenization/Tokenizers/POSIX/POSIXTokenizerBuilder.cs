@@ -9,6 +9,7 @@
         /// Indicates whether options may be bundled in groups.
         /// </summary>
         public bool AllowShortOptionGroups { get; set; }
+        public char[] Separators { get; set; }
 
         /// <summary>
         /// Builds a chain of tokenizers configured as defined.
@@ -17,10 +18,11 @@
         public IArgumentTokenizer BuildTokenizer()
         {
             var shortNameTokenizer = new ShortNameOptionTokenizer();
-            var longNameTokenizer = new LongNameOptionTokenizer();
             if (AllowShortOptionGroups)
-                longNameTokenizer.Next = new OptionsGroupTokenizer();
-            shortNameTokenizer.Next = longNameTokenizer;
+                shortNameTokenizer.AddLink(new OptionsGroupTokenizer());
+            shortNameTokenizer.AddLink(new LongNameOptionTokenizer());
+            if (Separators.Length > 0)
+                shortNameTokenizer.AddLink(new ValuesGroupTokenizer(Separators));
             return shortNameTokenizer;
         }
     }
