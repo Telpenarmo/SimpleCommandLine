@@ -9,6 +9,7 @@
         /// Indicates whether options may be bundled in groups.
         /// </summary>
         public bool AllowShortOptionGroups { get; set; }
+        public bool AllowAssigningOptions { get; set; } = false;
         public char[] Separators { get; set; }
 
         /// <summary>
@@ -18,11 +19,19 @@
         public IArgumentTokenizer BuildTokenizer()
         {
             var shortNameTokenizer = new ShortNameOptionTokenizer();
+            var valueTokenizer = Separators.Length == 0
+                ? new ValueTokenizer() as IArgumentTokenizer
+                : new ValuesGroupTokenizer(Separators);
+
+            if (AllowAssigningOptions)
+            {
+                shortNameTokenizer.AddLink(new AssignedValueTokenizer(Separators, new ShortNameOptionTokenizer(), valueTokenizer));               
+                shortNameTokenizer.AddLink(new AssignedValueTokenizer(Separators, new LongNameOptionTokenizer(), valueTokenizer));
+            }
             if (AllowShortOptionGroups)
                 shortNameTokenizer.AddLink(new OptionsGroupTokenizer());
-            shortNameTokenizer.AddLink(new LongNameOptionTokenizer());
-            if (Separators.Length > 0)
-                shortNameTokenizer.AddLink(new ValuesGroupTokenizer(Separators));
+            shortNameTokenizer.AddLink(new LongNameOptionTokenizer(){ Next = valueTokenizer });
+            
             return shortNameTokenizer;
         }
     }

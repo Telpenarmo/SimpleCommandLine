@@ -16,12 +16,12 @@ namespace SimpleCommandLine.Tokenization.Tokenizers
             this.separators = separators;
         }
 
-        protected override bool CanHandle(string arg)
+        public override bool CanHandle(string arg)
         {
             return separators.Any(s => arg.Contains(s));
         }
 
-        protected override IArgumentToken Handle(string arg)
+        public override IArgumentToken Handle(string arg)
         {
             return HandleRecursively(arg.Split(separators[0]), 1);
         }

@@ -8,7 +8,7 @@ namespace SimpleCommandLine.Parsing
         IOptionParser LastOption { get; }
 
         void AddOption(IOptionToken token);
-        void AddValue(ValueToken token);
+        void AddValue(IValueToken token);
         object Parse();
     }
 }

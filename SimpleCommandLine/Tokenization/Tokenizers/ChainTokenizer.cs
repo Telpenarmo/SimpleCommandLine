@@ -27,13 +27,15 @@ namespace SimpleCommandLine.Tokenization.Tokenizers
 
         public void AddLink(ChainTokenizer link)
         {
+            if (link is null)
+                return;
             var current = this;
             while (current.Next is ChainTokenizer next)
                 current = next;
             link.Next = current.Next;
         }
 
-        protected abstract bool CanHandle(string arg);
-        protected abstract IArgumentToken Handle(string arg);
+        public abstract bool CanHandle(string arg);
+        public abstract IArgumentToken Handle(string arg);
     }
 }
