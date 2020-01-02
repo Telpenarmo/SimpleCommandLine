@@ -6,10 +6,18 @@
     public class POSIXTokenizerBuilder : ITokenizerBuilder
     {
         /// <summary>
+        /// Indicates whether options may be explicitly assigned.
+        /// </summary>
+        public bool AllowAssigningOptions { get; set; } = false;
+
+        /// <summary>
         /// Indicates whether options may be bundled in groups.
         /// </summary>
         public bool AllowShortOptionGroups { get; set; }
-        public bool AllowAssigningOptions { get; set; } = false;
+
+        /// <summary>
+        /// Defines characters that separate parts of command-line arguments.
+        /// </summary>
         public char[] Separators { get; set; }
 
         /// <summary>
