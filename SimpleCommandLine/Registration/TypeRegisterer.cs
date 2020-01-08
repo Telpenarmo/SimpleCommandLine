@@ -21,8 +21,11 @@ namespace SimpleCommandLine.Registration
         public ParsingTypeInfo Register<T>(Func<T> factory)
         {
             var type = typeof(T);
-            var options = ExtractOptions(type);
-            var values = ExtractValues(type);
+            var options = ExtractArgs<OptionAttribute, ParsingOptionInfo>(type,
+                pair => new ParsingOptionInfo(pair.Item1, pair.Item2),
+                attr => optionAttributes.Add(attr));
+            var values = ExtractArgs<ValueAttribute, ParsingValueInfo>(type,
+                pair => new ParsingValueInfo(pair.Item1, pair.Item2));
             ParsingTypeInfo typeInfo = CreateTypeInfo(type, options, values, factory);
             typeValidator.Verify(typeInfo, optionAttributes);
             return typeInfo;
@@ -39,38 +42,14 @@ namespace SimpleCommandLine.Registration
             return typeInfo;
         }
 
-        private IEnumerable<ParsingOptionInfo> ExtractOptions(Type type)
-        {
-            OptionAttribute attribute = null;
-            return type.GetProperties()
-                .Where(property =>
-                {
-                    attribute = property.GetCustomAttribute<OptionAttribute>();
-                    if (attribute != null)
-                    {
-                        optionAttributes.Add(attribute);
-                        return true;
-                    }
-                    else
-                        return false;
-                })
-                .Where(property => propertyValidator.Verify(property))
-                .Select(property => new ParsingOptionInfo(property, attribute))
+        private IEnumerable<TInfo> ExtractArgs<TAttr, TInfo>(Type type, Func<(PropertyInfo, TAttr), TInfo> factory, Action<TAttr> action = null)
+            where TAttr : ArgumentAttribute where TInfo : ParsingArgumentInfo
+            => type.GetProperties()
+                .Select(property => (property, property.GetCustomAttribute<TAttr>()))
+                .Where(pair => pair.Item2 != null)
+                .ForEach(pair => action?.Invoke(pair.Item2))
+                .Where(pair => propertyValidator.Verify(pair.Item1))
+                .Select(pair => factory(pair))
                 .ToArray();
-        }
-
-        private IEnumerable<ParsingValueInfo> ExtractValues(Type type)
-        {
-            ValueAttribute attribute = null;
-            return type.GetProperties()
-                .Where(property =>
-                {
-                    attribute = property.GetCustomAttribute<ValueAttribute>();
-                    return attribute != null;
-                })
-                .Where(property => propertyValidator.Verify(property))
-                .Select(property => new ParsingValueInfo(property, attribute))
-                .ToArray();
-        }
     }
 }

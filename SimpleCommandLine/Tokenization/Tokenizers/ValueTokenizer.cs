@@ -3,7 +3,7 @@
 namespace SimpleCommandLine.Tokenization.Tokenizers
 {
     /// <summary>
-    /// Used to create a <see cref="ValueToken"/>.
+    /// Builds the <see cref="ValueToken"/>.
     /// </summary>
     public class ValueTokenizer : IArgumentTokenizer
     {

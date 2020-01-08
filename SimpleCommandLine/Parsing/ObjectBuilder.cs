@@ -25,7 +25,7 @@ namespace SimpleCommandLine.Parsing
             objectResult = typeInfo.Factory.DynamicInvoke();
             maxValuesNumber = typeInfo.Values.Count();
             if (typeInfo.Values.Last().IsCollection)
-                maxValuesNumber += typeInfo.Values.Last().Maximum;
+                maxValuesNumber += typeInfo.Values.Last().Maximum - 1;
         }
 
         private ParsingOptionInfo GetOptionInfo(IOptionToken token)
@@ -49,13 +49,13 @@ namespace SimpleCommandLine.Parsing
                 assignedOptions.Add(new SingleValueOptionParser(info, (IValueConverter)info.ChooseConverter(convertersFactory), token));
         }
 
-        public void AddValue(ValueToken token)
+        public void AddValue(IValueToken token)
         {
             var info = typeInfo.GetValueInfoAt(usedValuesNumber) ?? typeInfo.Values.Last();
-            if (!(!info.IsCollection || assignedValues.Last() is CollectionParser))
-                assignedValues.Add(new CollectionParser(info, (CollectionConverter)info.ChooseConverter(convertersFactory)));
-            else
+            if (!info.IsCollection || assignedValues.Last() is CollectionParser)
                 assignedValues.Add(new SingleValueParser(info, (IValueConverter)info.ChooseConverter(convertersFactory)));
+            else
+                assignedValues.Add(new CollectionParser(info, (CollectionConverter)info.ChooseConverter(convertersFactory)));
             assignedValues.Last().AddValue(token);
             usedValuesNumber++;
         }

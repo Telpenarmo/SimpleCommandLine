@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SimpleCommandLine
 {
@@ -13,6 +14,16 @@ namespace SimpleCommandLine
             else if (typeof(System.Collections.IEnumerable).IsAssignableFrom(type))
                 return type.GenericTypeArguments[0];
             else return null;
+        }
+    }
+
+    internal static class EnumerableExtensions
+    {
+        public static IEnumerable<T> ForEach<T>(this IEnumerable<T> collection, Action<T> action)
+        {
+            foreach (var element in collection)
+                action(element);
+            return collection;
         }
     }
 }
