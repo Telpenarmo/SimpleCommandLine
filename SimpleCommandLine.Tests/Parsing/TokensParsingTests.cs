@@ -144,13 +144,6 @@ namespace SimpleCommandLine.Tests.Parsing
         }
 
         [Fact]
-        public void Given_arrayOption_and_too_many_values_throws()
-        {
-            Assert.Throws<ArgumentException>(() => GetTypeParser.Parse(GetTokens(
-                new ShortOptionToken('a')).Concat(ProduceValueTokens("first", "second", "third", "fourth", "fifth"))));
-        }
-
-        [Fact]
         public void Given_arrayOption_and_valuesGroup_sets_corresponding()
         {
             var result = GetTypeParser.Parse(GetTokens(new ShortOptionToken('a'),
