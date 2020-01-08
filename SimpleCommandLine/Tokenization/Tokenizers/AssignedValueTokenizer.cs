@@ -3,6 +3,9 @@ using SimpleCommandLine.Tokenization.Tokens;
 
 namespace SimpleCommandLine.Tokenization.Tokenizers
 {
+    /// <summary>
+    /// Builds the <see cref="AssignedValueToken"/>.
+    /// </summary>
     public class AssignedValueTokenizer : ChainTokenizer
     {
         private readonly char[] separators;
@@ -15,13 +18,21 @@ namespace SimpleCommandLine.Tokenization.Tokenizers
             this.optionTokenizer = optionTokenizer ?? throw new ArgumentNullException(nameof(optionTokenizer));
             this.valueTokenizer = valueTokenizer ?? throw new ArgumentNullException(nameof(valueTokenizer));
         }
-
+        
+        /// <summary>
+        /// Checks if this tokenizer is able to handle given argument.
+        /// </summary>
+        /// <param name="arg">An argument to check.</param>
         public override bool CanHandle(string arg)
         {
             var index = arg.IndexOfAny(separators);
             return index < 1 ? false : optionTokenizer.CanHandle(arg.Substring(0, index));
         }
 
+        /// <summary>
+        /// Tokenizes given argument assuming its correctness.
+        /// </summary>
+        /// <param name="arg">An argument checked by <see cref="CanHandle(string)"/> method.</param>
         public override IArgumentToken Handle(string arg)
         {
             var index = arg.IndexOfAny(separators);

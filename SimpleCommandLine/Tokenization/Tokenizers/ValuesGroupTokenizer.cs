@@ -5,6 +5,9 @@ using SimpleCommandLine.Tokenization.Tokens;
 
 namespace SimpleCommandLine.Tokenization.Tokenizers
 {
+    /// <summary>
+    /// Builds the <see cref="ValuesGroupToken"/>.
+    /// </summary>
     public class ValuesGroupTokenizer : ChainTokenizer
     {
         private readonly char[] separators;
@@ -18,11 +21,19 @@ namespace SimpleCommandLine.Tokenization.Tokenizers
             this.separators = separators;
         }
 
+        /// <summary>
+        /// Checks if this tokenizer is able to handle given argument.
+        /// </summary>
+        /// <param name="arg">An argument to check.</param>
         public override bool CanHandle(string arg)
         {
             return separators.Any(s => arg.Contains(s));
         }
 
+        /// <summary>
+        /// Tokenizes given argument assuming its correctness.
+        /// </summary>
+        /// <param name="arg">An argument checked by <see cref="CanHandle(string)"/> method.</param>
         public override IArgumentToken Handle(string arg)
         {
             return HandleRecursively(arg.Split(separators[0]), 1);

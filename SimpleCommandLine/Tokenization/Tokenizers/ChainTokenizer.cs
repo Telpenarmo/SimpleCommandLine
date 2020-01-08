@@ -25,7 +25,11 @@ namespace SimpleCommandLine.Tokenization.Tokenizers
             else return Next.TokenizeArgument(arg);
         }
 
-        public void AddLink(ChainTokenizer link)
+        /// <summary>
+        /// Appends given tokenizer to the end of the current chain.
+        /// </summary>
+        /// <param name="link">A tokenizer to append.</param>
+        public void AppendLink(ChainTokenizer link)
         {
             if (link is null)
                 return;
@@ -36,7 +40,16 @@ namespace SimpleCommandLine.Tokenization.Tokenizers
             current.Next = link;
         }
 
+        /// <summary>
+        /// Checks if this tokenizer is able to handle given argument.
+        /// </summary>
+        /// <param name="arg">An argument to check.</param>
         public abstract bool CanHandle(string arg);
+
+        /// <summary>
+        /// Tokenizes given argument assuming its correctness.
+        /// </summary>
+        /// <param name="arg">An argument checked by <see cref="CanHandle(string)"/> method.</param>
         public abstract IArgumentToken Handle(string arg);
     }
 }

@@ -17,7 +17,7 @@ namespace SimpleCommandLine.Tests.Tokenization.Tokenizers
         {
             var chain = new FakeTokenizer();
             chain.Next = new ValueTokenizer();
-            chain.AddLink(new FakeTokenizer());
+            chain.AppendLink(new FakeTokenizer());
             Assert.IsType<FakeTokenizer>(chain.Next);
             Assert.IsType<ValueTokenizer>((chain.Next as ChainTokenizer).Next);
         }
