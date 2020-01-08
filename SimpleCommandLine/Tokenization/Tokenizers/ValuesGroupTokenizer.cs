@@ -8,9 +8,11 @@ namespace SimpleCommandLine.Tokenization.Tokenizers
     public class ValuesGroupTokenizer : ChainTokenizer
     {
         private readonly char[] separators;
+        private readonly ValueTokenizer valueTokenizer;
 
-        public ValuesGroupTokenizer(char[] separators)
+        public ValuesGroupTokenizer(char[] separators, ValueTokenizer valueTokenizer)
         {
+            this.valueTokenizer = valueTokenizer ?? throw new ArgumentNullException(nameof(valueTokenizer));
             if (separators.Length == 0)
                 throw new ArgumentException("At least one separator must be defined.");
             this.separators = separators;
@@ -31,7 +33,7 @@ namespace SimpleCommandLine.Tokenization.Tokenizers
             IEnumerable<IValueToken> tokens;
 
             if (separators.Length == sepIndex)
-                tokens = args.Select(arg => Next.TokenizeArgument(arg) as IValueToken);
+                tokens = args.Select(arg => valueTokenizer.TokenizeArgument(arg) as ValueToken);
             else
                 tokens = args.Select(arg => HandleRecursively(arg.Split(separators[sepIndex]), sepIndex+1));
 

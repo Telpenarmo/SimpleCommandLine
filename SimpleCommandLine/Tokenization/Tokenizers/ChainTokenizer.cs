@@ -33,6 +33,7 @@ namespace SimpleCommandLine.Tokenization.Tokenizers
             while (current.Next is ChainTokenizer next)
                 current = next;
             link.Next = current.Next;
+            current.Next = link;
         }
 
         public abstract bool CanHandle(string arg);

@@ -18,7 +18,7 @@ namespace SimpleCommandLine.Parsing
 
         public void AddValue(IValueToken valueToken)
         {
-            if (this.valueToken is ValueToken value)
+            if (valueToken is ValueToken value)
                 this.valueToken = value;
             else throw new ArgumentException();
         }

@@ -8,7 +8,7 @@
         /// <summary>
         /// Indicates whether options may be explicitly assigned.
         /// </summary>
-        public bool AllowAssigningOptions { get; set; };
+        public bool AllowAssigningOptions { get; set; }
 
         /// <summary>
         /// Indicates whether options may be bundled in groups.

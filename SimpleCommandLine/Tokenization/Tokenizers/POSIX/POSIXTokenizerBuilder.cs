@@ -29,7 +29,7 @@
             var shortNameTokenizer = new ShortNameOptionTokenizer();
             var valueTokenizer = Separators.Length == 0
                 ? new ValueTokenizer() as IArgumentTokenizer
-                : new ValuesGroupTokenizer(Separators);
+                : new ValuesGroupTokenizer(Separators, new ValueTokenizer());
 
             if (AllowAssigningOptions)
             {
