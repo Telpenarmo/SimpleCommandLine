@@ -40,9 +40,9 @@ namespace SimpleCommandLine.Parsing.Converters
             readonly ConstructorInfo formatAndStringConstructor;
 
             public bool CanConvert =>
-                stringAndFormatConstructor != null ? true
-                : stringAndFormatConstructor != null ? true
-                : stringConstructor != null;
+                stringAndFormatConstructor != null ||
+                stringAndFormatConstructor != null ||
+                stringConstructor != null;
 
             public ReflectionConverter(Type type)
             {

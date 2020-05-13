@@ -23,6 +23,6 @@ namespace SimpleCommandLine.Tokenization.Tokens
         public IEnumerable<ShortOptionToken> Tokens { get; }
 
         public bool Equals(IArgumentToken other)
-            => other is OptionsGroupToken groupToken ? Tokens.SequenceEqual(groupToken.Tokens) : false;
+            => other is OptionsGroupToken groupToken && Tokens.SequenceEqual(groupToken.Tokens);
     }
 }

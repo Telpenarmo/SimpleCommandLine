@@ -21,7 +21,7 @@ namespace SimpleCommandLine.Tokenization.Tokens
         public string Value { get; }
 
         public bool Equals(IArgumentToken other)
-            => other is LongOptionToken token ? token.Value == Value : false;
+            => other is LongOptionToken token && token.Value == Value;
 
         public override string ToString() => Value;
     }

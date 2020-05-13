@@ -1,6 +1,4 @@
-﻿using System;
-using SimpleCommandLine.Registration;
-using SimpleCommandLine.Tokenization.Tokens;
+﻿using SimpleCommandLine.Tokenization.Tokens;
 
 namespace SimpleCommandLine.Parsing
 {

@@ -40,15 +40,12 @@ namespace SimpleCommandLine.Registration
         /// <returns>True, if given token matches this option; false otherwise.</returns>
         public bool MatchToken(IOptionToken token)
         {
-            switch (token)
+            return token switch
             {
-                case ShortOptionToken sToken:
-                    return MatchToken(sToken);
-                case LongOptionToken lToken:
-                    return MatchToken(lToken);
-                default:
-                    return false;
-            }
+                ShortOptionToken sToken => MatchToken(sToken),
+                LongOptionToken lToken => MatchToken(lToken),
+                _ => false,
+            };
         }
 
         /// <summary>

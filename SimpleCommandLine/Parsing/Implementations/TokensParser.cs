@@ -17,7 +17,7 @@ namespace SimpleCommandLine.Parsing
 
         public object Parse(IEnumerable<IArgumentToken> tokens)
         {
-            builder = builderFactory.Invoke();
+            builder = builderFactory();
 
             var argumentsQueue = new Queue<IArgumentToken>(tokens);
             while (argumentsQueue.Any())

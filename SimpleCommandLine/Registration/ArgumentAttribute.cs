@@ -18,7 +18,8 @@ namespace SimpleCommandLine
             set
             {
                 if (value > Maximum)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, $"The {nameof(Minimum)} value must not be greater than the {nameof(Maximum)} value");
+                    throw new ArgumentOutOfRangeException(nameof(value), value,
+                        $"The {nameof(Minimum)} value must not be greater than the {nameof(Maximum)} value");
                 else minimum = value;
             }
         }
@@ -33,7 +34,8 @@ namespace SimpleCommandLine
             set
             {
                 if (value < Minimum)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, $"The {nameof(Maximum)} value must not be lower than the {nameof(Minimum)} value");
+                    throw new ArgumentOutOfRangeException(nameof(value), value,
+                        $"The {nameof(Maximum)} value must not be lower than the {nameof(Minimum)} value");
                 else maximum = value;
             }
         }

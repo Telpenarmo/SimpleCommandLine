@@ -1,6 +1,5 @@
-﻿using SimpleCommandLine.Parsing;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using SimpleCommandLine.Parsing;
 
 namespace SimpleCommandLine.Registration.Validation
 {

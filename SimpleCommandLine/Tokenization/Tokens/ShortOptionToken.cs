@@ -17,7 +17,7 @@
         public char Value { get; }
 
         public bool Equals(IArgumentToken other)
-            => other is ShortOptionToken token ? token.Value == Value : false;
+            => other is ShortOptionToken token && token.Value == Value;
 
         public override string ToString() => Value.ToString();
     }

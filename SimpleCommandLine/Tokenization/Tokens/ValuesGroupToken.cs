@@ -26,6 +26,6 @@ namespace SimpleCommandLine.Tokenization.Tokens
         public IReadOnlyList<IValueToken> Tokens { get; }
 
         public bool Equals(IArgumentToken other)
-            => other is ValuesGroupToken collectionToken ? Tokens.SequenceEqual(collectionToken.Tokens) : false;
+            => other is ValuesGroupToken collectionToken && Tokens.SequenceEqual(collectionToken.Tokens);
     }
 }

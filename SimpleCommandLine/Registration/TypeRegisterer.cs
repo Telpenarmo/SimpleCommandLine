@@ -48,7 +48,7 @@ namespace SimpleCommandLine.Registration
                 .Select(property => (property, property.GetCustomAttribute<TAttr>()))
                 .Where(pair => pair.Item2 != null)
                 .ForEach(pair => action?.Invoke(pair.Item2))
-                .Where(pair => propertyValidator.Verify(pair.Item1))
+                .Where(pair => propertyValidator.Verify(pair.property))
                 .Select(pair => factory(pair))
                 .ToArray();
     }

@@ -1,9 +1,7 @@
-﻿using System;
-
-namespace SimpleCommandLine.Parsing
+﻿namespace SimpleCommandLine.Parsing
 {
     internal interface ICollectionConvertersFactory
     {
-        CollectionConverter GetConverter(Type type);
+        CollectionConverter GetConverter(System.Type type);
     }
 }

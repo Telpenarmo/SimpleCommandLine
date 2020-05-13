@@ -21,6 +21,6 @@ namespace SimpleCommandLine.Tokenization.Tokens
         public string Alias { get; }
 
         public bool Equals(IArgumentToken other)
-            => other is CommandToken token ? token.Alias == Alias : false;
+            => other is CommandToken token && token.Alias == Alias;
     }
 }

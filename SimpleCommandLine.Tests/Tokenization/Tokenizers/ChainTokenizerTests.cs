@@ -15,8 +15,7 @@ namespace SimpleCommandLine.Tests.Tokenization.Tokenizers
         [Fact]
         public void When_Next_set_to_non_ChainTokenizer_Add_inserts_into_middle()
         {
-            var chain = new FakeTokenizer();
-            chain.Next = new ValueTokenizer();
+            var chain = new FakeTokenizer { Next = new ValueTokenizer() };
             chain.AppendLink(new FakeTokenizer());
             Assert.IsType<FakeTokenizer>(chain.Next);
             Assert.IsType<ValueTokenizer>((chain.Next as ChainTokenizer).Next);

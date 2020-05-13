@@ -26,7 +26,7 @@ namespace SimpleCommandLine.Tokenization.Tokenizers
         public override bool CanHandle(string arg)
         {
             var index = arg.IndexOfAny(separators);
-            return index < 1 ? false : optionTokenizer.CanHandle(arg.Substring(0, index));
+            return index >= 1 && optionTokenizer.CanHandle(arg.Substring(0, index));
         }
 
         /// <summary>

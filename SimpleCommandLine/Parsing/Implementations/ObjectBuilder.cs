@@ -30,7 +30,7 @@ namespace SimpleCommandLine.Parsing
 
         private ParsingOptionInfo GetOptionInfo(IOptionToken token)
             => typeInfo.GetMatchingOptionInfo(token)
-                ?? throw new ArgumentException($"This type does not contain the {token.ToString()} option.", nameof(token));
+                ?? throw new ArgumentException($"This type does not contain the {token} option.", nameof(token));
 
         public IOptionParser LastOption => assignedOptions.LastOrDefault();
 
@@ -40,13 +40,16 @@ namespace SimpleCommandLine.Parsing
         {
             var info = GetOptionInfo(token);
             if (info.IsCollection)
-                assignedOptions.Add(new CollectionOptionParser(info, (CollectionConverter)info.ChooseConverter(convertersFactory), token));
+                assignedOptions.Add(
+                    new CollectionOptionParser(info, info.ChooseConverter(convertersFactory) as CollectionConverter, token));
             else if (assignedOptions.Exists(p => p.OptionToken.Equals(token)))
                 throw new ArgumentException("This option was already declared.");
             else if (info.IsImplicit)
-                assignedOptions.Add(new ImplicitOptionParser(info, (IValueConverter)info.ChooseConverter(convertersFactory), token));
+                assignedOptions.Add(
+                    new ImplicitOptionParser(info, info.ChooseConverter(convertersFactory) as IValueConverter, token));
             else
-                assignedOptions.Add(new SingleValueOptionParser(info, (IValueConverter)info.ChooseConverter(convertersFactory), token));
+                assignedOptions.Add(
+                    new SingleValueOptionParser(info, info.ChooseConverter(convertersFactory) as IValueConverter, token));
         }
 
         public void AddValue(IValueToken token)
