@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace SimpleCommandLine.Registration.Validation
 {
-    internal class PropertyValidator : IPropertyValidator
+    internal class PropertyValidator
     {
         public bool Verify(PropertyInfo propertyInfo)
         {

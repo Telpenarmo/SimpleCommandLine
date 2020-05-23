@@ -16,11 +16,11 @@ namespace SimpleCommandLine
     public class ParserBuilder
     {
         private readonly List<ParsingTypeInfo> types;
-        private readonly ITypeRegisterer typeRegisterer;
+        private readonly TypeRegisterer typeRegisterer;
         private readonly IConvertersFactory convertersFactory = new ConvertersFactory();
-        private readonly IFinalValidator finalVerifier = new FinalValidator();
-        private readonly ITypeValidator typeValidator;
-        private readonly IPropertyValidator argumentValidator = new PropertyValidator();
+        private readonly FinalValidator finalVerifier = new FinalValidator();
+        private readonly TypeValidator typeValidator;
+        private readonly PropertyValidator argumentValidator = new PropertyValidator();
         private ITokenizerBuilder tokenizerBuilder;
         private IFormatProvider formatProvider;
                 
@@ -107,7 +107,7 @@ namespace SimpleCommandLine
             return new CommandTokenizer(commandsNames) { Next = tokenizer };
         }
 
-        private ITokensParserFactory PrepareTypeParserFactory()
+        private TokensParserFactory PrepareTypeParserFactory()
             => new TokensParserFactory(types, convertersFactory, formatProvider);
 
         private void LoadDefaultConverters()
@@ -115,22 +115,14 @@ namespace SimpleCommandLine
             RegisterConverter(StockConverters.StringConverter);
             RegisterConverter(new BoolValueConverter());
             RegisterConverter(NumericValueConverters.ByteConverter);
-            RegisterConverter(NumericValueConverters.SByteConverter);
             RegisterConverter(NumericValueConverters.DoubleConverter);
             RegisterConverter(NumericValueConverters.FloatConverter);
             RegisterConverter(NumericValueConverters.DecimalConverter);
             RegisterConverter(NumericValueConverters.Int16Converter);
             RegisterConverter(NumericValueConverters.Int32Converter);
             RegisterConverter(NumericValueConverters.Int64Converter);
-            RegisterConverter(NumericValueConverters.UInt16Converter);
-            RegisterConverter(NumericValueConverters.UInt32Converter);
-            RegisterConverter(NumericValueConverters.UInt64Converter);
-            RegisterConverter(StockConverters.GuidConverter);
-            RegisterConverter(StockConverters.IPAdressConverter);
             RegisterConverter(StockConverters.DateTimeConverter);
-            RegisterConverter(StockConverters.DateTimeOffsetConverter);
             RegisterConverter(StockConverters.TimeSpanConverter);
-            RegisterConverter(StockConverters.URIConverter);
         }
     }
 }

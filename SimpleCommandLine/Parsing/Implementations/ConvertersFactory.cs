@@ -7,7 +7,7 @@ namespace SimpleCommandLine.Parsing
     internal class ConvertersFactory : IConvertersFactory
     {
         private readonly IDictionary<Type, IValueConverter> valueConverters = new Dictionary<Type, IValueConverter>();
-        private readonly ICollectionConvertersFactory collectionConvertersFactory;
+        private readonly CollectionConvertersFactory collectionConvertersFactory;
 
         public ConvertersFactory()
         {

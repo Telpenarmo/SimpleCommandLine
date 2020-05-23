@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace SimpleCommandLine.Registration.Validation
 {
-    internal class TypeValidator : ITypeValidator
+    internal class TypeValidator
     {
         private readonly IEnumerable<ParsingTypeInfo> types;
 

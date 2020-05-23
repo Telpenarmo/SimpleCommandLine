@@ -5,12 +5,12 @@ using SimpleCommandLine.Tokenization.Tokens;
 
 namespace SimpleCommandLine.Parsing
 {
-    internal class TokensParser : ITokensParser
+    internal class TokensParser
     {
-        private readonly Func<IObjectBuilder> builderFactory;
-        private IObjectBuilder builder;
+        private readonly Func<ObjectBuilder> builderFactory;
+        private ObjectBuilder builder;
         
-        public TokensParser(Func<IObjectBuilder> builderFactory)
+        public TokensParser(Func<ObjectBuilder> builderFactory)
         {
             this.builderFactory = builderFactory ?? throw new ArgumentNullException(nameof(builderFactory));
         }

@@ -6,13 +6,13 @@ using SimpleCommandLine.Registration.Validation;
 
 namespace SimpleCommandLine.Registration
 {
-    internal class TypeRegisterer : ITypeRegisterer
+    internal class TypeRegisterer
     {
-        private readonly ITypeValidator typeValidator;
-        private readonly IPropertyValidator propertyValidator;
+        private readonly TypeValidator typeValidator;
+        private readonly PropertyValidator propertyValidator;
         private readonly IList<OptionAttribute> optionAttributes = new List<OptionAttribute>();
 
-        public TypeRegisterer(ITypeValidator typeValidator, IPropertyValidator propertyValidator)
+        public TypeRegisterer(TypeValidator typeValidator, PropertyValidator propertyValidator)
         {
             this.typeValidator = typeValidator ?? throw new ArgumentNullException(nameof(typeValidator));
             this.propertyValidator = propertyValidator ?? throw new ArgumentNullException(nameof(propertyValidator));

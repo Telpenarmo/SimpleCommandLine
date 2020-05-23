@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace SimpleCommandLine.Parsing
 {
-    internal class ObjectBuilder : IObjectBuilder
+    internal class ObjectBuilder
     {
         private readonly ParsingTypeInfo typeInfo;
         private readonly IConvertersFactory convertersFactory;
@@ -52,7 +52,7 @@ namespace SimpleCommandLine.Parsing
                     new SingleValueOptionParser(info, info.ChooseConverter(convertersFactory) as IValueConverter, token));
         }
 
-        public void AddValue(IValueToken token)
+        public void AddValue(ValueToken token)
         {
             var info = typeInfo.GetValueInfoAt(usedValuesNumber) ?? typeInfo.Values.Last();
             if (!info.IsCollection || assignedValues.Last() is CollectionParser)

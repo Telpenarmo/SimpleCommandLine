@@ -5,7 +5,7 @@ using SimpleCommandLine.Parsing;
 
 namespace SimpleCommandLine.Registration.Validation
 {
-    internal class FinalValidator : IFinalValidator
+    internal class FinalValidator
     {
         public void Verify(IEnumerable<ParsingTypeInfo> types, IConvertersFactory convertersFactory)
         {

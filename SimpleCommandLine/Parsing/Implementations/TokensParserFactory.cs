@@ -5,7 +5,7 @@ using SimpleCommandLine.Registration;
 
 namespace SimpleCommandLine.Parsing
 {
-    internal class TokensParserFactory : ITokensParserFactory
+    internal class TokensParserFactory
     {
         private readonly IEnumerable<ParsingTypeInfo> registeredTypes;
         private readonly IConvertersFactory convertersFactory;
@@ -18,14 +18,14 @@ namespace SimpleCommandLine.Parsing
             this.formatProvider = formatProvider ?? throw new ArgumentNullException(nameof(formatProvider));
         }
 
-        public ITokensParser Build()
+        public TokensParser Build()
         {
             var typeInfo = registeredTypes.SingleOrDefault(x => !(x is ParsingCommandTypeInfo))
                 ?? throw new InvalidOperationException("No generic types were declared.");
             return CreateParser(typeInfo);
         }
 
-        public ITokensParser Build(string commandName)
+        public TokensParser Build(string commandName)
         {
             if (string.IsNullOrEmpty(commandName))
                 return Build();

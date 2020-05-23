@@ -4,7 +4,7 @@ using SimpleCommandLine.Parsing.Converters;
 
 namespace SimpleCommandLine.Parsing
 {
-    internal class CollectionConvertersFactory : ICollectionConvertersFactory
+    internal class CollectionConvertersFactory
     {
         private readonly IConvertersFactory convertersFactory;
 

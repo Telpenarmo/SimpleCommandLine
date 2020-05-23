@@ -14,11 +14,11 @@ namespace SimpleCommandLine
     /// </summary>
     public class Parser
     {
-        private readonly ITokensParserFactory typeParserFactory;
+        private readonly TokensParserFactory typeParserFactory;
         private IArgumentTokenizer tokenizer;
         private readonly List<object> results = new List<object>();
 
-        internal Parser(IArgumentTokenizer tokenizer, ITokensParserFactory typeParserFactory)
+        internal Parser(IArgumentTokenizer tokenizer, TokensParserFactory typeParserFactory)
         {
             this.tokenizer = tokenizer ?? throw new ArgumentNullException(nameof(tokenizer));
             this.typeParserFactory = typeParserFactory ?? throw new ArgumentNullException(nameof(typeParserFactory));

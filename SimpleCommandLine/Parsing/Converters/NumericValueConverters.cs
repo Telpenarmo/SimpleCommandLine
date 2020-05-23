@@ -30,14 +30,6 @@ namespace SimpleCommandLine.Parsing.Converters
             => IntegerConverter<long>(long.TryParse);
         public static IValueConverter<byte> ByteConverter
             => IntegerConverter<byte>(byte.TryParse);
-        public static IValueConverter<sbyte> SByteConverter
-            => IntegerConverter<sbyte>(sbyte.TryParse);
-        public static IValueConverter<ushort> UInt16Converter
-            => IntegerConverter<ushort>(ushort.TryParse);
-        public static IValueConverter<uint> UInt32Converter
-            => IntegerConverter<uint>(uint.TryParse);
-        public static IValueConverter<ulong> UInt64Converter
-            => IntegerConverter<ulong>(ulong.TryParse);
 
         private static IValueConverter<T> FloatingPointConverter<T>(NumberConverter<T> converter)
             => CreateNumberConverter(converter, (value) => throw new FormatException($"\"{value}\" is not a valid number."));
