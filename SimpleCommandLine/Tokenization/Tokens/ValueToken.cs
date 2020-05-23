@@ -3,9 +3,9 @@
 namespace SimpleCommandLine.Tokenization.Tokens
 {
     /// <summary>
-    /// Represents a command-line atomic value.
+    /// Represents a command-line value.
     /// </summary>
-    public class ValueToken : IValueToken
+    public class ValueToken : IArgumentToken
     {
         /// <summary>
         /// Creates a new instance of <see cref="ValueToken"/>.

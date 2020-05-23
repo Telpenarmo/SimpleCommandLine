@@ -8,14 +8,14 @@ namespace SimpleCommandLine.Tokenization.Tokens
     /// Represents a group of command-line values.
     /// <seealso cref="ValueToken"/>
     /// </summary>
-    public class ValuesGroupToken : IValueToken
+    public class ValuesGroupToken : IArgumentToken
     {
         /// <summary>
         /// Creates a new onstance of <see cref="ValuesGroupToken"/> type.
         /// </summary>
         /// <param name="values">Tokens that form the group.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="values"/> is null.</exception>
-        public ValuesGroupToken(IEnumerable<IValueToken> values)
+        public ValuesGroupToken(IEnumerable<IArgumentToken> values)
         {
             Tokens = values?.ToList() ?? throw new ArgumentNullException(nameof(values));
         }
@@ -23,7 +23,7 @@ namespace SimpleCommandLine.Tokenization.Tokens
         /// <summary>
         /// Gets all elements of this token.
         /// </summary>
-        public IReadOnlyList<IValueToken> Tokens { get; }
+        public IReadOnlyList<IArgumentToken> Tokens { get; }
 
         public bool Equals(IArgumentToken other)
             => other is ValuesGroupToken collectionToken && Tokens.SequenceEqual(collectionToken.Tokens);

@@ -16,10 +16,10 @@ namespace SimpleCommandLine.Parsing
             this.valueConverter = valueConverter ?? throw new ArgumentNullException(nameof(valueConverter));
         }
 
-        public void AddValue(IValueToken valueToken)
+        public void AddValue(ValueToken valueToken)
         {
-            if (valueToken is ValueToken value)
-                this.valueToken = value;
+            if (this.valueToken == null)
+                this.valueToken = valueToken;
             else throw new ArgumentException();
         }
 

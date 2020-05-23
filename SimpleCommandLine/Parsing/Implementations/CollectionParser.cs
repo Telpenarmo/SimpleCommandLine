@@ -22,18 +22,11 @@ namespace SimpleCommandLine.Parsing
 
         public bool AcceptsValue => values.Count < argumentInfo.Maximum;
 
-        public void AddValue(IValueToken valueToken)
-        {
-            if (valueToken is ValuesGroupToken group)
-                values.AddRange(group.Tokens.OfType<ValueToken>());
-            else
-                values.Add(valueToken as ValueToken);
-        }
+        public void AddValue(ValueToken valueToken)
+            => values.Add(valueToken);
 
         public void Parse(object target, IFormatProvider formatProvider)
         {
-            if (values.Count > argumentInfo.Maximum)
-                throw new ArgumentException("Too many values provided.");
             argumentInfo.SetValue(target, collectionConverter.Convert(values.Select(v => v.Value).ToArray(), formatProvider));
         }
     }
