@@ -90,11 +90,11 @@ namespace SimpleCommandLine
         /// <typeparam name="T">Type to which string values are converted.</typeparam>
         /// <param name="converter">Object that will convert string values to <typeparamref name="T"/>.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="converter"/> is null.</exception>
-        public void RegisterConverter<T>(IValueConverter<T> converter)
+        public void RegisterConverter(IValueConverter converter, Type type)
         {
             if (converter == null)
                 throw new ArgumentNullException(nameof(converter));
-            convertersFactory.RegisterConverter(converter, typeof(T));
+            convertersFactory.RegisterConverter(converter, type);
         }
 
         /// <summary>
@@ -119,17 +119,12 @@ namespace SimpleCommandLine
 
         private void LoadDefaultConverters()
         {
-            RegisterConverter(StockConverters.StringConverter);
-            RegisterConverter(new BoolValueConverter());
-            RegisterConverter(NumericValueConverters.ByteConverter);
-            RegisterConverter(NumericValueConverters.DoubleConverter);
-            RegisterConverter(NumericValueConverters.FloatConverter);
-            RegisterConverter(NumericValueConverters.DecimalConverter);
-            RegisterConverter(NumericValueConverters.Int16Converter);
-            RegisterConverter(NumericValueConverters.Int32Converter);
-            RegisterConverter(NumericValueConverters.Int64Converter);
-            RegisterConverter(StockConverters.DateTimeConverter);
-            RegisterConverter(StockConverters.TimeSpanConverter);
+            RegisterConverter(new StringValueConverter(), typeof(string));
+            RegisterConverter(new BoolValueConverter(), typeof(bool));
+            RegisterConverter(new FloatValueConverter(), typeof(float));
+            RegisterConverter(new IntValueConverter(), typeof(int));
+            //RegisterConverter(StockConverters.DateTimeConverter);
+            //RegisterConverter(StockConverters.TimeSpanConverter);
         }
     }
 }
