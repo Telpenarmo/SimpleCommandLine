@@ -12,8 +12,8 @@ namespace SimpleCommandLine.Parsing
 
         public SingleValueParser(ParsingArgumentInfo argumentInfo, IValueConverter valueConverter)
         {
-            this.argumentInfo = argumentInfo ?? throw new ArgumentNullException(nameof(argumentInfo));
-            this.valueConverter = valueConverter ?? throw new ArgumentNullException(nameof(valueConverter));
+            this.argumentInfo = argumentInfo;
+            this.valueConverter = valueConverter;
         }
 
         public void AddValue(ValueToken valueToken)

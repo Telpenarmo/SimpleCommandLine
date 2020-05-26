@@ -6,20 +6,9 @@
     public class POSIXTokenizerBuilder : ITokenizerBuilder
     {
         /// <summary>
-        /// Indicates whether options may be explicitly assigned.
-        /// </summary>
-        public bool AllowAssigningOptions { get; set; }
-
-        /// <summary>
         /// Indicates whether options may be bundled in groups.
         /// </summary>
         public bool AllowShortOptionGroups { get; set; }
-
-        /// <summary>
-        /// Defines characters that separate parts of command-line arguments.
-        /// Default is empty (values grouping and assigning not allowed).
-        /// </summary>
-        public char[] Separators { get; set; } = System.Array.Empty<char>();
 
         /// <summary>
         /// Builds a chain of tokenizers configured as defined.
@@ -27,21 +16,17 @@
         /// <returns>First tokenizer of newly constructed chain.</returns>
         public IArgumentTokenizer BuildTokenizer()
         {
+            var valueTokenizer = new ValueTokenizer();
             var shortNameTokenizer = new ShortNameOptionTokenizer();
-            var valueTokenizer = Separators.Length == 0
-                ? new ValueTokenizer() as IArgumentTokenizer
-                : new ValuesGroupTokenizer(Separators, new ValueTokenizer());
+            var longNameTokenizer = new LongNameOptionTokenizer();
 
-            if (AllowAssigningOptions)
-            {
-                shortNameTokenizer.AppendLink(new AssignedValueTokenizer(Separators, new ShortNameOptionTokenizer(), valueTokenizer));               
-                shortNameTokenizer.AppendLink(new AssignedValueTokenizer(Separators, new LongNameOptionTokenizer(), valueTokenizer));
-            }
+            shortNameTokenizer.Next = longNameTokenizer;
             if (AllowShortOptionGroups)
-                shortNameTokenizer.AppendLink(new OptionsGroupTokenizer());
-            shortNameTokenizer.AppendLink(new LongNameOptionTokenizer(){ Next = valueTokenizer });
-            
-            return shortNameTokenizer;
+                longNameTokenizer.Next = new OptionsGroupTokenizer() { Next = valueTokenizer };
+            else
+                longNameTokenizer.Next = valueTokenizer;
+
+            return longNameTokenizer;
         }
     }
 }

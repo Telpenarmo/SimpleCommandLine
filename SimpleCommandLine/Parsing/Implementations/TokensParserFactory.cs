@@ -13,24 +13,22 @@ namespace SimpleCommandLine.Parsing
 
         public TokensParserFactory(IEnumerable<ParsingTypeInfo> registeredTypes, IConvertersFactory convertersFactory, IFormatProvider formatProvider)
         {
-            this.registeredTypes = registeredTypes ?? throw new ArgumentNullException(nameof(registeredTypes));
-            this.convertersFactory = convertersFactory ?? throw new ArgumentNullException(nameof(convertersFactory));
-            this.formatProvider = formatProvider ?? throw new ArgumentNullException(nameof(formatProvider));
+            this.registeredTypes = registeredTypes;
+            this.convertersFactory = convertersFactory;
+            this.formatProvider = formatProvider;
         }
 
         public TokensParser Build()
         {
             var typeInfo = registeredTypes.SingleOrDefault(x => !(x is ParsingCommandTypeInfo))
-                ?? throw new InvalidOperationException("No generic types were declared.");
+                ?? throw new InvalidOperationException("The global type was not defined.");
             return CreateParser(typeInfo);
         }
 
         public TokensParser Build(string commandName)
         {
-            if (string.IsNullOrEmpty(commandName))
-                return Build();
-            var typeInfo = registeredTypes.OfType<ParsingCommandTypeInfo>().SingleOrDefault(x => x.Aliases.Contains(commandName))
-                ?? throw new InvalidOperationException("This command was not declared.");
+            var typeInfo = registeredTypes.OfType<ParsingCommandTypeInfo>().SingleOrDefault(x => x.Name == commandName)
+                ?? throw new InvalidOperationException("This command was not defined.");
             return CreateParser(typeInfo);
         }
 

@@ -38,12 +38,6 @@ namespace SimpleCommandLine.Parsing
         {
             if (type.IsEnum)
                 valueConverters.Add(type, new EnumConverter(type));
-            else
-            {
-                var fallbackConverter = new FallbackValueConverter(type);
-                if (fallbackConverter.CanConvert)
-                    valueConverters.Add(type, fallbackConverter);
-            }
             return valueConverters.ContainsKey(type);
         }
     }

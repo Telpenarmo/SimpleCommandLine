@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SimpleCommandLine.Parsing;
 using SimpleCommandLine.Registration.Validation;
 
 namespace SimpleCommandLine.Registration
@@ -9,13 +10,13 @@ namespace SimpleCommandLine.Registration
     internal class TypeRegisterer
     {
         private readonly TypeValidator typeValidator;
-        private readonly PropertyValidator propertyValidator;
+        private readonly IConvertersFactory convertersFactory;
         private readonly IList<OptionAttribute> optionAttributes = new List<OptionAttribute>();
 
-        public TypeRegisterer(TypeValidator typeValidator, PropertyValidator propertyValidator)
+        public TypeRegisterer(TypeValidator typeValidator, IConvertersFactory convertersFactory)
         {
-            this.typeValidator = typeValidator ?? throw new ArgumentNullException(nameof(typeValidator));
-            this.propertyValidator = propertyValidator ?? throw new ArgumentNullException(nameof(propertyValidator));
+            this.typeValidator = typeValidator;
+            this.convertersFactory = convertersFactory;
         }
 
         public ParsingTypeInfo Register<T>(Func<T> factory)
@@ -31,7 +32,9 @@ namespace SimpleCommandLine.Registration
             return typeInfo;
         }
 
-        private ParsingTypeInfo CreateTypeInfo<T>(Type type, IEnumerable<ParsingOptionInfo> optionInfos, IEnumerable<ParsingValueInfo> valueInfos, Func<T> factory)
+        private ParsingTypeInfo CreateTypeInfo<T>(Type type,
+            IEnumerable<ParsingOptionInfo> optionInfos,
+            IEnumerable<ParsingValueInfo> valueInfos, Func<T> factory)
         {
             ParsingTypeInfo typeInfo;
             var commandAttribute = type.GetTypeInfo().GetCustomAttribute<CommandAttribute>();
@@ -42,14 +45,30 @@ namespace SimpleCommandLine.Registration
             return typeInfo;
         }
 
-        private IEnumerable<TInfo> ExtractArgs<TAttr, TInfo>(Type type, Func<(PropertyInfo, TAttr), TInfo> factory, Action<TAttr> action = null)
+        private IEnumerable<TInfo> ExtractArgs<TAttr, TInfo>(Type type,
+            Func<(PropertyInfo, TAttr), TInfo> factory,
+            Action<TAttr> action = null)
             where TAttr : ArgumentAttribute where TInfo : ParsingArgumentInfo
             => type.GetProperties()
                 .Select(property => (property, property.GetCustomAttribute<TAttr>()))
                 .Where(pair => pair.Item2 != null)
                 .ForEach(pair => action?.Invoke(pair.Item2))
-                .Where(pair => propertyValidator.Verify(pair.property))
+                .Where(pair => CheckProperty(pair.property))
                 .Select(pair => factory(pair))
                 .ToArray();
+
+        public bool CheckProperty(PropertyInfo propertyInfo)
+        {
+            var propertyType = propertyInfo.PropertyType;
+            if (!propertyInfo.CanWrite)
+                throw new InvalidOperationException("Argument property must have \"set\" accesor.");
+            if (propertyType.IsAbstract)
+                throw new InvalidOperationException("Type of the property must not be abstract.");
+            if (propertyType.GetCollectionElementType()?.IsCollection() ?? false)
+                throw new NotSupportedException("Nested collections are not supported.");
+            if (propertyType.GetCustomAttribute<FlagsAttribute>() != null)
+                throw new NotSupportedException("Flag enumerations are not supported.");
+            return true;
+        }
     }
 }

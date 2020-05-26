@@ -12,7 +12,7 @@ namespace SimpleCommandLine.Parsing
         
         public TokensParser(Func<ObjectBuilder> builderFactory)
         {
-            this.builderFactory = builderFactory ?? throw new ArgumentNullException(nameof(builderFactory));
+            this.builderFactory = builderFactory;
         }
 
         public object Parse(IEnumerable<IArgumentToken> tokens)
@@ -28,13 +28,10 @@ namespace SimpleCommandLine.Parsing
                     case OptionsGroupToken optionsGroup:
                         HandleOptionsGroup(optionsGroup);
                         break;
-                    case AssignedValueToken assignedValueToken:
-                        HandleAssignedValue(assignedValueToken);
-                        break;
                     case IOptionToken option:
                         HandleOption(option);
                         break;
-                    case IValueToken value:
+                    case ValueToken value:
                         HandleValue(value);
                         break;
                 }
@@ -56,13 +53,7 @@ namespace SimpleCommandLine.Parsing
                 HandleOption(option);
         }
 
-        protected void HandleAssignedValue(AssignedValueToken token)
-        {
-            HandleOption(token.Option);
-            builder.LastOption.AddValue(token.Value);
-        }
-
-        protected void HandleValue(IValueToken token)
+        protected void HandleValue(ValueToken token)
         {
             if (builder.LastOption?.AcceptsValue ?? false)
                 builder.LastOption.AddValue(token);

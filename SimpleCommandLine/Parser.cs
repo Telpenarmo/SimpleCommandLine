@@ -20,8 +20,8 @@ namespace SimpleCommandLine
 
         internal Parser(IArgumentTokenizer tokenizer, TokensParserFactory typeParserFactory)
         {
-            this.tokenizer = tokenizer ?? throw new ArgumentNullException(nameof(tokenizer));
-            this.typeParserFactory = typeParserFactory ?? throw new ArgumentNullException(nameof(typeParserFactory));
+            this.tokenizer = tokenizer;
+            this.typeParserFactory = typeParserFactory;
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace SimpleCommandLine
             if (count < tokens.Count())
             {
                 var commandToken = tokens.First(t => t is CommandToken) as CommandToken;
-                var resultType = typeParserFactory.Build(commandToken.Alias).Parse(tokens.Skip(count + 1));
+                var resultType = typeParserFactory.Build(commandToken.Name).Parse(tokens.Skip(count + 1));
                 results.Add(resultType);
             }
             

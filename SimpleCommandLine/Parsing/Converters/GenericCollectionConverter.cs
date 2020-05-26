@@ -7,7 +7,8 @@ namespace SimpleCommandLine.Parsing.Converters
     {
         private readonly Type type;
 
-        public GenericCollectionConverter(Type type, IValueConverter valueConverter) : base(type.GenericTypeArguments[0], valueConverter)
+        public GenericCollectionConverter(Type type, IValueConverter valueConverter)
+            : base(type.GenericTypeArguments[0], valueConverter)
         {
             this.type = type ?? throw new ArgumentNullException(nameof(type));
         }

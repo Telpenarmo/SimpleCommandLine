@@ -10,17 +10,17 @@ namespace SimpleCommandLine.Tokenization.Tokens
         /// <summary>
         /// Creates a new instance of <see cref="CommandToken"/>.
         /// </summary>
-        /// <param name="alias">The value of this token.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="alias"/> is null.</exception>
-        public CommandToken(string alias)
-            => Alias = alias ?? throw new ArgumentNullException(nameof(alias));
+        /// <param name="name">The value of this token.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
+        public CommandToken(string name)
+            => Name = name ?? throw new ArgumentNullException(nameof(name));
 
         /// <summary>
         /// Gets this command.
         /// </summary>
-        public string Alias { get; }
+        public string Name { get; }
 
         public bool Equals(IArgumentToken other)
-            => other is CommandToken token && token.Alias == Alias;
+            => other is CommandToken token && token.Name == Name;
     }
 }

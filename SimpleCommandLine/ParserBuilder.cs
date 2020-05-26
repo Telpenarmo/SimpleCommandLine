@@ -15,21 +15,19 @@ namespace SimpleCommandLine
     /// </summary>
     public class ParserBuilder
     {
-        private readonly List<ParsingTypeInfo> types;
+        private readonly List<ParsingTypeInfo> types = new List<ParsingTypeInfo>();
         private readonly TypeRegisterer typeRegisterer;
         private readonly IConvertersFactory convertersFactory = new ConvertersFactory();
-        private readonly FinalValidator finalVerifier = new FinalValidator();
         private readonly TypeValidator typeValidator;
-        private readonly PropertyValidator argumentValidator = new PropertyValidator();
         private ITokenizerBuilder tokenizerBuilder;
         private IFormatProvider formatProvider;
-                
+        private bool globalTypeSet;
+
         public ParserBuilder()
         {
             RegisterTokenization<POSIXTokenizerBuilder>(x => x.AllowShortOptionGroups = true);
-            types = new List<ParsingTypeInfo>();
             typeValidator = new TypeValidator(types);
-            typeRegisterer = new TypeRegisterer(typeValidator, argumentValidator);
+            typeRegisterer = new TypeRegisterer(typeValidator, convertersFactory);
             LoadDefaultConverters();
         }
 
@@ -39,7 +37,6 @@ namespace SimpleCommandLine
         /// <exception cref="InvalidOperationException">Thrown when registration was invalid.</exception>
         public Parser Build()
         {
-            finalVerifier.Verify(types, convertersFactory);
             return new Parser(PrepareTokenizer(), PrepareTypeParserFactory());
         }
 
@@ -62,7 +59,17 @@ namespace SimpleCommandLine
         {
             if (factory == null)
                 throw new ArgumentNullException(nameof(factory));
-            types.Add(typeRegisterer.Register(factory));
+
+            var type = typeRegisterer.Register(factory);
+
+            if (!(type is ParsingCommandTypeInfo))
+            {
+                if (globalTypeSet)
+                    throw new InvalidOperationException("You can register only one non-command type");
+                globalTypeSet = true;
+            }
+
+            types.Add(type);
         }
 
         /// <summary>
@@ -70,7 +77,7 @@ namespace SimpleCommandLine
         /// </summary>
         /// <typeparam name="T">Type of <see cref="ITokenizerBuilder"/> to be constructed.</typeparam>
         /// <param name="tokenizationBuilder">Action configuring the given builder.</param>
-        public void RegisterTokenization<T>(Action<T> tokenizationBuilder) where T : ITokenizerBuilder, new ()
+        public void RegisterTokenization<T>(Action<T> tokenizationBuilder) where T : ITokenizerBuilder, new()
         {
             var t = new T();
             tokenizationBuilder(t);
@@ -102,7 +109,7 @@ namespace SimpleCommandLine
 
         private ChainTokenizer PrepareTokenizer()
         {
-            var commandsNames = types.OfType<ParsingCommandTypeInfo>().SelectMany(x => x.Aliases);
+            var commandsNames = types.OfType<ParsingCommandTypeInfo>().Select(x => x.Name);
             var tokenizer = tokenizerBuilder.BuildTokenizer();
             return new CommandTokenizer(commandsNames) { Next = tokenizer };
         }

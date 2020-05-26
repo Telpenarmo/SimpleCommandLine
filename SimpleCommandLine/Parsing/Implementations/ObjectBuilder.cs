@@ -19,9 +19,9 @@ namespace SimpleCommandLine.Parsing
 
         public ObjectBuilder(ParsingTypeInfo typeInfo, IConvertersFactory convertersFactory, IFormatProvider formatProvider)
         {
-            this.typeInfo = typeInfo ?? throw new ArgumentNullException(nameof(typeInfo));
-            this.convertersFactory = convertersFactory ?? throw new ArgumentNullException(nameof(convertersFactory));
-            this.formatProvider = formatProvider ?? throw new ArgumentNullException(nameof(formatProvider));
+            this.typeInfo = typeInfo;
+            this.convertersFactory = convertersFactory;
+            this.formatProvider = formatProvider;
             objectResult = typeInfo.Factory.DynamicInvoke();
             maxValuesNumber = typeInfo.Values.Count();
             if (typeInfo.Values.Last().IsCollection)

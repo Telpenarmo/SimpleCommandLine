@@ -22,11 +22,13 @@ namespace SimpleCommandLine.Parsing.Converters
 
         public bool Convert(string str, IFormatProvider formatProvider)
         {
-            if (trueAliases.Contains(str, StringComparer.OrdinalIgnoreCase)) return true;
-            else if (falseAliases.Contains(str, StringComparer.OrdinalIgnoreCase)) return false;
-            else if (bool.TryParse(str, out bool result))
+            if (trueAliases.Contains(str, StringComparer.OrdinalIgnoreCase))
+                return true;
+            if (falseAliases.Contains(str, StringComparer.OrdinalIgnoreCase))
+                return false;
+            if (bool.TryParse(str, out bool result))
                 return result;
-            else throw new FormatException("Value is not valid.");
+            throw new FormatException("Value is not valid.");
         }
 
         object IValueConverter.Convert(string str, IFormatProvider formatProvider) => Convert(str, formatProvider);

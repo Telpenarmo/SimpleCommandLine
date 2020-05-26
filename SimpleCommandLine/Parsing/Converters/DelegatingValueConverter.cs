@@ -11,7 +11,8 @@ namespace SimpleCommandLine.Parsing.Converters
             this.converter = converter ?? throw new ArgumentNullException(nameof(converter));
         }
 
-        public DelegatingValueConverter(Func<string, IFormatProvider, (bool, T)> converter, Func<string, FormatException> errorSelector)
+        public DelegatingValueConverter(Func<string, IFormatProvider, (bool, T)> converter,
+            Func<string, FormatException> errorSelector)
         {
             if (converter == null)
                 throw new ArgumentNullException(nameof(converter));
@@ -23,7 +24,7 @@ namespace SimpleCommandLine.Parsing.Converters
                 if (string.IsNullOrEmpty(value))
                     throw new ArgumentNullException("The value must not be empty.");
                 var (isSuccess, result) = converter(value, format);
-                return isSuccess ? result : throw errorSelector(value); 
+                return isSuccess ? result : throw errorSelector(value);
             };
         }
 

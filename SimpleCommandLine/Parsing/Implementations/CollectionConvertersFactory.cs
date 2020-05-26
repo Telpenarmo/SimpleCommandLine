@@ -10,7 +10,7 @@ namespace SimpleCommandLine.Parsing
 
         public CollectionConvertersFactory(IConvertersFactory convertersFactory)
         {
-            this.convertersFactory = convertersFactory ?? throw new ArgumentNullException(nameof(convertersFactory));
+            this.convertersFactory = convertersFactory;
         }
 
         public CollectionConverter GetConverter(Type type)

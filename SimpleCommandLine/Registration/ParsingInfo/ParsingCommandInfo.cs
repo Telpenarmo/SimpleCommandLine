@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using SimpleCommandLine.Tokenization.Tokens;
 
 namespace SimpleCommandLine.Registration
@@ -20,19 +19,19 @@ namespace SimpleCommandLine.Registration
         public ParsingCommandTypeInfo(IEnumerable<ParsingValueInfo> values, IEnumerable<ParsingOptionInfo> options, Delegate factory, CommandAttribute attribute)
             : base(values, options, factory)
         {
-            Aliases = attribute.Aliases;
+            Name = attribute.Name;
         }
 
         /// <summary>
         /// Gets all aliases of this command.
         /// </summary>
-        public IEnumerable<string> Aliases { get; }
+        public string Name { get; }
 
         /// <summary>
         /// Checks if given token matches current command.
         /// </summary>
         /// <param name="token">The token to match.</param>
         /// <returns>True, if given token matches this command; false otherwise.</returns>
-        public bool Match(CommandToken token) => Aliases.Contains(token?.Alias);
+        public bool Match(CommandToken token) => token.Name == Name;
     }
 }

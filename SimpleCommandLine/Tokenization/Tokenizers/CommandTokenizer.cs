@@ -14,7 +14,7 @@ namespace SimpleCommandLine.Tokenization.Tokenizers
 
         public CommandTokenizer(IEnumerable<string> commandNames)
         {
-            this.commandNames = commandNames ?? throw new ArgumentNullException(nameof(commandNames));
+            this.commandNames = commandNames;
         }
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace SimpleCommandLine.Tokenization.Tokenizers
         /// </summary>
         /// <param name="arg">An argument to check.</param>
 
-        public override bool CanHandle(string arg) => !string.IsNullOrWhiteSpace(arg) && commandNames.Contains(arg);
+        public override bool CanHandle(string arg) => commandNames.Contains(arg);
 
         /// <summary>
         /// Tokenizes given argument assuming its correctness.

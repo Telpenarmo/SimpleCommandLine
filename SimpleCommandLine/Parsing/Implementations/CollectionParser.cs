@@ -14,8 +14,8 @@ namespace SimpleCommandLine.Parsing
 
         public CollectionParser(ParsingArgumentInfo argumentInfo, CollectionConverter converter)
         {
-            this.argumentInfo = argumentInfo ?? throw new ArgumentNullException(nameof(argumentInfo));
-            collectionConverter = converter ?? throw new ArgumentNullException(nameof(converter));
+            this.argumentInfo = argumentInfo;
+            collectionConverter = converter;
         }
 
         public bool RequiresValue => values.Count < argumentInfo.Minimum;
