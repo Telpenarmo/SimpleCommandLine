@@ -16,15 +16,18 @@ namespace SimpleCommandLine.Registration
         /// <param name="values">Collection of properties representing command-line values.</param>
         /// <param name="options">Collection of properties representing command-line options.</param>
         /// <param name="factory">Factory method that is used to create a new instance of the encapsulated type.</param>
-        public ParsingTypeInfo(IEnumerable<ParsingValueInfo> values, IEnumerable<ParsingOptionInfo> options, Delegate factory)
+        public ParsingTypeInfo(IEnumerable<ParsingValueInfo> values,
+            IEnumerable<ParsingOptionInfo> options, Delegate factory, string name = "")
         {
-            Values = values.OrderBy(x => x.Index) ?? throw new ArgumentNullException(nameof(values));
-            Options = options ?? throw new ArgumentNullException(nameof(options));
-            Factory = factory ?? throw new ArgumentNullException(nameof(factory));
+            Values = values.OrderBy(x => x.Index);
+            Options = options;
+            Factory = factory;
+            Name = name;
         }
-        
-        internal IEnumerable<ParsingValueInfo> Values { get; }        
-        internal IEnumerable<ParsingOptionInfo> Options { get; }
+
+        public string Name { get; }
+        public IEnumerable<ParsingValueInfo> Values { get; }
+        public IEnumerable<ParsingOptionInfo> Options { get; }
 
         /// <summary>
         /// Factory method that is used to create a new instance of the encapsulated type.
@@ -36,7 +39,7 @@ namespace SimpleCommandLine.Registration
         /// </summary>
         /// <param name="token">Token to be matched.</param>
         /// <returns><see cref="ParsingOptionInfo"/> that matches the given token.</returns>
-        public ParsingOptionInfo GetMatchingOptionInfo(IOptionToken token)
+        public ParsingOptionInfo GetMatchingOptionInfo(OptionToken token)
             => Options.SingleOrDefault(x => x.MatchToken(token));
 
         /// <summary>

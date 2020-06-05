@@ -21,24 +21,10 @@ namespace SimpleCommandLine.Registration.Validation
                 throw new InvalidOperationException("Options must have different short names.");
             if (optionAttributes.Select(attr => attr.LongName).HasDuplicates())
                 throw new InvalidOperationException("Options must have different long names.");
-            if (typeInfo is ParsingCommandTypeInfo command && types.OfType<ParsingCommandTypeInfo>().Select(x => x.Name).Contains(command.Name))
+            if (typeInfo.Name != "" && types.Select(x => x.Name).Contains(typeInfo.Name))
                 throw new InvalidOperationException("One of this command's name has been already registered");
             else
                 return true;
-        }
-    }
-
-    internal static class EnumerableExtensions
-    {
-        public static bool HasDuplicates<T>(this IEnumerable<T> subjects)
-        {
-            var set = new HashSet<T>();
-
-            foreach (var s in subjects)
-                if (!set.Add(s))
-                    return true;
-
-            return false;
         }
     }
 }

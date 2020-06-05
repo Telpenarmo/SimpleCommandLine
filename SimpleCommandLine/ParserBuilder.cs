@@ -25,7 +25,7 @@ namespace SimpleCommandLine
 
         public ParserBuilder()
         {
-            RegisterTokenization<POSIXTokenizerBuilder>(x => x.AllowShortOptionGroups = true);
+            RegisterTokenization(new POSIXTokenizerBuilder());
             typeValidator = new TypeValidator(types);
             typeRegisterer = new TypeRegisterer(typeValidator, convertersFactory);
             LoadDefaultConverters();
@@ -37,7 +37,7 @@ namespace SimpleCommandLine
         /// <exception cref="InvalidOperationException">Thrown when registration was invalid.</exception>
         public Parser Build()
         {
-            return new Parser(PrepareTokenizer(), PrepareTypeParserFactory());
+            return new Parser(PrepareTokenizer(), PrepareObjectBuilderFactory());
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace SimpleCommandLine
 
             var type = typeRegisterer.Register(factory);
 
-            if (!(type is ParsingCommandTypeInfo))
+            if (type.Name == string.Empty)
             {
                 if (globalTypeSet)
                     throw new InvalidOperationException("You can register only one non-command type");
@@ -77,11 +77,9 @@ namespace SimpleCommandLine
         /// </summary>
         /// <typeparam name="T">Type of <see cref="ITokenizerBuilder"/> to be constructed.</typeparam>
         /// <param name="tokenizationBuilder">Action configuring the given builder.</param>
-        public void RegisterTokenization<T>(Action<T> tokenizationBuilder) where T : ITokenizerBuilder, new()
+        public void RegisterTokenization(ITokenizerBuilder tokenizerBuilder)
         {
-            var t = new T();
-            tokenizationBuilder(t);
-            tokenizerBuilder = t;
+            this.tokenizerBuilder = tokenizerBuilder;
         }
 
         /// <summary>
@@ -109,13 +107,13 @@ namespace SimpleCommandLine
 
         private ChainTokenizer PrepareTokenizer()
         {
-            var commandsNames = types.OfType<ParsingCommandTypeInfo>().Select(x => x.Name);
+            var commandsNames = types.Select(x => x.Name);
             var tokenizer = tokenizerBuilder.BuildTokenizer();
             return new CommandTokenizer(commandsNames) { Next = tokenizer };
         }
 
-        private TokensParserFactory PrepareTypeParserFactory()
-            => new TokensParserFactory(types, convertersFactory, formatProvider);
+        private ObjectBuilderFactory PrepareObjectBuilderFactory()
+            => new ObjectBuilderFactory(types, convertersFactory, formatProvider);
 
         private void LoadDefaultConverters()
         {

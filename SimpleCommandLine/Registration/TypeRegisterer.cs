@@ -39,7 +39,7 @@ namespace SimpleCommandLine.Registration
             ParsingTypeInfo typeInfo;
             var commandAttribute = type.GetTypeInfo().GetCustomAttribute<CommandAttribute>();
             if (commandAttribute != null)
-                typeInfo = new ParsingCommandTypeInfo(valueInfos, optionInfos, factory, commandAttribute);
+                typeInfo = new ParsingTypeInfo(valueInfos, optionInfos, factory, commandAttribute.Name);
             else
                 typeInfo = new ParsingTypeInfo(valueInfos, optionInfos, factory);
             return typeInfo;
