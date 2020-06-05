@@ -28,7 +28,7 @@ namespace SimpleCommandLine.Parsing
                 maxValuesNumber += typeInfo.Values.Last().Maximum - 1;
         }
 
-        private ParsingOptionInfo GetOptionInfo(IOptionToken token)
+        private ParsingOptionInfo GetOptionInfo(OptionToken token)
             => typeInfo.GetMatchingOptionInfo(token)
                 ?? throw new ArgumentException($"This type does not contain the {token} option.", nameof(token));
 
@@ -36,7 +36,7 @@ namespace SimpleCommandLine.Parsing
 
         public bool AwaitsValue => usedValuesNumber < maxValuesNumber;
 
-        public void AddOption(IOptionToken token)
+        public void AddOption(OptionToken token)
         {
             var info = GetOptionInfo(token);
             if (info.IsCollection)

@@ -5,8 +5,6 @@ using SimpleCommandLine.Parsing;
 using SimpleCommandLine.Tokenization.Tokens;
 using SimpleCommandLine.Tokenization.Tokenizers;
 
-[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("SimpleCommandLine.Tests")]
-
 namespace SimpleCommandLine
 {
     /// <summary>
@@ -14,14 +12,15 @@ namespace SimpleCommandLine
     /// </summary>
     public class Parser
     {
-        private readonly TokensParserFactory typeParserFactory;
-        private IArgumentTokenizer tokenizer;
+        private readonly ObjectBuilderFactory objectBuilderFactory;
+        private ObjectBuilder builder;
+        private readonly IArgumentTokenizer tokenizer;
         private readonly List<object> results = new List<object>();
 
-        internal Parser(IArgumentTokenizer tokenizer, TokensParserFactory typeParserFactory)
+        internal Parser(IArgumentTokenizer tokenizer, ObjectBuilderFactory objectBuilderFactory)
         {
             this.tokenizer = tokenizer;
-            this.typeParserFactory = typeParserFactory;
+            this.objectBuilderFactory = objectBuilderFactory;
         }
 
         /// <summary>
@@ -33,35 +32,53 @@ namespace SimpleCommandLine
         /// <exception cref="InvalidOperationException"></exception>
         public Result Parse(IEnumerable<string> args)
         {
-            IEnumerable<IArgumentToken> tokens = Tokenize(args ?? Enumerable.Empty<string>()).ToArray();
-
-            IEnumerable<IArgumentToken> generic = tokens.TakeWhile(t => !(t is CommandToken));
-            int count = generic.Count();
-            if (count > 0)
-                results.Add(typeParserFactory.Build().Parse(generic));
-            if (count < tokens.Count())
+            builder = objectBuilderFactory.Build();
+            var tokens = new Queue<IArgumentToken>((args ?? Enumerable.Empty<string>())
+                .Select(a => tokenizer.TokenizeArgument(a)));
+            if (builder is null && !(tokens.Peek() is CommandToken))
+                throw new ArgumentException("Generic type was not provided!");
+            while (tokens.Any())
             {
-                var commandToken = tokens.First(t => t is CommandToken) as CommandToken;
-                var resultType = typeParserFactory.Build(commandToken.Name).Parse(tokens.Skip(count + 1));
-                results.Add(resultType);
+                var current = tokens.Dequeue();
+                switch (current)
+                {
+                    case CommandToken command:
+                        results.Add(builder.Parse());
+                        builder = objectBuilderFactory.Build(command.Name);
+                        break;
+                    case OptionToken option:
+                        HandleOption(option);
+                        break;
+                    case ValueToken value:
+                        HandleValue(value);
+                        break;
+                }
             }
-            
+            EnsureLastOptionSet();
+
             return new Result(results);
         }
 
-        private IEnumerable<IArgumentToken> Tokenize(IEnumerable<string> args)
+        protected void HandleOption(OptionToken token)
         {
-            ChainTokenizer commandTokenizer = tokenizer as ChainTokenizer;
-            foreach (var str in args)
-            {
-                var token = tokenizer.TokenizeArgument(str);
-                if (token is CommandToken)
-                {
-                    tokenizer = commandTokenizer.Next;
-                }
-                yield return token;
-            }
-            tokenizer = commandTokenizer;
+            EnsureLastOptionSet();
+            builder.AddOption(token);
+        }
+
+        protected void HandleValue(ValueToken token)
+        {
+            if (builder.LastOption?.AcceptsValue ?? false)
+                builder.LastOption.AddValue(token);
+            else if (builder.AwaitsValue)
+                builder.AddValue(token);
+            else
+                throw new ArgumentException("This type does not accept any more values.");
+        }
+
+        private void EnsureLastOptionSet()
+        {
+            if (builder.LastOption?.RequiresValue ?? false)
+                throw new ArgumentException("Value was not provided for a token.");
         }
     }
 }

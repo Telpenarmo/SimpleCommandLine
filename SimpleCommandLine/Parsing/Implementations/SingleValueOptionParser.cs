@@ -6,7 +6,7 @@ namespace SimpleCommandLine.Parsing
 {
     internal class SingleValueOptionParser : SingleValueParser, IOptionParser
     {
-        public SingleValueOptionParser(ParsingArgumentInfo argumentInfo, IValueConverter valueConverter, IOptionToken optionToken)
+        public SingleValueOptionParser(ParsingArgumentInfo argumentInfo, IValueConverter valueConverter, OptionToken optionToken)
             : base(argumentInfo, valueConverter)
         {
             OptionToken = optionToken;
@@ -14,6 +14,6 @@ namespace SimpleCommandLine.Parsing
 
         public virtual bool AcceptsValue => valueToken == null;
         public virtual bool RequiresValue => valueToken == null;
-        public IOptionToken OptionToken { get; }
+        public OptionToken OptionToken { get; }
     }
 }
