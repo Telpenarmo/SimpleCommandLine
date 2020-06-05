@@ -5,14 +5,14 @@ namespace SimpleCommandLine.Tokenization.Tokens
     /// <summary>
     /// Represents a command-line long option.
     /// </summary>
-    public class LongOptionToken : IOptionToken
+    public class OptionToken : IArgumentToken
     {
         /// <summary>
         /// Creates a new instance of <see cref="LongOptionToken"/>.
         /// </summary>
         /// <param name="value">Value of the option.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="value"/> is null.</exception>
-        public LongOptionToken(string value)
+        public OptionToken(string value)
             => Value = value ?? throw new ArgumentNullException(nameof(value));
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace SimpleCommandLine.Tokenization.Tokens
         public string Value { get; }
 
         public bool Equals(IArgumentToken other)
-            => other is LongOptionToken token && token.Value == Value;
+            => other is OptionToken token && token.Value == Value;
 
         public override string ToString() => Value;
     }

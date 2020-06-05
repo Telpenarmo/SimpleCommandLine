@@ -6,6 +6,6 @@ namespace SimpleCommandLine.Parsing
     {
         bool RequiresValue { get; }
         bool AcceptsValue { get; }
-        IOptionToken OptionToken { get; }
+        OptionToken OptionToken { get; }
     }
 }

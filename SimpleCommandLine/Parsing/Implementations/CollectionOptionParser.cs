@@ -5,12 +5,12 @@ namespace SimpleCommandLine.Parsing
 {
     internal class CollectionOptionParser : CollectionParser, IOptionParser
     {
-        public CollectionOptionParser(ParsingArgumentInfo argumentInfo, CollectionConverter converter, IOptionToken optionToken)
+        public CollectionOptionParser(ParsingArgumentInfo argumentInfo, CollectionConverter converter, OptionToken optionToken)
             : base(argumentInfo, converter)
         {
             OptionToken = optionToken;
         }
 
-        public IOptionToken OptionToken { get; }
+        public OptionToken OptionToken { get; }
     }
 }
