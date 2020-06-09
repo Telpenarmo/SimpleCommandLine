@@ -33,18 +33,22 @@ namespace SimpleCommandLine
         public Result Parse(IEnumerable<string> args)
         {
             builder = objectBuilderFactory.Build();
-            var tokens = new Queue<IArgumentToken>((args ?? Enumerable.Empty<string>())
-                .Select(a => tokenizer.TokenizeArgument(a)));
-            if (builder is null && !(tokens.Peek() is CommandToken))
+            var enumerator = (args ?? Enumerable.Empty<string>())
+                .Select(arg => tokenizer.TokenizeArgument(arg)).GetEnumerator();
+
+            if (builder is null && !(enumerator.Current is CommandToken))
                 throw new ArgumentException("Generic type was not provided!");
-            while (tokens.Any())
+
+            while (enumerator.MoveNext())
             {
-                var current = tokens.Dequeue();
-                switch (current)
+                switch (enumerator.Current)
                 {
                     case CommandToken command:
                         results.Add(builder.Parse());
                         builder = objectBuilderFactory.Build(command.Name);
+                        break;
+                    case OptionsGroupToken group:
+                        group.Tokens.ForEach(o => HandleOption(o));
                         break;
                     case OptionToken option:
                         HandleOption(option);
@@ -67,8 +71,8 @@ namespace SimpleCommandLine
 
         protected void HandleValue(ValueToken token)
         {
-            if (builder.LastOption?.AcceptsValue ?? false)
-                builder.LastOption.AddValue(token);
+            if (builder.LastAssignedOption?.AcceptsValue ?? false)
+                builder.LastAssignedOption.AddValue(token);
             else if (builder.AwaitsValue)
                 builder.AddValue(token);
             else
@@ -77,7 +81,7 @@ namespace SimpleCommandLine
 
         private void EnsureLastOptionSet()
         {
-            if (builder.LastOption?.RequiresValue ?? false)
+            if (builder.LastAssignedOption?.RequiresValue ?? false)
                 throw new ArgumentException("Value was not provided for a token.");
         }
     }
