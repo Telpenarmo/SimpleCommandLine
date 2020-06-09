@@ -6,7 +6,7 @@ namespace SimpleCommandLine.Parsing
 {
     internal class ImplicitOptionParser : SingleValueOptionParser
     {
-        public ImplicitOptionParser(ParsingArgumentInfo argumentInfo, IValueConverter valueConverter, IOptionToken optionToken)
+        public ImplicitOptionParser(ParsingArgumentInfo argumentInfo, IValueConverter valueConverter, OptionToken optionToken)
             : base(argumentInfo, valueConverter, optionToken) { }
 
         public override bool RequiresValue => false;

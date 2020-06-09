@@ -24,17 +24,6 @@ namespace SimpleCommandLine
             foreach (var element in collection)
                 action(element);
             return collection;
-        }
-        
-        public static bool HasDuplicates<T>(this IEnumerable<T> subjects)
-        {
-            var set = new HashSet<T>();
-
-            foreach (var s in subjects)
-                if (!set.Add(s))
-                    return true;
-
-            return false;
-        }        
+        }     
     }
 }

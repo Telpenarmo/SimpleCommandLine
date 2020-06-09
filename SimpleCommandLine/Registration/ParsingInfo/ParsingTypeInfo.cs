@@ -19,16 +19,15 @@ namespace SimpleCommandLine.Registration
         public ParsingTypeInfo(IEnumerable<ParsingValueInfo> values,
             IEnumerable<ParsingOptionInfo> options, Delegate factory, string name = "")
         {
-            Values = values.OrderBy(x => x.Index);
-            Options = options;
+            Values = values.OrderBy(x => x.Index).ToArray();
+            Options = options.ToArray();
             Factory = factory;
             Name = name;
         }
 
         public string Name { get; }
-        public IEnumerable<ParsingValueInfo> Values { get; }
-        public IEnumerable<ParsingOptionInfo> Options { get; }
-
+        public IReadOnlyList<ParsingValueInfo> Values { get; }
+        public IReadOnlyList<ParsingOptionInfo> Options { get; }
         /// <summary>
         /// Factory method that is used to create a new instance of the encapsulated type.
         /// </summary>
@@ -41,12 +40,5 @@ namespace SimpleCommandLine.Registration
         /// <returns><see cref="ParsingOptionInfo"/> that matches the given token.</returns>
         public ParsingOptionInfo GetMatchingOptionInfo(OptionToken token)
             => Options.SingleOrDefault(x => x.MatchToken(token));
-
-        /// <summary>
-        /// Gets <see cref="ParsingValueInfo"/> at the given position.
-        /// </summary>
-        /// <param name="index">Index of the <see cref="ParsingValueInfo"/> to be found.</param>
-        /// <returns><see cref="ParsingValueInfo"/> at the given position.</returns>
-        public ParsingValueInfo GetValueInfoAt(int index) => index < Values.Count() ? Values.ElementAt(index) : null;
     }
 }

@@ -1,8 +1,7 @@
-﻿using SimpleCommandLine.Registration;
-using SimpleCommandLine.Tokenization.Tokens;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using SimpleCommandLine.Registration;
+using SimpleCommandLine.Tokenization.Tokens;
 
 namespace SimpleCommandLine.Parsing
 {
@@ -12,7 +11,7 @@ namespace SimpleCommandLine.Parsing
         private readonly IConvertersFactory convertersFactory;
         private readonly List<IOptionParser> assignedOptions = new List<IOptionParser>();
         private readonly List<IArgumentParser> assignedValues = new List<IArgumentParser>();
-        private readonly object objectResult;
+        private readonly object result;
         private readonly IFormatProvider formatProvider;
         private int usedValuesNumber;
         private readonly int maxValuesNumber;
@@ -22,17 +21,21 @@ namespace SimpleCommandLine.Parsing
             this.typeInfo = typeInfo;
             this.convertersFactory = convertersFactory;
             this.formatProvider = formatProvider;
-            objectResult = typeInfo.Factory.DynamicInvoke();
-            maxValuesNumber = typeInfo.Values.Count();
-            if (typeInfo.Values.Last().IsCollection)
-                maxValuesNumber += typeInfo.Values.Last().Maximum - 1;
+            result = typeInfo.Factory.DynamicInvoke();
+            maxValuesNumber = AllValuesNumber;
+            if (LastValue.IsCollection)
+                maxValuesNumber += LastValue.Maximum - 1;
         }
 
         private ParsingOptionInfo GetOptionInfo(OptionToken token)
             => typeInfo.GetMatchingOptionInfo(token)
                 ?? throw new ArgumentException($"This type does not contain the {token} option.", nameof(token));
 
-        public IOptionParser LastOption => assignedOptions.LastOrDefault();
+        private int AllValuesNumber => typeInfo.Values.Count;
+        private ParsingValueInfo LastValue => typeInfo.Values[maxValuesNumber - 1];
+
+        public IOptionParser LastAssignedOption => assignedOptions[assignedOptions.Count - 1];
+        public IArgumentParser LastAssignedValue => assignedValues[assignedValues.Count - 1];
 
         public bool AwaitsValue => usedValuesNumber < maxValuesNumber;
 
@@ -40,34 +43,34 @@ namespace SimpleCommandLine.Parsing
         {
             var info = GetOptionInfo(token);
             if (info.IsCollection)
-                assignedOptions.Add(
-                    new CollectionOptionParser(info, info.ChooseConverter(convertersFactory) as CollectionConverter, token));
+                assignedOptions.Add(new CollectionOptionParser(info, GetConverter<CollectionConverter>(info), token));
             else if (assignedOptions.Exists(p => p.OptionToken.Equals(token)))
                 throw new ArgumentException("This option was already declared.");
             else if (info.IsImplicit)
-                assignedOptions.Add(
-                    new ImplicitOptionParser(info, info.ChooseConverter(convertersFactory) as IValueConverter, token));
+                assignedOptions.Add(new ImplicitOptionParser(info, GetConverter<IValueConverter>(info), token));
             else
-                assignedOptions.Add(
-                    new SingleValueOptionParser(info, info.ChooseConverter(convertersFactory) as IValueConverter, token));
+                assignedOptions.Add(new SingleValueOptionParser(info, GetConverter<IValueConverter>(info), token));
         }
+
+        private T GetConverter<T>(ParsingOptionInfo info) where T : class, IConverter
+            => info.ChooseConverter(convertersFactory) as T;
 
         public void AddValue(ValueToken token)
         {
-            var info = typeInfo.GetValueInfoAt(usedValuesNumber) ?? typeInfo.Values.Last();
-            if (!info.IsCollection || assignedValues.Last() is CollectionParser)
-                assignedValues.Add(new SingleValueParser(info, (IValueConverter)info.ChooseConverter(convertersFactory)));
+            var info = usedValuesNumber < AllValuesNumber ? typeInfo.Values[usedValuesNumber] : LastValue;
+            if (!info.IsCollection || LastAssignedValue is CollectionParser)
+                assignedValues.Add(new SingleValueParser(info, info.ChooseConverter(convertersFactory) as IValueConverter));
             else
-                assignedValues.Add(new CollectionParser(info, (CollectionConverter)info.ChooseConverter(convertersFactory)));
-            assignedValues.Last().AddValue(token);
+                assignedValues.Add(new CollectionParser(info, info.ChooseConverter(convertersFactory) as CollectionConverter));
+            LastAssignedValue.AddValue(token);
             usedValuesNumber++;
         }
 
         public object Parse()
         {
-            assignedOptions.ForEach(o => o.Parse(objectResult, formatProvider));
-            assignedValues.ForEach(o => o.Parse(objectResult, formatProvider));
-            return objectResult;
+            assignedOptions.ForEach(o => o.Parse(result, formatProvider));
+            assignedValues.ForEach(o => o.Parse(result, formatProvider));
+            return result;
         }
     }
 }

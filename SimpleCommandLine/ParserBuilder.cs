@@ -4,7 +4,6 @@ using System.Linq;
 using SimpleCommandLine.Parsing;
 using SimpleCommandLine.Parsing.Converters;
 using SimpleCommandLine.Registration;
-using SimpleCommandLine.Registration.Validation;
 using SimpleCommandLine.Tokenization.Tokenizers;
 using SimpleCommandLine.Tokenization.Tokenizers.POSIX;
 
@@ -18,7 +17,6 @@ namespace SimpleCommandLine
         private readonly List<ParsingTypeInfo> types = new List<ParsingTypeInfo>();
         private readonly TypeRegisterer typeRegisterer;
         private readonly IConvertersFactory convertersFactory = new ConvertersFactory();
-        private readonly TypeValidator typeValidator;
         private ITokenizerBuilder tokenizerBuilder;
         private IFormatProvider formatProvider;
         private bool globalTypeSet;
@@ -26,8 +24,7 @@ namespace SimpleCommandLine
         public ParserBuilder()
         {
             RegisterTokenization(new POSIXTokenizerBuilder());
-            typeValidator = new TypeValidator(types);
-            typeRegisterer = new TypeRegisterer(typeValidator, convertersFactory);
+            typeRegisterer = new TypeRegisterer(convertersFactory);
             LoadDefaultConverters();
         }
 
