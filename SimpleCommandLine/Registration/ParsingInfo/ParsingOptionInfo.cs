@@ -13,16 +13,6 @@ namespace SimpleCommandLine.Registration
         /// Creates a new instance of <see cref="ParsingOptionInfo"/> class.
         /// </summary>
         /// <param name="propertyInfo">A property to encapsulate.</param>
-        public ParsingOptionInfo(PropertyInfo propertyInfo) : base(propertyInfo)
-        {
-            attribute = propertyInfo.GetCustomAttribute<OptionAttribute>()
-                    ?? throw new ArgumentNullException(nameof(propertyInfo), "Given property doesn't have the required attribute.");
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="ParsingOptionInfo"/> class.
-        /// </summary>
-        /// <param name="propertyInfo">A property to encapsulate.</param>
         /// <param name="attribute">Attribute containing configuration of the option.</param>
         public ParsingOptionInfo(PropertyInfo propertyInfo, OptionAttribute attribute) : base(propertyInfo)
         {

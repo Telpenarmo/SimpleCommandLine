@@ -8,22 +8,13 @@ namespace SimpleCommandLine.Registration
     /// </summary>
     internal class ParsingValueInfo : ParsingArgumentInfo
     {
-        /// <summary>
-        /// Creates a new instance of <see cref="ParsingValueInfo"/>.
-        /// </summary>
-        /// <param name="propertyInfo">A property to encapsulate.</param>
-        public ParsingValueInfo(PropertyInfo propertyInfo) : base(propertyInfo)
-        {
-            attribute = propertyInfo.GetCustomAttribute<ValueAttribute>()
-                ?? throw new ArgumentNullException(nameof(propertyInfo), "Given property doesn't have the required attribute.");
-        }
 
         /// <summary>
         /// Creates a new instance of <see cref="ParsingValueInfo"/>.
         /// </summary>
         /// <param name="propertyInfo">A property to encapsulate.</param>
         /// <param name="attribute">Attribute containing configuration of the value.</param>
-        public ParsingValueInfo(PropertyInfo propertyInfo, ValueAttribute attribute) : this(propertyInfo)
+        public ParsingValueInfo(PropertyInfo propertyInfo, ValueAttribute attribute) : base(propertyInfo)
             => this.attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
 
         private ValueAttribute Attribute => attribute as ValueAttribute;

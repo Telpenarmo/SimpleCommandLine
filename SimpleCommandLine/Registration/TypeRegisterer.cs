@@ -70,17 +70,13 @@ namespace SimpleCommandLine.Registration
 
         private void CheckOption(OptionAttribute attr)
         {
-            if (LongOptions.Add(attr.LongName) && ShortOptions.Add(attr.ShortName))
-                return;
-            else
+            if (!(LongOptions.Add(attr.LongName) && ShortOptions.Add(attr.ShortName)))
                 throw new InvalidOperationException("Options must have different names.");
         }
 
         private void CheckValue(ValueAttribute attr)
         {
-            if (ValuesIndices.Add(attr.Index))
-                return;
-            else
+            if (!ValuesIndices.Add(attr.Index))
                 throw new InvalidOperationException("Values must have different indices.");
         }
     }
