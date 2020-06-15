@@ -4,7 +4,10 @@ namespace SimpleCommandLine.Parsing.Converters
 {
     public class StringValueConverter : IValueConverter
     {
-        public object Convert(string value, IFormatProvider formatProvider)
-            => value;
+        public bool Convert(string value, IFormatProvider formatProvider, out object result)
+        {
+            result = value;
+            return true;
+        }
     }
 }

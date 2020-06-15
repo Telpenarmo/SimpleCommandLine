@@ -8,22 +8,27 @@ namespace SimpleCommandLine.Parsing
     {
         protected readonly ParsingArgumentInfo argumentInfo;
         protected readonly IValueConverter valueConverter;
-        protected ValueToken valueToken;
+        protected readonly IFormatProvider formatProvider;
+        protected object value;
 
-        public SingleValueParser(ParsingArgumentInfo argumentInfo, IValueConverter valueConverter)
+        public SingleValueParser(ParsingArgumentInfo argumentInfo, IValueConverter valueConverter, IFormatProvider formatProvider)
         {
             this.argumentInfo = argumentInfo;
             this.valueConverter = valueConverter;
+            this.formatProvider = formatProvider;
+            valueConverter.Convert(string.Empty, formatProvider, out value); // for impilict options
         }
+
+        public virtual bool AcceptsValue => value == null;
+        public virtual bool RequiresValue => value == null;
 
         public void AddValue(ValueToken valueToken)
         {
-            if (this.valueToken == null)
-                this.valueToken = valueToken;
-            else throw new ArgumentException();
+            if (!valueConverter.Convert(valueToken.Value, formatProvider, out value))
+                throw new ArgumentException();
         }
 
-        public virtual void Parse(object target, IFormatProvider formatProvider)
-            => argumentInfo.SetValue(target, valueConverter.Convert(valueToken.Value, formatProvider));
+        public virtual void Parse(object target)
+            => argumentInfo.SetValue(target, value);
     }
 }

@@ -7,12 +7,15 @@ namespace SimpleCommandLine.Parsing.Converters
     {
         public ArrayConverter(Type elementType, IValueConverter valueConverter) : base(elementType, valueConverter) { }
 
-        public override object Convert(IReadOnlyList<string> values, IFormatProvider formatProvider)
+        public override bool Convert(IReadOnlyList<string> values, IFormatProvider formatProvider, out object result)
         {
             var array = Array.CreateInstance(elementType, values.Count);
-            for (var i = 0; i < array.Length; i++)
-                array.SetValue(valueConverter.Convert(values[i], formatProvider), i);
-            return array;
+            for (var i = 0; i < array.Length; i++){
+                valueConverter.Convert(values[i], formatProvider, out object o);
+                array.SetValue(o, i);
+            }
+            result = array;
+            return true;
         }
     }
 }

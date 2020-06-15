@@ -1,8 +1,12 @@
-﻿namespace SimpleCommandLine.Parsing
+﻿using SimpleCommandLine.Tokenization.Tokens;
+
+namespace SimpleCommandLine.Parsing
 {
     internal interface IArgumentParser
     {
-        void AddValue(Tokenization.Tokens.ValueToken token);
-        void Parse(object target, System.IFormatProvider formatProvider);
+        void AddValue(ValueToken token);
+        void Parse(object target);
+        bool RequiresValue { get; }
+        bool AcceptsValue { get; }
     }
 }

@@ -6,23 +6,10 @@ namespace SimpleCommandLine.Parsing
 {
     internal class ConvertersFactory : IConvertersFactory
     {
-        private readonly IDictionary<Type, IValueConverter> valueConverters = new Dictionary<Type, IValueConverter>();
-        private readonly CollectionConvertersFactory collectionConvertersFactory;
+        private readonly IDictionary<Type, IConverter> valueConverters = new Dictionary<Type, IConverter>();
 
-        public ConvertersFactory()
-        {
-            collectionConvertersFactory = new CollectionConvertersFactory(this);
-        }
-
-        public IConverter GetConverter(Type type)
-        {
-            if (type == null) throw new ArgumentNullException(nameof(type));
-
-            if (type.IsCollection())
-                return collectionConvertersFactory.GetConverter(type);
-            else
-                return valueConverters.ContainsKey(type) || TryBuild(type) ? valueConverters[type] : null;
-        }
+        public IConverter<object> GetConverter(Type type)
+            => valueConverters.ContainsKey(type) || TryBuild(type) ? valueConverters[type] : null;
 
         public void RegisterConverter(IValueConverter converter, Type type)
         {
@@ -31,14 +18,46 @@ namespace SimpleCommandLine.Parsing
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
 
-            valueConverters.Add(type, converter);
+            valueConverters.Add(type, converter as IConverter);
         }
 
         private bool TryBuild(Type type)
         {
-            if (type.IsEnum)
-                valueConverters.Add(type, new EnumConverter(type));
-            return valueConverters.ContainsKey(type);
+            Type elementType = type.GetCollectionElementType();
+            if (!(valueConverters.ContainsKey(type) && valueConverters[type] is IValueConverter valueConverter))
+                return false;
+
+            CollectionConverter result = null;
+            if (type.IsArray)
+                result = new ArrayConverter(elementType, valueConverter);
+
+            else if (!type.IsGenericType)
+                return false;
+
+            var typeDef = type.GetGenericTypeDefinition();
+
+            if (typeof(IList<>) == typeDef
+                || typeof(IEnumerable<>) == typeDef
+                || typeof(ICollection<>) == typeDef
+                || typeof(IReadOnlyCollection<>) == typeDef
+                || typeof(IReadOnlyList<>) == typeDef
+                || typeof(List<>) == typeDef
+
+                || typeof(LinkedList<>) == typeDef
+                || typeof(Queue<>) == typeDef
+                || typeof(Stack<>) == typeDef
+
+                || typeof(HashSet<>) == typeDef
+                || typeof(ISet<>) == typeDef)
+                result = new GenericCollectionConverter(type, valueConverter);
+
+            var enumerableDef = typeof(IEnumerable<>).MakeGenericType(elementType);
+            var constructor = type.GetConstructor(new[] { enumerableDef });
+            if (constructor != null)
+                result = new GenericCollectionConverter(type, valueConverter);
+
+            valueConverters[type] = result as IConverter;
+            return true;
         }
     }
 }

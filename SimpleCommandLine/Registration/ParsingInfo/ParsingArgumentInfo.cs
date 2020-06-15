@@ -40,7 +40,7 @@ namespace SimpleCommandLine.Registration
         /// </summary>
         /// <param name="convertersFactory">Used to get the applicable converter.</param>
         /// <returns>Object converting string to this property's type; null if no suitable converter was registered.</returns>
-        public IConverter ChooseConverter(IConvertersFactory convertersFactory)
+        public IConverter<object> ChooseConverter(IConvertersFactory convertersFactory)
             => convertersFactory.GetConverter(PropertyType);
     }
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace SimpleCommandLine
 {
-    internal abstract class CollectionConverter : IConverter
+    internal abstract class CollectionConverter : IConverter<IReadOnlyList<string>>
     {
         protected Type elementType;
         protected IValueConverter valueConverter;
@@ -15,6 +15,6 @@ namespace SimpleCommandLine
             this.valueConverter = valueConverter;
         }
 
-        public abstract object Convert(IReadOnlyList<string> values, IFormatProvider formatProvider);
+        public abstract bool Convert(IReadOnlyList<string> values, IFormatProvider formatProvider, out object result);
     }
 }

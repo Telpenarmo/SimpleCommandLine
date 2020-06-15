@@ -10,12 +10,14 @@ namespace SimpleCommandLine.Parsing
     {
         protected readonly ParsingArgumentInfo argumentInfo;
         protected readonly CollectionConverter collectionConverter;
+        private readonly IFormatProvider formatProvider;
         protected readonly List<ValueToken> values = new List<ValueToken>();
 
-        public CollectionParser(ParsingArgumentInfo argumentInfo, CollectionConverter converter)
+        public CollectionParser(ParsingArgumentInfo argumentInfo, CollectionConverter converter, IFormatProvider formatProvider)
         {
             this.argumentInfo = argumentInfo;
             collectionConverter = converter;
+            this.formatProvider = formatProvider;
         }
 
         public bool RequiresValue => values.Count < argumentInfo.Minimum;
@@ -25,9 +27,11 @@ namespace SimpleCommandLine.Parsing
         public void AddValue(ValueToken valueToken)
             => values.Add(valueToken);
 
-        public void Parse(object target, IFormatProvider formatProvider)
+        public void Parse(object target)
         {
-            argumentInfo.SetValue(target, collectionConverter.Convert(values.Select(v => v.Value).ToArray(), formatProvider));
+            if (!collectionConverter.Convert(values.Select(v => v.Value).ToArray(), formatProvider, out object result))
+                throw new ArgumentException();
+            argumentInfo.SetValue(target, result);
         }
     }
 }

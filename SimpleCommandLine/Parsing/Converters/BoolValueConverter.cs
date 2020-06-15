@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace SimpleCommandLine.Parsing.Converters
 {
-    internal class BoolValueConverter : IValueConverter<bool>
+    internal class BoolValueConverter : IValueConverter
     {
         readonly string[] trueAliases;
         readonly string[] falseAliases;
@@ -20,17 +20,17 @@ namespace SimpleCommandLine.Parsing.Converters
             this.falseAliases = falseAliases ?? throw new ArgumentNullException(nameof(falseAliases));
         }
 
-        public bool Convert(string str, IFormatProvider formatProvider)
+        public bool Convert(string str, IFormatProvider formatProvider, out object result)
         {
             if (trueAliases.Contains(str, StringComparer.OrdinalIgnoreCase))
-                return true;
-            if (falseAliases.Contains(str, StringComparer.OrdinalIgnoreCase))
-                return false;
-            if (bool.TryParse(str, out bool result))
-                return result;
-            throw new FormatException("Value is not valid.");
+                result = true;
+            else if (falseAliases.Contains(str, StringComparer.OrdinalIgnoreCase))
+                result = false;
+            else if (bool.TryParse(str, out bool b))
+                result = b;
+            else
+                result = null;
+            return result != null;
         }
-
-        object IValueConverter.Convert(string str, IFormatProvider formatProvider) => Convert(str, formatProvider);
     }
 }

@@ -4,11 +4,12 @@ namespace SimpleCommandLine.Parsing.Converters
 {
     public class IntValueConverter : IValueConverter
     {
-        public object Convert(string value, IFormatProvider formatProvider)
+        public bool Convert(string value, IFormatProvider formatProvider, out object result)
         {
-            if (int.TryParse(value, out int result))
-                return result;
-            else throw new FormatException($"\"{value}\" is not a valid integer number.");
+            result = null;
+            if (!int.TryParse(value, out int i)) return false;
+            result = i;
+            return true;
         }
     }
 }
