@@ -16,7 +16,7 @@ namespace SimpleCommandLine.Parsing
             this.argumentInfo = argumentInfo;
             this.valueConverter = valueConverter;
             this.formatProvider = formatProvider;
-            valueConverter.Convert(string.Empty, formatProvider, out value); // for impilict options
+            valueConverter.Convert(string.Empty, formatProvider, out value); // for implilict options
         }
 
         public virtual bool AcceptsValue => value == null;
