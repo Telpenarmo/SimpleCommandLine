@@ -26,7 +26,7 @@
             else
                 longNameTokenizer.Next = valueTokenizer;
 
-            return longNameTokenizer;
+            return shortNameTokenizer;
         }
     }
 }

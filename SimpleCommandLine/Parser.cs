@@ -44,7 +44,7 @@ namespace SimpleCommandLine
                 switch (enumerator.Current)
                 {
                     case CommandToken command:
-                        results.Add(builder.Parse());
+                        NewResult();
                         builder = objectBuilderFactory.Build(command.Name);
                         break;
                     case OptionsGroupToken group:
@@ -59,10 +59,12 @@ namespace SimpleCommandLine
                 }
             }
             EnsureLastOptionSet();
+            NewResult();
 
             return new Result(results);
         }
 
+        private void NewResult() => results.Add(builder.Parse());
         protected void HandleOption(OptionToken token)
         {
             EnsureLastOptionSet();

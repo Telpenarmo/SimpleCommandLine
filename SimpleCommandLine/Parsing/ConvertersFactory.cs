@@ -4,11 +4,11 @@ using SimpleCommandLine.Parsing.Converters;
 
 namespace SimpleCommandLine.Parsing
 {
-    internal class ConvertersFactory : IConvertersFactory
+    internal class ConvertersFactory
     {
         private readonly IDictionary<Type, IConverter> valueConverters = new Dictionary<Type, IConverter>();
 
-        public IConverter<object> GetConverter(Type type)
+        public IConverter GetConverter(Type type)
             => valueConverters.ContainsKey(type) || TryBuild(type) ? valueConverters[type] : null;
 
         public void RegisterConverter(IValueConverter converter, Type type)

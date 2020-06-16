@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace SimpleCommandLine
 {
-    internal abstract class CollectionConverter : IConverter<IReadOnlyList<string>>
+    internal abstract class CollectionConverter : IConverter
     {
         protected Type elementType;
         protected IValueConverter valueConverter;

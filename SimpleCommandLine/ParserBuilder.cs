@@ -16,16 +16,16 @@ namespace SimpleCommandLine
     {
         private readonly List<ParsingTypeInfo> types = new List<ParsingTypeInfo>();
         private readonly TypeRegisterer typeRegisterer;
-        private readonly IConvertersFactory convertersFactory = new ConvertersFactory();
+        private readonly ConvertersFactory convertersFactory = new ConvertersFactory();
         private ITokenizerBuilder tokenizerBuilder;
         private IFormatProvider formatProvider;
         private bool globalTypeSet;
 
         public ParserBuilder()
         {
+            LoadDefaultConverters();
             RegisterTokenization(new POSIXTokenizerBuilder());
             typeRegisterer = new TypeRegisterer(convertersFactory);
-            LoadDefaultConverters();
         }
 
         /// <summary>
@@ -118,8 +118,6 @@ namespace SimpleCommandLine
             RegisterConverter(new BoolValueConverter(), typeof(bool));
             RegisterConverter(new FloatValueConverter(), typeof(float));
             RegisterConverter(new IntValueConverter(), typeof(int));
-            //RegisterConverter(StockConverters.DateTimeConverter);
-            //RegisterConverter(StockConverters.TimeSpanConverter);
         }
     }
 }

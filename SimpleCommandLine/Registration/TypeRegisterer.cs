@@ -8,12 +8,12 @@ namespace SimpleCommandLine.Registration
 {
     internal class TypeRegisterer
     {
-        private readonly IConvertersFactory convertersFactory;
+        private readonly ConvertersFactory convertersFactory;
         private readonly HashSet<string> LongOptions = new HashSet<string>();
         private readonly HashSet<string> ShortOptions = new HashSet<string>();
         private readonly HashSet<uint> ValuesIndices = new HashSet<uint>();
 
-        public TypeRegisterer(IConvertersFactory convertersFactory)
+        public TypeRegisterer(ConvertersFactory convertersFactory)
         {
             this.convertersFactory = convertersFactory;
         }
@@ -60,12 +60,12 @@ namespace SimpleCommandLine.Registration
                 throw new InvalidOperationException("Argument property must have \"set\" accesor.");
             if (propertyType.IsAbstract)
                 throw new InvalidOperationException("Type of the property must not be abstract.");
-            if (propertyType.GetCollectionElementType()?.IsCollection() ?? false)
+            if (propertyType.IsCollection() && (propertyType.GetCollectionElementType()?.IsCollection() ?? false))
                 throw new NotSupportedException("Nested collections are not supported.");
             if (propertyType.GetCustomAttribute<FlagsAttribute>() != null)
                 throw new NotSupportedException("Flag enumerations are not supported.");
             if (convertersFactory.GetConverter(propertyType) is null)
-                throw new InvalidOperationException("No converter registered for a type.");
+                throw new InvalidOperationException("No converter registered for:" + propertyType.Name);
         }
 
         private void CheckOption(OptionAttribute attr)

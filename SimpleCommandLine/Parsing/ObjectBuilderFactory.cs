@@ -8,10 +8,10 @@ namespace SimpleCommandLine.Parsing
     internal class ObjectBuilderFactory
     {
         private readonly IEnumerable<ParsingTypeInfo> registeredTypes;
-        private readonly IConvertersFactory convertersFactory;
+        private readonly ConvertersFactory convertersFactory;
         private readonly IFormatProvider formatProvider;
 
-        public ObjectBuilderFactory(IEnumerable<ParsingTypeInfo> registeredTypes, IConvertersFactory convertersFactory, IFormatProvider formatProvider)
+        public ObjectBuilderFactory(IEnumerable<ParsingTypeInfo> registeredTypes, ConvertersFactory convertersFactory, IFormatProvider formatProvider)
         {
             this.registeredTypes = registeredTypes;
             this.convertersFactory = convertersFactory;

@@ -8,7 +8,7 @@ namespace SimpleCommandLine.Parsing
     internal class ObjectBuilder
     {
         private readonly ParsingTypeInfo typeInfo;
-        private readonly IConvertersFactory convertersFactory;
+        private readonly ConvertersFactory convertersFactory;
         private readonly List<IArgumentParser> assignedOptions = new List<IArgumentParser>();
         private readonly List<IArgumentParser> assignedValues = new List<IArgumentParser>();
         private readonly object result;
@@ -16,14 +16,14 @@ namespace SimpleCommandLine.Parsing
         private int usedValuesNumber;
         private readonly int maxValuesNumber;
 
-        public ObjectBuilder(ParsingTypeInfo typeInfo, IConvertersFactory convertersFactory, IFormatProvider formatProvider)
+        public ObjectBuilder(ParsingTypeInfo typeInfo, ConvertersFactory convertersFactory, IFormatProvider formatProvider)
         {
             this.typeInfo = typeInfo;
             this.convertersFactory = convertersFactory;
             this.formatProvider = formatProvider;
             result = typeInfo.Factory.DynamicInvoke();
             maxValuesNumber = AllValuesNumber;
-            if (LastValue.IsCollection)
+            if (maxValuesNumber != 0 && LastValue.IsCollection)
                 maxValuesNumber += LastValue.Maximum - 1;
         }
 
@@ -34,8 +34,14 @@ namespace SimpleCommandLine.Parsing
         private int AllValuesNumber => typeInfo.Values.Count;
         private ParsingValueInfo LastValue => typeInfo.Values[maxValuesNumber - 1];
 
-        public IArgumentParser LastAssignedOption => assignedOptions[assignedOptions.Count - 1];
-        public IArgumentParser LastAssignedValue => assignedValues[assignedValues.Count - 1];
+        private T GetLastItem<T>(IReadOnlyList<T> list) => list.Count switch
+        {
+            0 => default,
+            int n => list[n - 1]
+        };
+        
+        public IArgumentParser LastAssignedOption => GetLastItem(assignedOptions);
+        public IArgumentParser LastAssignedValue => GetLastItem(assignedValues);
 
         public bool AwaitsValue => usedValuesNumber < maxValuesNumber;
 
