@@ -14,7 +14,7 @@ namespace SimpleCommandLine
     /// </summary>
     public class ParserBuilder
     {
-        private readonly List<ParsingTypeInfo> types = new List<ParsingTypeInfo>();
+        private readonly List<TypeInfo> types = new List<TypeInfo>();
         private readonly TypeRegisterer typeRegisterer;
         private readonly ConvertersFactory convertersFactory = new ConvertersFactory();
         private ITokenizerBuilder tokenizerBuilder;

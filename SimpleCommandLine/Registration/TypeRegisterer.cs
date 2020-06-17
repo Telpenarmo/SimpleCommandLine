@@ -18,31 +18,31 @@ namespace SimpleCommandLine.Registration
             this.convertersFactory = convertersFactory;
         }
 
-        public ParsingTypeInfo Register<T>(Func<T> factory)
+        public TypeInfo Register<T>(Func<T> factory)
         {
             var type = typeof(T);
-            var options = ExtractArgs<OptionAttribute, ParsingOptionInfo>(type,
-                pair => new ParsingOptionInfo(pair.Item1, pair.Item2), CheckOption);
-            var values = ExtractArgs<ValueAttribute, ParsingValueInfo>(type,
-                pair => new ParsingValueInfo(pair.Item1, pair.Item2), CheckValue);
+            var options = ExtractArgs<OptionAttribute, OptionInfo>(type,
+                pair => new OptionInfo(pair.Item1, pair.Item2), CheckOption);
+            var values = ExtractArgs<ValueAttribute, ValueInfo>(type,
+                pair => new ValueInfo(pair.Item1, pair.Item2), CheckValue);
 
             return CreateTypeInfo(type, options, values, factory);
         }
 
-        private ParsingTypeInfo CreateTypeInfo<T>(Type type,
-            IEnumerable<ParsingOptionInfo> optionInfos,
-            IEnumerable<ParsingValueInfo> valueInfos, Func<T> factory)
+        private TypeInfo CreateTypeInfo<T>(Type type,
+            IEnumerable<OptionInfo> optionInfos,
+            IEnumerable<ValueInfo> valueInfos, Func<T> factory)
         {
             var commandAttribute = type.GetTypeInfo().GetCustomAttribute<CommandAttribute>();
             return commandAttribute != null
-                ? new ParsingTypeInfo(valueInfos, optionInfos, factory, commandAttribute.Name)
-                : new ParsingTypeInfo(valueInfos, optionInfos, factory);
+                ? new TypeInfo(valueInfos, optionInfos, factory, commandAttribute.Name)
+                : new TypeInfo(valueInfos, optionInfos, factory);
         }
 
         private IEnumerable<TInfo> ExtractArgs<TAttr, TInfo>(Type type,
             Func<(PropertyInfo, TAttr), TInfo> factory,
             Action<TAttr> customCheck = null)
-            where TAttr : ArgumentAttribute where TInfo : ParsingArgumentInfo
+            where TAttr : ArgumentAttribute where TInfo : ArgumentInfo
             => type.GetProperties()
                 .Select(property => (property, attr: property.GetCustomAttribute<TAttr>()))
                 .Where(pair => pair.attr != null)

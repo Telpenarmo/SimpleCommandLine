@@ -7,14 +7,14 @@ namespace SimpleCommandLine.Registration
     /// <summary>
     /// Encapsulates a <see cref="PropertyInfo"/> representing a command-line option.
     /// </summary>
-    internal class ParsingOptionInfo : ParsingArgumentInfo
+    internal class OptionInfo : ArgumentInfo
     {
         /// <summary>
-        /// Creates a new instance of <see cref="ParsingOptionInfo"/> class.
+        /// Creates a new instance of <see cref="OptionInfo"/> class.
         /// </summary>
         /// <param name="propertyInfo">A property to encapsulate.</param>
         /// <param name="attribute">Attribute containing configuration of the option.</param>
-        public ParsingOptionInfo(PropertyInfo propertyInfo, OptionAttribute attribute) : base(propertyInfo)
+        public OptionInfo(PropertyInfo propertyInfo, OptionAttribute attribute) : base(propertyInfo)
         {
             this.attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
         }

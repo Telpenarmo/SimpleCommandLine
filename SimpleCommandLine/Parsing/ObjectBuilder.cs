@@ -7,7 +7,7 @@ namespace SimpleCommandLine.Parsing
 {
     internal class ObjectBuilder
     {
-        private readonly ParsingTypeInfo typeInfo;
+        private readonly TypeInfo typeInfo;
         private readonly ConvertersFactory convertersFactory;
         private readonly List<IArgumentParser> assignedOptions = new List<IArgumentParser>();
         private readonly List<IArgumentParser> assignedValues = new List<IArgumentParser>();
@@ -16,7 +16,7 @@ namespace SimpleCommandLine.Parsing
         private int usedValuesNumber;
         private readonly int maxValuesNumber;
 
-        public ObjectBuilder(ParsingTypeInfo typeInfo, ConvertersFactory convertersFactory, IFormatProvider formatProvider)
+        public ObjectBuilder(TypeInfo typeInfo, ConvertersFactory convertersFactory, IFormatProvider formatProvider)
         {
             this.typeInfo = typeInfo;
             this.convertersFactory = convertersFactory;
@@ -27,12 +27,12 @@ namespace SimpleCommandLine.Parsing
                 maxValuesNumber += LastValue.Maximum - 1;
         }
 
-        private ParsingOptionInfo GetOptionInfo(OptionToken token)
+        private OptionInfo GetOptionInfo(OptionToken token)
             => typeInfo.GetMatchingOptionInfo(token)
                 ?? throw new ArgumentException($"This type does not contain the {token} option.", nameof(token));
 
         private int AllValuesNumber => typeInfo.Values.Count;
-        private ParsingValueInfo LastValue => typeInfo.Values[maxValuesNumber - 1];
+        private ValueInfo LastValue => typeInfo.Values[maxValuesNumber - 1];
 
         private T GetLastItem<T>(IReadOnlyList<T> list) => list.Count switch
         {

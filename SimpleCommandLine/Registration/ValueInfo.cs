@@ -6,15 +6,15 @@ namespace SimpleCommandLine.Registration
     /// <summary>
     /// Encapsulates a <see cref="PropertyInfo"/> representing a command-line value.
     /// </summary>
-    internal class ParsingValueInfo : ParsingArgumentInfo
+    internal class ValueInfo : ArgumentInfo
     {
 
         /// <summary>
-        /// Creates a new instance of <see cref="ParsingValueInfo"/>.
+        /// Creates a new instance of <see cref="ValueInfo"/>.
         /// </summary>
         /// <param name="propertyInfo">A property to encapsulate.</param>
         /// <param name="attribute">Attribute containing configuration of the value.</param>
-        public ParsingValueInfo(PropertyInfo propertyInfo, ValueAttribute attribute) : base(propertyInfo)
+        public ValueInfo(PropertyInfo propertyInfo, ValueAttribute attribute) : base(propertyInfo)
             => this.attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
 
         private ValueAttribute Attribute => attribute as ValueAttribute;

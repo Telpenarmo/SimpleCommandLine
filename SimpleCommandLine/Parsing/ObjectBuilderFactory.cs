@@ -7,11 +7,11 @@ namespace SimpleCommandLine.Parsing
 {
     internal class ObjectBuilderFactory
     {
-        private readonly IEnumerable<ParsingTypeInfo> registeredTypes;
+        private readonly IEnumerable<TypeInfo> registeredTypes;
         private readonly ConvertersFactory convertersFactory;
         private readonly IFormatProvider formatProvider;
 
-        public ObjectBuilderFactory(IEnumerable<ParsingTypeInfo> registeredTypes, ConvertersFactory convertersFactory, IFormatProvider formatProvider)
+        public ObjectBuilderFactory(IEnumerable<TypeInfo> registeredTypes, ConvertersFactory convertersFactory, IFormatProvider formatProvider)
         {
             this.registeredTypes = registeredTypes;
             this.convertersFactory = convertersFactory;
@@ -31,7 +31,7 @@ namespace SimpleCommandLine.Parsing
             return Create(typeInfo);
         }
 
-        private ObjectBuilder Create(ParsingTypeInfo typeInfo)
+        private ObjectBuilder Create(TypeInfo typeInfo)
             => new ObjectBuilder(typeInfo, convertersFactory, formatProvider);
     }
 }

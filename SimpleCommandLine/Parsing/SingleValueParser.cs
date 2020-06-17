@@ -6,12 +6,12 @@ namespace SimpleCommandLine.Parsing
 {
     internal class SingleValueParser : IArgumentParser
     {
-        protected readonly ParsingArgumentInfo argumentInfo;
+        protected readonly ArgumentInfo argumentInfo;
         protected readonly IValueConverter valueConverter;
         protected readonly IFormatProvider formatProvider;
         protected object value;
 
-        public SingleValueParser(ParsingArgumentInfo argumentInfo, IValueConverter valueConverter, IFormatProvider formatProvider)
+        public SingleValueParser(ArgumentInfo argumentInfo, IValueConverter valueConverter, IFormatProvider formatProvider)
         {
             this.argumentInfo = argumentInfo;
             this.valueConverter = valueConverter;

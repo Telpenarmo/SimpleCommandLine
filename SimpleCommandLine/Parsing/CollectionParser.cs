@@ -8,12 +8,12 @@ namespace SimpleCommandLine.Parsing
 {
     internal class CollectionParser : IArgumentParser
     {
-        protected readonly ParsingArgumentInfo argumentInfo;
+        protected readonly ArgumentInfo argumentInfo;
         protected readonly CollectionConverter collectionConverter;
         private readonly IFormatProvider formatProvider;
         protected readonly List<ValueToken> values = new List<ValueToken>();
 
-        public CollectionParser(ParsingArgumentInfo argumentInfo, CollectionConverter converter, IFormatProvider formatProvider)
+        public CollectionParser(ArgumentInfo argumentInfo, CollectionConverter converter, IFormatProvider formatProvider)
         {
             this.argumentInfo = argumentInfo;
             collectionConverter = converter;

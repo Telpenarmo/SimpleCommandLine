@@ -7,16 +7,16 @@ namespace SimpleCommandLine.Registration
     /// <summary>
     /// Encapsulates the <see cref="PropertyInfo"/> representing a command-line argument.
     /// </summary>
-    internal abstract class ParsingArgumentInfo
+    internal abstract class ArgumentInfo
     {
         protected PropertyInfo propertyInfo;
         protected ArgumentAttribute attribute;
 
         /// <summary>
-        /// Creates a new instance of <see cref="ParsingArgumentInfo"/>.
+        /// Creates a new instance of <see cref="ArgumentInfo"/>.
         /// </summary>
         /// <param name="propertyInfo">A property to encapsulate.</param>
-        protected ParsingArgumentInfo(PropertyInfo propertyInfo)
+        protected ArgumentInfo(PropertyInfo propertyInfo)
             => this.propertyInfo = propertyInfo ?? throw new ArgumentNullException(nameof(propertyInfo));
 
         protected Type PropertyType => propertyInfo.PropertyType;
