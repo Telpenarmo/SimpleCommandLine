@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using SimpleCommandLine.Tokenization.Tokens;
+using SimpleCommandLine.Tokens;
 
 namespace SimpleCommandLine.Registration
 {

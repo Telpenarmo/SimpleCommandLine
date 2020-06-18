@@ -1,4 +1,4 @@
-﻿namespace SimpleCommandLine.Tokenization.Tokenizers.POSIX
+﻿namespace SimpleCommandLine.Tokenizers.POSIX
 {
     /// <summary>
     /// Used to build a chain of tokenizers using POSIX standard.

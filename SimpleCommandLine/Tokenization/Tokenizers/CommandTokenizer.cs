@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SimpleCommandLine.Tokenization.Tokens;
+using SimpleCommandLine.Tokens;
 
-namespace SimpleCommandLine.Tokenization.Tokenizers
+namespace SimpleCommandLine.Tokenizers
 {
     /// <summary>
     /// Builds the <see cref="AssignedValueToken"/>.

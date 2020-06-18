@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SimpleCommandLine.Tokenization.Tokens
+namespace SimpleCommandLine.Tokens
 {
     /// <summary>
     /// Represents a group of option tokens.

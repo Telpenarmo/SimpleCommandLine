@@ -1,4 +1,4 @@
-﻿using SimpleCommandLine.Tokenization.Tokens;
+﻿using SimpleCommandLine.Tokens;
 
 namespace SimpleCommandLine.Parsing
 {

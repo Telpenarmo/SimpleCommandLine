@@ -4,8 +4,8 @@ using System.Linq;
 using SimpleCommandLine.Parsing;
 using SimpleCommandLine.Parsing.Converters;
 using SimpleCommandLine.Registration;
-using SimpleCommandLine.Tokenization.Tokenizers;
-using SimpleCommandLine.Tokenization.Tokenizers.POSIX;
+using SimpleCommandLine.Tokenizers;
+using SimpleCommandLine.Tokenizers.POSIX;
 
 namespace SimpleCommandLine
 {
