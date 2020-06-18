@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using SimpleCommandLine.Tokenization.Tokens;
+using SimpleCommandLine.Tokens;
 
-namespace SimpleCommandLine.Tokenization.Tokenizers.POSIX
+namespace SimpleCommandLine.Tokenizers.POSIX
 {
     internal class OptionsGroupTokenizer : ChainTokenizer
     {

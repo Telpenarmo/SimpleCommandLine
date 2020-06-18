@@ -1,6 +1,6 @@
-﻿using SimpleCommandLine.Tokenization.Tokens;
+﻿using SimpleCommandLine.Tokens;
 
-namespace SimpleCommandLine.Tokenization.Tokenizers
+namespace SimpleCommandLine.Tokenizers
 {
     /// <summary>
     /// Base class for tokenizers that form chain of responsibility.

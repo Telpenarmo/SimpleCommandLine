@@ -1,4 +1,4 @@
-﻿namespace SimpleCommandLine.Tokenization.Tokenizers
+﻿namespace SimpleCommandLine.Tokenizers
 {
     /// <summary>
     /// Declares a method for creating tokens.

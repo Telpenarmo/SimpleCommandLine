@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using SimpleCommandLine.Parsing;
-using SimpleCommandLine.Tokenization.Tokens;
-using SimpleCommandLine.Tokenization.Tokenizers;
+using SimpleCommandLine.Tokens;
+using SimpleCommandLine.Tokenizers;
 
 namespace SimpleCommandLine
 {

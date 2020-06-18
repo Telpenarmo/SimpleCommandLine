@@ -1,6 +1,6 @@
-﻿using SimpleCommandLine.Tokenization.Tokens;
+﻿using SimpleCommandLine.Tokens;
 
-namespace SimpleCommandLine.Tokenization.Tokenizers
+namespace SimpleCommandLine.Tokenizers
 {
     /// <summary>
     /// Builds the <see cref="ValueToken"/>.

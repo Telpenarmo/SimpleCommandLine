@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SimpleCommandLine.Tokenization.Tokens
+namespace SimpleCommandLine.Tokens
 {
     /// <summary>
     /// Represents a command-line long option.
