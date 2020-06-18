@@ -20,17 +20,18 @@ namespace SimpleCommandLine.Parsing.Converters
             this.falseAliases = falseAliases ?? throw new ArgumentNullException(nameof(falseAliases));
         }
 
-        public bool Convert(string str, IFormatProvider formatProvider, out object result)
+        public ParsingResult Convert(string str, IFormatProvider formatProvider)
         {
+            ParsingResult result;
             if (trueAliases.Contains(str, StringComparer.OrdinalIgnoreCase))
-                result = true;
+                result = ParsingResult.Success(true);
             else if (falseAliases.Contains(str, StringComparer.OrdinalIgnoreCase))
-                result = false;
+                result = ParsingResult.Success(false);
             else if (bool.TryParse(str, out bool b))
-                result = b;
+                result = ParsingResult.Success(b);
             else
-                result = null;
-            return result != null;
+                result = ParsingResult.Error($"{str} is not a valid boolean.");
+            return result;
         }
     }
 }

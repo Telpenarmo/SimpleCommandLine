@@ -18,6 +18,6 @@ namespace SimpleCommandLine.Parsing
         /// <param name="value">A string to convert.</param>
         /// <param name="formatProvider"></param>
         /// <returns>A converted object.</returns>
-        bool Convert(string value, IFormatProvider formatProvider, out object result);
+        ParsingResult Convert(string value, IFormatProvider formatProvider);
     }
 }

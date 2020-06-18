@@ -4,12 +4,11 @@ namespace SimpleCommandLine.Parsing.Converters
 {
     public class FloatValueConverter : IValueConverter
     {
-        public bool Convert(string value, IFormatProvider formatProvider, out object result)
+        public ParsingResult Convert(string value, IFormatProvider formatProvider)
         {
-            result = null;
-            if (!float.TryParse(value, out float f)) return false;
-            result = f;
-            return true;
+            if (float.TryParse(value, out float f))
+                return ParsingResult.Success(f);
+            return ParsingResult.Error($"{value} is not a valid floating-point number.");
         }
     }
 }

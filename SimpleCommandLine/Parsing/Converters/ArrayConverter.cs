@@ -5,17 +5,19 @@ namespace SimpleCommandLine.Parsing.Converters
 {
     internal class ArrayConverter : CollectionConverter
     {
-        public ArrayConverter(Type elementType, IValueConverter valueConverter) : base(elementType, valueConverter) { }
+        public ArrayConverter(Type elementType, IValueConverter valueConverter)
+            : base(elementType, valueConverter) { }
 
-        public override bool Convert(IReadOnlyList<string> values, IFormatProvider formatProvider, out object result)
+        public override ParsingResult Convert(IReadOnlyList<string> values, IFormatProvider formatProvider)
         {
             var array = Array.CreateInstance(elementType, values.Count);
             for (var i = 0; i < array.Length; i++){
-                valueConverter.Convert(values[i], formatProvider, out object o);
-                array.SetValue(o, i);
+                var res = valueConverter.Convert(values[i], formatProvider);
+                if (res.IsError)
+                    return res;
+                array.SetValue(res.AsSuccess.Result, i);
             }
-            result = array;
-            return true;
+            return ParsingResult.Success(array);
         }
     }
 }

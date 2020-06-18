@@ -27,11 +27,13 @@ namespace SimpleCommandLine.Parsing
         public void AddValue(ValueToken valueToken)
             => values.Add(valueToken);
 
-        public void Parse(object target)
+        public ParsingResult Parse(object target)
         {
-            if (!collectionConverter.Convert(values.Select(v => v.Value).ToArray(), formatProvider, out object result))
-                throw new ArgumentException();
+            var result = collectionConverter.Convert(values.Select(v => v.Value).ToArray(), formatProvider);
+            if (result.IsError)
+                return result;
             argumentInfo.SetValue(target, result);
+            return ParsingResult.Success(target);
         }
     }
 }

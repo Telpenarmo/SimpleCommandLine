@@ -13,13 +13,13 @@ namespace SimpleCommandLine.Parsing.Converters
             this.type = type ?? throw new ArgumentNullException(nameof(type));
         }
 
-        public override bool Convert(IReadOnlyList<string> values, IFormatProvider formatProvider, out object result)
+        public override ParsingResult Convert(IReadOnlyList<string> values, IFormatProvider formatProvider)
         {
-            result = null;
-            if (!base.Convert(values, formatProvider, out object array))
-                return false;
-            result = Activator.CreateInstance(type, new object[] { array });
-            return true;
+            var result = base.Convert(values, formatProvider);
+            if (result.IsError)
+                return result;
+            return ParsingResult.Success(
+                Activator.CreateInstance(type, new object[] { result.AsSuccess.Result }));
         }
     }
 }

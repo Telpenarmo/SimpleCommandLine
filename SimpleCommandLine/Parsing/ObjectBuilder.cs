@@ -39,7 +39,7 @@ namespace SimpleCommandLine.Parsing
             0 => default,
             int n => list[n - 1]
         };
-        
+
         public IArgumentParser LastAssignedOption => GetLastItem(assignedOptions);
         public IArgumentParser LastAssignedValue => GetLastItem(assignedValues);
 
@@ -69,8 +69,16 @@ namespace SimpleCommandLine.Parsing
 
         public object Parse()
         {
-            assignedOptions.ForEach(o => o.Parse(result));
-            assignedValues.ForEach(o => o.Parse(result));
+            foreach (var o in assignedOptions)
+            {
+                var r = o.Parse(result);
+                if (r.IsError) return r;
+            }
+            foreach (var v in assignedValues)
+            {
+                var r = v.Parse(result);
+                if (r.IsError) return r;
+            }
             return result;
         }
     }

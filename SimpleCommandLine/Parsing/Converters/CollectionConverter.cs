@@ -15,6 +15,6 @@ namespace SimpleCommandLine
             this.valueConverter = valueConverter;
         }
 
-        public abstract bool Convert(IReadOnlyList<string> values, IFormatProvider formatProvider, out object result);
+        public abstract ParsingResult Convert(IReadOnlyList<string> values, IFormatProvider formatProvider);
     }
 }

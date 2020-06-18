@@ -9,26 +9,29 @@ namespace SimpleCommandLine.Parsing
         protected readonly ArgumentInfo argumentInfo;
         protected readonly IValueConverter valueConverter;
         protected readonly IFormatProvider formatProvider;
-        protected object value;
+        protected ParsingResult result;
 
         public SingleValueParser(ArgumentInfo argumentInfo, IValueConverter valueConverter, IFormatProvider formatProvider)
         {
             this.argumentInfo = argumentInfo;
             this.valueConverter = valueConverter;
             this.formatProvider = formatProvider;
-            valueConverter.Convert(string.Empty, formatProvider, out value); // for implilict options
         }
 
-        public virtual bool AcceptsValue => value == null;
-        public virtual bool RequiresValue => value == null;
+        public virtual bool AcceptsValue => result == null;
+        public virtual bool RequiresValue => result == null;
 
         public void AddValue(ValueToken valueToken)
         {
-            if (!valueConverter.Convert(valueToken.Value, formatProvider, out value))
-                throw new ArgumentException();
+            result = valueConverter.Convert(valueToken.Value, formatProvider);
         }
 
-        public virtual void Parse(object target)
-            => argumentInfo.SetValue(target, value);
+        public virtual ParsingResult Parse(object target)
+        {
+            if (result.IsError)
+                return result;
+            argumentInfo.SetValue(target, result);
+            return ParsingResult.Success(target); // not necessary allocation
+        }
     }
 }
