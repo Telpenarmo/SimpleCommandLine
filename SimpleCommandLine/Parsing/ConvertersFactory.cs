@@ -9,7 +9,7 @@ namespace SimpleCommandLine.Parsing
         private readonly IDictionary<Type, IConverter> valueConverters = new Dictionary<Type, IConverter>();
 
         public IConverter GetConverter(Type type)
-            => valueConverters.ContainsKey(type) || TryBuild(type) ? valueConverters[type] : null;
+            => valueConverters.ContainsKey(type) || TryCreating(type) ? valueConverters[type] : null;
 
         public void RegisterConverter(IValueConverter converter, Type type)
         {
@@ -18,21 +18,31 @@ namespace SimpleCommandLine.Parsing
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
 
-            valueConverters.Add(type, converter as IConverter);
+            valueConverters.Add(type, converter);
         }
 
-        private bool TryBuild(Type type)
+        private bool TryCreating(Type type)
+        {
+            if (type.IsCollection())
+                return TryCreatingCollectionConverter(type);
+            var fallbackConverter = new FallbackValueConverter(type);
+            if (fallbackConverter.CanConvert)
+                valueConverters.Add(type, fallbackConverter);
+
+            return valueConverters.ContainsKey(type);
+        }
+
+        private bool TryCreatingCollectionConverter(Type type)
         {
             Type elementType = type.GetCollectionElementType();
-            if (!(valueConverters.ContainsKey(type) && valueConverters[type] is IValueConverter valueConverter))
-                return false;
-
-            CollectionConverter result = null;
+            if (!(valueConverters.ContainsKey(elementType) && valueConverters[elementType] is IValueConverter valueConverter))
+                return false; // failure when element's type is not convertable
             if (type.IsArray)
-                result = new ArrayConverter(elementType, valueConverter);
-
-            else if (!type.IsGenericType)
-                return false;
+            {
+                valueConverters[type] = new ArrayConverter(elementType, valueConverter);
+                return true;
+            }
+            else if (!type.IsGenericType) return false;
 
             var typeDef = type.GetGenericTypeDefinition();
 
@@ -49,15 +59,20 @@ namespace SimpleCommandLine.Parsing
 
                 || typeof(HashSet<>) == typeDef
                 || typeof(ISet<>) == typeDef)
-                result = new GenericCollectionConverter(type, valueConverter);
+            {
+                valueConverters[type] = new GenericCollectionConverter(type, valueConverter);
+                return true;
+            }
 
             var enumerableDef = typeof(IEnumerable<>).MakeGenericType(elementType);
             var constructor = type.GetConstructor(new[] { enumerableDef });
             if (constructor != null)
-                result = new GenericCollectionConverter(type, valueConverter);
+            {
+                valueConverters[type] = new GenericCollectionConverter(type, valueConverter);
+                return true;
+            }
 
-            valueConverters[type] = result as IConverter;
-            return true;
+            return false;
         }
     }
 }
