@@ -27,10 +27,6 @@ namespace SimpleCommandLine.Parsing
                 maxValuesNumber += LastValue.Maximum - 1;
         }
 
-        private OptionInfo GetOptionInfo(OptionToken token)
-            => typeInfo.GetMatchingOptionInfo(token)
-                ?? throw new ArgumentException($"This type does not contain the {token} option.", nameof(token));
-
         private int AllValuesNumber => typeInfo.Values.Count;
         private ValueInfo LastValue => typeInfo.Values[maxValuesNumber - 1];
 
@@ -41,19 +37,21 @@ namespace SimpleCommandLine.Parsing
         };
 
         public IArgumentParser LastAssignedOption => GetLastItem(assignedOptions);
-        public IArgumentParser LastAssignedValue => GetLastItem(assignedValues);
+        private IArgumentParser LastAssignedValue => GetLastItem(assignedValues);
 
         public bool AwaitsValue => usedValuesNumber < maxValuesNumber;
 
-        public void AddOption(OptionToken token)
+        public bool TryAddOption(OptionToken token)
         {
-            var info = GetOptionInfo(token);
-            if (info.IsCollection)
+            var info = typeInfo.GetMatchingOptionInfo(token);
+            if (info is null) return false;
+            else if (info.IsCollection)
                 assignedOptions.Add(new CollectionParser(info,
                 info.ChooseConverter(convertersFactory) as CollectionConverter, formatProvider));
             else
                 assignedOptions.Add(new SingleValueParser(info,
                     info.ChooseConverter(convertersFactory) as IValueConverter, formatProvider));
+            return true;
         }
 
         public void AddValue(ValueToken token)
@@ -67,7 +65,7 @@ namespace SimpleCommandLine.Parsing
             usedValuesNumber++;
         }
 
-        public object Parse()
+        public ParsingResult Parse()
         {
             foreach (var o in assignedOptions)
             {
@@ -79,7 +77,7 @@ namespace SimpleCommandLine.Parsing
                 var r = v.Parse(result);
                 if (r.IsError) return r;
             }
-            return result;
+            return ParsingResult.Success(result);
         }
     }
 }

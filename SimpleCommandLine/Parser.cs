@@ -16,6 +16,8 @@ namespace SimpleCommandLine
         private ObjectBuilder builder;
         private readonly IArgumentTokenizer tokenizer;
         private readonly List<object> results = new List<object>();
+        private readonly List<string> errors = new List<string>();
+        private bool ErrorOccured => errors.Count != 0;
 
         internal Parser(IArgumentTokenizer tokenizer, ObjectBuilderFactory objectBuilderFactory)
         {
@@ -37,7 +39,7 @@ namespace SimpleCommandLine
                 .Select(arg => tokenizer.TokenizeArgument(arg)).GetEnumerator();
 
             if (builder is null && !(enumerator.Current is CommandToken))
-                throw new ArgumentException("Generic type was not provided!");
+                return new Result(new[] { "Generic type was not provided!" });
 
             while (enumerator.MoveNext())
             {
@@ -57,18 +59,28 @@ namespace SimpleCommandLine
                         HandleValue(value);
                         break;
                 }
+                if (ErrorOccured) return new Result(errors);
             }
             EnsureLastOptionSet();
             NewResult();
 
-            return new Result(results);
+            return ErrorOccured ? new Result(errors) : new Result(results);
+        }
+        
+        private void NewResult()
+        {
+            if (ErrorOccured) return;
+            ParsingResult result = builder.Parse();
+            if (result.IsError)
+                errors.Add(result.AsError.ErrorMessage);
+            results.Add(result.AsSuccess.Result);
         }
 
-        private void NewResult() => results.Add(builder.Parse());
         protected void HandleOption(OptionToken token)
         {
             EnsureLastOptionSet();
-            builder.AddOption(token);
+            if (!builder.TryAddOption(token))
+                errors.Add($"This type does not contain the {token} option.");
         }
 
         protected void HandleValue(ValueToken token)
@@ -78,13 +90,13 @@ namespace SimpleCommandLine
             else if (builder.AwaitsValue)
                 builder.AddValue(token);
             else
-                throw new ArgumentException("This type does not accept any more values.");
+                errors.Add("This type does not accept any more values.");
         }
 
         private void EnsureLastOptionSet()
         {
             if (builder.LastAssignedOption?.RequiresValue ?? false)
-                throw new ArgumentException("Value was not provided for a token.");
+                errors.Add("Value was not provided for an option.");
         }
     }
 }

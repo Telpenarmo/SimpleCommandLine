@@ -8,6 +8,7 @@ namespace SimpleCommandLine.Parsing
         public static SuccessfulParsingResult Success(object result) => new SuccessfulParsingResult(result);
 
         public SuccessfulParsingResult AsSuccess => this as SuccessfulParsingResult;
+        public ErrorParsingResult AsError => this as ErrorParsingResult;
         public class SuccessfulParsingResult : ParsingResult
         {
             internal SuccessfulParsingResult(object result) => Result = result;
