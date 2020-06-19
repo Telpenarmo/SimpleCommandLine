@@ -19,5 +19,6 @@ namespace SimpleCommandLine.Parsing
         /// <param name="formatProvider"></param>
         /// <returns>A converted object.</returns>
         ParsingResult Convert(string value, IFormatProvider formatProvider);
+        ParsingResult DefaultValue => null;
     }
 }

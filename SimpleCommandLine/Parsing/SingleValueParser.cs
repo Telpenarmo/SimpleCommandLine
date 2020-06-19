@@ -16,6 +16,7 @@ namespace SimpleCommandLine.Parsing
             this.argumentInfo = argumentInfo;
             this.valueConverter = valueConverter;
             this.formatProvider = formatProvider;
+            result = valueConverter.DefaultValue;
         }
 
         public virtual bool AcceptsValue => result == null;

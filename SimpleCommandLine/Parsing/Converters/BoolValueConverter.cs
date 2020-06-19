@@ -10,7 +10,7 @@ namespace SimpleCommandLine.Parsing.Converters
 
         public BoolValueConverter()
         {
-            trueAliases = new[] { string.Empty, "true", "t", "on", "1", "yes", "y", "+" };
+            trueAliases = new[] { "true", "t", "on", "1", "yes", "y", "+" };
             falseAliases = new[] { "false", "f", "off", "0", "no", "n", "-" };
         }
 
@@ -33,5 +33,7 @@ namespace SimpleCommandLine.Parsing.Converters
                 result = ParsingResult.Error($"{str} is not a valid boolean.");
             return result;
         }
+
+        public ParsingResult DefaultValue => ParsingResult.Success(true);
     }
 }
