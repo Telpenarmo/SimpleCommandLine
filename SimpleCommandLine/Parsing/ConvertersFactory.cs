@@ -12,14 +12,7 @@ namespace SimpleCommandLine.Parsing
             => valueConverters.ContainsKey(type) || TryCreating(type) ? valueConverters[type] : null;
 
         public void RegisterConverter(IValueConverter converter, Type type)
-        {
-            if (converter == null)
-                throw new ArgumentNullException(nameof(converter));
-            if (type == null)
-                throw new ArgumentNullException(nameof(type));
-
-            valueConverters.Add(type, converter);
-        }
+            => valueConverters.Add(type, converter);
 
         private bool TryCreating(Type type)
         {
@@ -35,7 +28,8 @@ namespace SimpleCommandLine.Parsing
         private bool TryCreatingCollectionConverter(Type type)
         {
             Type elementType = type.GetCollectionElementType();
-            if (!(valueConverters.ContainsKey(elementType) && valueConverters[elementType] is IValueConverter valueConverter))
+            if (!(valueConverters.ContainsKey(elementType)
+                && valueConverters[elementType] is IValueConverter valueConverter))
                 return false; // failure when element's type is not convertable
             if (type.IsArray)
             {

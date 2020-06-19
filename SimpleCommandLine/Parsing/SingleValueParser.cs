@@ -23,16 +23,13 @@ namespace SimpleCommandLine.Parsing
         public virtual bool RequiresValue => result == null;
 
         public void AddValue(ValueToken valueToken)
-        {
-            result = valueConverter.Convert(valueToken.Value, formatProvider);
-        }
+            => result = valueConverter.Convert(valueToken.Value, formatProvider);
 
         public virtual ParsingResult Parse(object target)
         {
-            if (result.IsError)
-                return result;
+            if (result.IsError) return result;
             argumentInfo.SetValue(target, result);
-            return ParsingResult.Success(target); // not necessary allocation
+            return ParsingResult.Success(target);
         }
     }
 }

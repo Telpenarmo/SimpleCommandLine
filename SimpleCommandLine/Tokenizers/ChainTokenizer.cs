@@ -19,8 +19,7 @@ namespace SimpleCommandLine.Tokenizers
         /// <returns>A constructed token.</returns>
         public IArgumentToken TokenizeArgument(string arg)
         {
-            if (string.IsNullOrWhiteSpace(arg))
-                return null;
+            if (string.IsNullOrWhiteSpace(arg)) return null;
             if (CanHandle(arg)) return Handle(arg);
             else return Next.TokenizeArgument(arg);
         }

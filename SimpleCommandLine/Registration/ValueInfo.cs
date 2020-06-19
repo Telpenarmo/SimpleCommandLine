@@ -8,7 +8,6 @@ namespace SimpleCommandLine.Registration
     /// </summary>
     internal class ValueInfo : ArgumentInfo
     {
-
         /// <summary>
         /// Creates a new instance of <see cref="ValueInfo"/>.
         /// </summary>

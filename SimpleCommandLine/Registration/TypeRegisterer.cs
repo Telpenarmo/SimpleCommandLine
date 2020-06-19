@@ -9,9 +9,9 @@ namespace SimpleCommandLine.Registration
     internal class TypeRegisterer
     {
         private readonly ConvertersFactory convertersFactory;
-        private readonly HashSet<string> LongOptions = new HashSet<string>();
-        private readonly HashSet<string> ShortOptions = new HashSet<string>();
-        private readonly HashSet<uint> ValuesIndices = new HashSet<uint>();
+        private readonly HashSet<string> longOptions = new HashSet<string>();
+        private readonly HashSet<string> shortOptions = new HashSet<string>();
+        private readonly HashSet<uint> valuesIndices = new HashSet<uint>();
 
         public TypeRegisterer(ConvertersFactory convertersFactory)
         {
@@ -70,13 +70,13 @@ namespace SimpleCommandLine.Registration
 
         private void CheckOption(OptionAttribute attr)
         {
-            if (!(LongOptions.Add(attr.LongName) && ShortOptions.Add(attr.ShortName)))
+            if (!(longOptions.Add(attr.LongName) && shortOptions.Add(attr.ShortName)))
                 throw new InvalidOperationException("Options must have different names.");
         }
 
         private void CheckValue(ValueAttribute attr)
         {
-            if (!ValuesIndices.Add(attr.Index))
+            if (!valuesIndices.Add(attr.Index))
                 throw new InvalidOperationException("Values must have different indices.");
         }
     }

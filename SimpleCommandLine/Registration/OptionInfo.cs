@@ -19,8 +19,6 @@ namespace SimpleCommandLine.Registration
             this.attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
         }
 
-        public bool IsImplicit => PropertyType == typeof(bool);
-
         private OptionAttribute Attribute => attribute as OptionAttribute;
 
         /// <summary>

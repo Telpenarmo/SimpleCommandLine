@@ -7,12 +7,12 @@ namespace SimpleCommandLine
     internal abstract class CollectionConverter : IConverter
     {
         protected Type elementType;
-        protected IValueConverter valueConverter;
+        protected IValueConverter elementConverter;
 
-        protected CollectionConverter(Type elementType, IValueConverter valueConverter)
+        protected CollectionConverter(Type elementType, IValueConverter elementConverter)
         {
             this.elementType = elementType;
-            this.valueConverter = valueConverter;
+            this.elementConverter = elementConverter;
         }
 
         public abstract ParsingResult Convert(IReadOnlyList<string> values, IFormatProvider formatProvider);

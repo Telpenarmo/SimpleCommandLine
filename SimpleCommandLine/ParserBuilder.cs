@@ -89,6 +89,9 @@ namespace SimpleCommandLine
         {
             if (converter == null)
                 throw new ArgumentNullException(nameof(converter));
+            if (type is null)
+                throw new ArgumentNullException(nameof(type));
+
             convertersFactory.RegisterConverter(converter, type);
         }
 

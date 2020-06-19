@@ -9,15 +9,12 @@ namespace SimpleCommandLine.Parsing.Converters
 
         public GenericCollectionConverter(Type type, IValueConverter valueConverter)
             : base(type.GenericTypeArguments[0], valueConverter)
-        {
-            this.type = type ?? throw new ArgumentNullException(nameof(type));
-        }
+            => this.type = type;
 
         public override ParsingResult Convert(IReadOnlyList<string> values, IFormatProvider formatProvider)
         {
             var result = base.Convert(values, formatProvider);
-            if (result.IsError)
-                return result;
+            if (result.IsError) return result;
             return ParsingResult.Success(
                 Activator.CreateInstance(type, new object[] { result.AsSuccess.Result }));
         }

@@ -5,7 +5,6 @@
     /// </summary>
     public interface ITokenizerBuilder
     {
-
         /// <summary>
         /// Indicates whether options may be bundled in groups.
         /// </summary>

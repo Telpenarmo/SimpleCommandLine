@@ -33,11 +33,8 @@ namespace SimpleCommandLine
         public string LongName
         {
             get => longName;
-            set
-            {
-                longName = !value.Any(x => char.IsWhiteSpace(x)) ? value
-                    : throw new ArgumentException($"{nameof(LongName)} value must not contain any white spaces.");
-            }
+            set => longName = !value.Any(x => char.IsWhiteSpace(x)) ? value
+                : throw new ArgumentException($"{nameof(LongName)} value must not contain any white spaces.");
         }
     }
 }
