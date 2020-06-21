@@ -17,16 +17,16 @@
         public IArgumentTokenizer BuildTokenizer()
         {
             var valueTokenizer = new ValueTokenizer();
-            var shortNameTokenizer = new ShortNameOptionTokenizer();
-            var longNameTokenizer = new LongNameOptionTokenizer();
+            var shortOptionTokenizer = new ShortOptionTokenizer();
+            var longOptionTokenizer = new LongOptionTokenizer();
 
-            shortNameTokenizer.Next = longNameTokenizer;
+            shortOptionTokenizer.Next = longOptionTokenizer;
             if (AllowShortOptionGroups)
-                longNameTokenizer.Next = new OptionsGroupTokenizer() { Next = valueTokenizer };
+                longOptionTokenizer.Next = new OptionsGroupTokenizer() { Next = valueTokenizer };
             else
-                longNameTokenizer.Next = valueTokenizer;
+                longOptionTokenizer.Next = valueTokenizer;
 
-            return shortNameTokenizer;
+            return shortOptionTokenizer;
         }
     }
 }

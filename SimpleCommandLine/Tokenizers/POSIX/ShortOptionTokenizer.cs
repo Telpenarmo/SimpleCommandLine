@@ -2,7 +2,7 @@
 
 namespace SimpleCommandLine.Tokenizers.POSIX
 {
-    internal class ShortNameOptionTokenizer : ChainTokenizer
+    internal class ShortOptionTokenizer : ChainTokenizer
     {
         public override bool CanHandle(string arg) => arg[0] == '-' && arg.Length == 2;
 

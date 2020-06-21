@@ -3,23 +3,23 @@ namespace SimpleCommandLine.Parsing
     public abstract class ParsingResult
     {
         public abstract bool IsError { get; }
-        public static ErrorParsingResult Error(string message) => new ErrorParsingResult(message);
-        public static SuccessfulParsingResult Success(object result) => new SuccessfulParsingResult(result);
+        public static ParsingResult Error(string message) => new ErrorParsingResult(message);
+        public static ParsingResult Success(object result) => new SuccessfulParsingResult(result);
 
-        public SuccessfulParsingResult AsSuccess => this as SuccessfulParsingResult;
-        public ErrorParsingResult AsError => this as ErrorParsingResult;
-        
-        public class SuccessfulParsingResult : ParsingResult
+        public object ResultObject => (this as SuccessfulParsingResult)?.Result;
+        public string ErrorMessage => (this as ErrorParsingResult)?.Message;
+
+        private class SuccessfulParsingResult : ParsingResult
         {
             internal SuccessfulParsingResult(object result) => Result = result;
             public object Result { get; }
             public override bool IsError => false;
         }
 
-        public class ErrorParsingResult : ParsingResult
+        private class ErrorParsingResult : ParsingResult
         {
-            internal ErrorParsingResult(string errorMessage) => ErrorMessage = errorMessage;
-            public string ErrorMessage { get; }
+            internal ErrorParsingResult(string errorMessage) => Message = errorMessage;
+            public string Message { get; }
             public override bool IsError => true;
         }
     }

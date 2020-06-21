@@ -2,7 +2,7 @@
 
 namespace SimpleCommandLine.Tokenizers.POSIX
 {
-    internal class LongNameOptionTokenizer : ChainTokenizer
+    internal class LongOptionTokenizer : ChainTokenizer
     {
         public override bool CanHandle(string arg) => arg.StartsWith("--") && arg.Length > 3;
 

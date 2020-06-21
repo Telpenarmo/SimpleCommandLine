@@ -12,7 +12,7 @@ namespace SimpleCommandLine
             if (type.IsArray)
                 return type.GetElementType();
             else if (typeof(System.Collections.IEnumerable).IsAssignableFrom(type))
-                return type.GenericTypeArguments[0];
+                return type.IsGenericType ? type.GenericTypeArguments[0] : typeof(object);
             else return null;
         }
     }

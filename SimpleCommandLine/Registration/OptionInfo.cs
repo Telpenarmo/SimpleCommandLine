@@ -15,11 +15,10 @@ namespace SimpleCommandLine.Registration
         /// <param name="propertyInfo">A property to encapsulate.</param>
         /// <param name="attribute">Attribute containing configuration of the option.</param>
         public OptionInfo(PropertyInfo propertyInfo, OptionAttribute attribute) : base(propertyInfo)
-        {
-            this.attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
-        }
+            => this.attribute = attribute;
 
         private OptionAttribute Attribute => attribute as OptionAttribute;
+        public int Minimum => Attribute.Minimum;
 
         /// <summary>
         /// Checks if given token matches current option.

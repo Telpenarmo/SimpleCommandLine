@@ -1,72 +1,81 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SimpleCommandLine.Parsing.Converters;
 
 namespace SimpleCommandLine.Parsing
 {
     internal class ConvertersFactory
     {
-        private readonly IDictionary<Type, IConverter> valueConverters = new Dictionary<Type, IConverter>();
+        private readonly IDictionary<Type, IConverter> converters = new Dictionary<Type, IConverter>();
 
         public IConverter GetConverter(Type type)
-            => valueConverters.ContainsKey(type) || TryCreating(type) ? valueConverters[type] : null;
+            => converters.ContainsKey(type) || TryFind(type) || TryCreating(type)
+                ? converters[type] : null;
 
         public void RegisterConverter(IValueConverter converter, Type type)
-            => valueConverters.Add(type, converter);
+            => converters.Add(type, converter);
 
+        private bool TryFind(Type type)
+        {
+            var convs = converters.Where(c => type.IsAssignableFrom(c.Key));
+            if (!convs.Any()) return false;
+            converters[type] = convs.First().Value;
+            return true;
+        }
         private bool TryCreating(Type type)
         {
             if (type.IsCollection())
                 return TryCreatingCollectionConverter(type);
             var fallbackConverter = new FallbackValueConverter(type);
-            if (fallbackConverter.CanConvert)
-                valueConverters.Add(type, fallbackConverter);
-
-            return valueConverters.ContainsKey(type);
+            if (!fallbackConverter.CanConvert) return false;
+            converters.Add(type, fallbackConverter);
+            return true;
         }
 
         private bool TryCreatingCollectionConverter(Type type)
         {
             Type elementType = type.GetCollectionElementType();
-            if (!(valueConverters.ContainsKey(elementType)
-                && valueConverters[elementType] is IValueConverter valueConverter))
+            if (!(converters.ContainsKey(elementType)
+                && converters[elementType] is IValueConverter valueConverter))
                 return false; // failure when element's type is not convertable
-            if (type.IsArray)
+
+            if (type.IsArray || type.IsAssignableFrom(typeof(Array)))
             {
-                valueConverters[type] = new ArrayConverter(elementType, valueConverter);
+                converters[type] = new ArrayConverter(elementType, valueConverter);
                 return true;
             }
-            else if (!type.IsGenericType) return false;
 
+            else if (!type.IsGenericType) return false;
             var typeDef = type.GetGenericTypeDefinition();
 
             if (typeof(IList<>) == typeDef
                 || typeof(IEnumerable<>) == typeDef
                 || typeof(ICollection<>) == typeDef
                 || typeof(IReadOnlyCollection<>) == typeDef
-                || typeof(IReadOnlyList<>) == typeDef
-                || typeof(List<>) == typeDef
+                || typeof(IReadOnlyList<>) == typeDef)
+            {
+                converters[type] = new GenericCollectionConverter(typeof(List<>)
+                    .MakeGenericType(elementType), valueConverter);
+                return true;
+            }
 
-                || typeof(LinkedList<>) == typeDef
+            if (typeof(LinkedList<>) == typeDef
                 || typeof(Queue<>) == typeDef
                 || typeof(Stack<>) == typeDef
-
+                || typeof(List<>) == typeDef
                 || typeof(HashSet<>) == typeDef
-                || typeof(ISet<>) == typeDef)
+                || typeof(SortedSet<>) == typeDef)
             {
-                valueConverters[type] = new GenericCollectionConverter(type, valueConverter);
+                converters[type] = new GenericCollectionConverter(type, valueConverter);
                 return true;
             }
 
             var enumerableDef = typeof(IEnumerable<>).MakeGenericType(elementType);
             var constructor = type.GetConstructor(new[] { enumerableDef });
-            if (constructor != null)
-            {
-                valueConverters[type] = new GenericCollectionConverter(type, valueConverter);
-                return true;
-            }
-
-            return false;
+            if (constructor == null) return false;
+            converters[type] = new GenericCollectionConverter(type, valueConverter);
+            return true;
         }
     }
 }

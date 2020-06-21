@@ -20,7 +20,7 @@ namespace SimpleCommandLine.Parsing
             this.formatProvider = formatProvider;
         }
 
-        public bool RequiresValue => values.Count < argumentInfo.Minimum;
+        public bool RequiresValue => argumentInfo is OptionInfo opt && values.Count < opt.Minimum;
         public bool AcceptsValue => values.Count < argumentInfo.Maximum;
 
         public void AddValue(ValueToken valueToken)
@@ -30,8 +30,8 @@ namespace SimpleCommandLine.Parsing
         {
             var result = collectionConverter.Convert(values.Select(v => v.Value).ToArray(), formatProvider);
             if (result.IsError) return result;
-            argumentInfo.SetValue(target, result);
-            return ParsingResult.Success(target);
+            argumentInfo.SetValue(target, result.ResultObject);
+            return null;
         }
     }
 }

@@ -16,7 +16,7 @@ namespace SimpleCommandLine.Parsing.Converters
             var result = base.Convert(values, formatProvider);
             if (result.IsError) return result;
             return ParsingResult.Success(
-                Activator.CreateInstance(type, new object[] { result.AsSuccess.Result }));
+                Activator.CreateInstance(type, new object[] { result.ResultObject }));
         }
     }
 }

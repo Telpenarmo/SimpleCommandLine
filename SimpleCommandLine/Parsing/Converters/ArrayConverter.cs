@@ -14,7 +14,7 @@ namespace SimpleCommandLine.Parsing.Converters
             for (var i = 0; i < array.Length; i++){
                 var res = elementConverter.Convert(values[i], formatProvider);
                 if (res.IsError) return res;
-                array.SetValue(res.AsSuccess.Result, i);
+                array.SetValue(res.ResultObject, i);
             }
             return ParsingResult.Success(array);
         }

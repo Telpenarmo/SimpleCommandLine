@@ -25,7 +25,6 @@ namespace SimpleCommandLine.Registration
         /// Determines whether this argument may get multiple arguments.
         /// </summary>
         public bool IsCollection => PropertyType.IsCollection();
-        public int Minimum => attribute.Minimum;
         public int Maximum => attribute.Maximum;
 
         /// <summary>

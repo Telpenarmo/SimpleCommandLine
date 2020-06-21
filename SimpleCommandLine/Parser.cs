@@ -35,15 +35,15 @@ namespace SimpleCommandLine
         public Result Parse(IEnumerable<string> args)
         {
             builder = objectBuilderFactory.Build();
-            var enumerator = (args ?? Enumerable.Empty<string>())
-                .Select(arg => tokenizer.TokenizeArgument(arg)).GetEnumerator();
+            var tokens = (args ?? Enumerable.Empty<string>())
+                .Select(arg => tokenizer.TokenizeArgument(arg));
 
-            if (builder is null && !(enumerator.Current is CommandToken))
-                return new Result(new[] { "Generic type was not provided!" });
+            if (builder is null && !(tokens.FirstOrDefault() is CommandToken))
+                return Result.Error(new[] { "Generic type was not provided!" });
 
-            while (enumerator.MoveNext())
+            foreach (var token in tokens)
             {
-                switch (enumerator.Current)
+                switch (token)
                 {
                     case CommandToken command:
                         NewResult();
@@ -59,28 +59,31 @@ namespace SimpleCommandLine
                         HandleValue(value);
                         break;
                 }
-                if (ErrorOccured) return new Result(errors);
+                if (ErrorOccured) return Result.Error(errors);
             }
             EnsureLastOptionSet();
             NewResult();
 
-            return ErrorOccured ? new Result(errors) : new Result(results);
+            return ErrorOccured ? Result.Error(errors) : Result.Success(results);
         }
         
         private void NewResult()
         {
-            if (ErrorOccured) return;
+            if (builder is null || ErrorOccured) return;
             ParsingResult result = builder.Parse();
             if (result.IsError)
-                errors.Add(result.AsError.ErrorMessage);
-            results.Add(result.AsSuccess.Result);
+            {
+                errors.Add(result.ErrorMessage);
+                return;
+            }
+            results.Add(result.ResultObject);
         }
 
         protected void HandleOption(OptionToken token)
         {
             EnsureLastOptionSet();
             if (!builder.TryAddOption(token))
-                errors.Add($"This type does not contain the {token} option.");
+                errors.Add($"The current type does not contain the \"{token}\" option.");
         }
 
         protected void HandleValue(ValueToken token)
@@ -90,7 +93,7 @@ namespace SimpleCommandLine
             else if (builder.AwaitsValue)
                 builder.AddValue(token);
             else
-                errors.Add("This type does not accept any more values.");
+                errors.Add("The current type does not accept any more values.");
         }
 
         private void EnsureLastOptionSet()

@@ -28,8 +28,8 @@ namespace SimpleCommandLine.Parsing
         public virtual ParsingResult Parse(object target)
         {
             if (result.IsError) return result;
-            argumentInfo.SetValue(target, result);
-            return ParsingResult.Success(target);
+            argumentInfo.SetValue(target, result.ResultObject);
+            return null;
         }
     }
 }
