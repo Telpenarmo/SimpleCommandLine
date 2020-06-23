@@ -68,7 +68,8 @@ namespace SimpleCommandLine.Registration
 
         private void CheckOption(OptionAttribute attr)
         {
-            if (!(longOptions.Add(attr.LongName) && shortOptions.Add(attr.ShortName)))
+            if (!(AddIfNotNull(longOptions, attr.LongName)
+                && AddIfNotNull(shortOptions, attr.ShortName)))
                 throw new InvalidOperationException("Options must have different names.");
         }
 
@@ -77,5 +78,7 @@ namespace SimpleCommandLine.Registration
             if (!valuesIndices.Add(attr.Index))
                 throw new InvalidOperationException("Values must have different indices.");
         }
+
+        private bool AddIfNotNull(HashSet<string> set, string item) => item == null || set.Add(item);
     }
 }

@@ -64,7 +64,11 @@ namespace SimpleCommandLine
             EnsureLastOptionSet();
             NewResult();
 
-            return ErrorOccured ? Result.Error(errors) : Result.Success(results);
+            var result = ErrorOccured ? Result.Error(errors) : Result.Success(results);
+            errors.Clear();
+            results.Clear();
+            builder = null;
+            return result;
         }
         
         private void NewResult()

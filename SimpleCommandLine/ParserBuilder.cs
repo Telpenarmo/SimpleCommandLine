@@ -24,7 +24,7 @@ namespace SimpleCommandLine
         public ParserBuilder()
         {
             LoadDefaultConverters();
-            RegisterTokenization(new POSIXTokenizerBuilder());
+            RegisterTokenization(new POSIXTokenizerBuilder() { AllowShortOptionGroups = true });
             typeRegisterer = new TypeRegisterer(convertersFactory);
         }
 

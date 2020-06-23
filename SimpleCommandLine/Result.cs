@@ -11,6 +11,7 @@ namespace SimpleCommandLine
     {
         internal static Result Success(IEnumerable<object> parsed) => new SuccessResult(parsed);
         internal static Result Error(IEnumerable<string> messages) => new ErrorResult(messages);
+        public bool IsError => this is ErrorResult;
         public T GetResult<T>() where T : class
         {
             if (this is SuccessResult s)
