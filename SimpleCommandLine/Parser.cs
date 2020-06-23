@@ -58,6 +58,11 @@ namespace SimpleCommandLine
                     case ValueToken value:
                         HandleValue(value);
                         break;
+                    case AssignedValueToken assignedValue:
+                        HandleOption(assignedValue.Option);
+                        builder.LastAssignedOption.AddValue(assignedValue.Value);
+                        break;
+
                 }
                 if (ErrorOccured) return Result.Error(errors);
             }
