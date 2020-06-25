@@ -8,7 +8,7 @@ namespace SimpleCommandLine.Parsing.Converters
         {
             if (int.TryParse(value, out int i))
                 return ParsingResult.Success(i);
-            return ParsingResult.Error($"{value} is not a valid integer number.");
+            return ParsingResult.Error($"\"{value}\" is not a valid integer number.");
         }
     }
 }

@@ -8,7 +8,7 @@ namespace SimpleCommandLine.Parsing.Converters
         {
             if (float.TryParse(value, out float f))
                 return ParsingResult.Success(f);
-            return ParsingResult.Error($"{value} is not a valid floating-point number.");
+            return ParsingResult.Error($"\"{value}\" is not a valid floating-point number.");
         }
     }
 }

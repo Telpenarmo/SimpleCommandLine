@@ -13,10 +13,7 @@ namespace SimpleCommandLine.Registration
         private readonly HashSet<string> shortOptions = new HashSet<string>();
         private readonly HashSet<uint> valuesIndices = new HashSet<uint>();
 
-        public TypeRegisterer(ConvertersFactory convertersFactory)
-        {
-            this.convertersFactory = convertersFactory;
-        }
+        public TypeRegisterer(ConvertersFactory convertersFactory) => this.convertersFactory = convertersFactory;
 
         public TypeInfo Register<T>(Func<T> factory)
         {
@@ -26,7 +23,16 @@ namespace SimpleCommandLine.Registration
             var values = ExtractArgs<ValueAttribute, ValueInfo>(type,
                 pair => new ValueInfo(pair.Item1, pair.Item2), CheckValue);
 
-            return CreateTypeInfo(type, options, values, factory);
+            var info = CreateTypeInfo(type, options, values, factory);
+            Reset();
+            return info;
+        }
+
+        private void Reset()
+        {
+            longOptions.Clear();
+            shortOptions.Clear();
+            valuesIndices.Clear();
         }
 
         private TypeInfo CreateTypeInfo<T>(Type type,

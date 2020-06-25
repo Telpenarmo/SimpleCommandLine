@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 
 namespace SimpleCommandLine
@@ -16,9 +15,8 @@ namespace SimpleCommandLine
         {
             if (this is SuccessResult s)
             {
-                foreach (var type in s.Parsed ?? Enumerable.Empty<object>())
-                    if (type is T t)
-                        return t;
+                foreach (var type in s.Parsed)
+                    if (type is T t) return t;
             }
             return null;
         }
@@ -32,17 +30,17 @@ namespace SimpleCommandLine
         public Result WithParsed<T>(Action<T> action)
         {
             if (this is SuccessResult s)
-            {
                 foreach (var type in s.Parsed)
-                    if (type is T t)
-                        action(t);
-            }
+                    if (type is T t) action(t);
             return this;
         }
+
+        public IEnumerable<string> Errors => (this as ErrorResult)?.Messages;
+
         private class ErrorResult : Result
         {
-            public IEnumerable<string> Errors { get; }
-            public ErrorResult(IEnumerable<string> errors) => Errors = errors;
+            public IEnumerable<string> Messages { get; }
+            public ErrorResult(IEnumerable<string> messages) => Messages = messages;
         }
 
         private class SuccessResult : Result

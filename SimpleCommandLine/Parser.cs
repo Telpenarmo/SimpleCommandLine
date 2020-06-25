@@ -15,8 +15,8 @@ namespace SimpleCommandLine
         private readonly ObjectBuilderFactory objectBuilderFactory;
         private ObjectBuilder builder;
         private readonly IArgumentTokenizer tokenizer;
-        private readonly List<object> results = new List<object>();
-        private readonly List<string> errors = new List<string>();
+        private List<object> results = new List<object>();
+        private List<string> errors = new List<string>();
         private bool ErrorOccured => errors.Count != 0;
 
         internal Parser(IArgumentTokenizer tokenizer, ObjectBuilderFactory objectBuilderFactory)
@@ -64,28 +64,43 @@ namespace SimpleCommandLine
                         break;
 
                 }
-                if (ErrorOccured) return Result.Error(errors);
+                if (ErrorOccured) return Error();
             }
             EnsureLastOptionSet();
             NewResult();
 
-            var result = ErrorOccured ? Result.Error(errors) : Result.Success(results);
-            errors.Clear();
-            results.Clear();
-            builder = null;
-            return result;
+            return ErrorOccured ? Error() : Success();
         }
-        
+
         private void NewResult()
         {
             if (builder is null || ErrorOccured) return;
             ParsingResult result = builder.Parse();
             if (result.IsError)
-            {
                 errors.Add(result.ErrorMessage);
-                return;
-            }
-            results.Add(result.ResultObject);
+            else
+                results.Add(result.ResultObject);
+        }
+
+        private Result Error()
+        {
+            var old = errors;
+            Reset();
+            return Result.Error(old);
+        }
+
+        private Result Success()
+        {
+            var old = results;
+            Reset();
+            return Result.Success(old);
+        }
+
+        private void Reset()
+        {
+            errors = new List<string>();
+            results = new List<object>();
+            builder = null;
         }
 
         protected void HandleOption(OptionToken token)

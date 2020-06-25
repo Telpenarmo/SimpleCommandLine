@@ -30,7 +30,7 @@ namespace SimpleCommandLine.Parsing.Converters
             else if (bool.TryParse(str, out bool b))
                 result = ParsingResult.Success(b);
             else
-                result = ParsingResult.Error($"{str} is not a valid boolean.");
+                result = ParsingResult.Error($"\"{str}\" is not a valid boolean.");
             return result;
         }
 
