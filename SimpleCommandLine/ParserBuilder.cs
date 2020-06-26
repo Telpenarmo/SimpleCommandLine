@@ -117,10 +117,26 @@ namespace SimpleCommandLine
 
         private void LoadDefaultConverters()
         {
-            RegisterConverter(new StringValueConverter(), typeof(string));
+            RegisterConverter(StockConverters.StringConverter, typeof(string));
+            RegisterConverter(StockConverters.StringConverter, typeof(object));
             RegisterConverter(new BoolValueConverter(), typeof(bool));
-            RegisterConverter(new FloatValueConverter(), typeof(float));
-            RegisterConverter(new IntValueConverter(), typeof(int));
+            RegisterConverter(NumericalValueConverters.ByteConverter, typeof(byte));
+            RegisterConverter(NumericalValueConverters.SByteConverter, typeof(sbyte));
+            RegisterConverter(NumericalValueConverters.DoubleConverter, typeof(double));
+            RegisterConverter(NumericalValueConverters.FloatConverter, typeof(float));
+            RegisterConverter(NumericalValueConverters.DecimalConverter, typeof(decimal));
+            RegisterConverter(NumericalValueConverters.Int16Converter, typeof(short));
+            RegisterConverter(NumericalValueConverters.Int32Converter, typeof(int));
+            RegisterConverter(NumericalValueConverters.Int64Converter, typeof(long));
+            RegisterConverter(NumericalValueConverters.UInt16Converter, typeof(ushort));
+            RegisterConverter(NumericalValueConverters.UInt32Converter, typeof(uint));
+            RegisterConverter(NumericalValueConverters.UInt64Converter, typeof(ulong));
+            RegisterConverter(StockConverters.GuidConverter, typeof(Guid));
+            RegisterConverter(StockConverters.IPAdressConverter, typeof(System.Net.IPAddress));
+            RegisterConverter(StockConverters.DateTimeConverter, typeof(DateTime));
+            RegisterConverter(StockConverters.DateTimeOffsetConverter, typeof(DateTimeOffset));
+            RegisterConverter(StockConverters.TimeSpanConverter, typeof(TimeSpan));
+            RegisterConverter(StockConverters.URIConverter, typeof(Uri));
         }
     }
 }
