@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace SimpleCommandLine.Parsing.Converters
 {
-    internal class BoolValueConverter : IValueConverter
+    internal class BoolValueConverter : ISingleValueConverter
     {
         readonly string[] trueAliases;
         readonly string[] falseAliases;

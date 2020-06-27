@@ -41,12 +41,12 @@ namespace SimpleCommandLine.Parsing
         {
             var info = typeInfo.GetMatchingOptionInfo(token);
             if (info is null) return false;
-            else if (info.IsCollection)
+            else if (info.IsMulltiValued)
                 assignedOptions.Add(new CollectionParser(info,
                 info.ChooseConverter(convertersFactory) as CollectionConverter, formatProvider));
             else
                 assignedOptions.Add(new SingleValueParser(info,
-                    info.ChooseConverter(convertersFactory) as IValueConverter, formatProvider));
+                    info.ChooseConverter(convertersFactory) as ISingleValueConverter, formatProvider));
             return true;
         }
 
@@ -55,12 +55,12 @@ namespace SimpleCommandLine.Parsing
             if (!(LastAssignedValue?.AcceptsValue ?? false))
             {
                 var next = typeInfo.Values[usedValuesNumber];
-                if (next.IsCollection)
+                if (next.IsMulltiValued)
                     assignedValues.Add(new CollectionParser(next,
-                        next.ChooseConverter(convertersFactory) as CollectionConverter, formatProvider));
+                        next.ChooseConverter(convertersFactory) as IMultipleValueConverter, formatProvider));
                 else
                     assignedValues.Add(new SingleValueParser(next,
-                        next.ChooseConverter(convertersFactory) as IValueConverter, formatProvider));
+                        next.ChooseConverter(convertersFactory) as ISingleValueConverter, formatProvider));
                 usedValuesNumber++;
             }
             LastAssignedValue.AddValue(token);

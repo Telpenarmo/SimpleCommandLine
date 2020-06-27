@@ -3,12 +3,18 @@ using System.Collections.Generic;
 
 namespace SimpleCommandLine.Parsing.Converters
 {
-    internal class ArrayConverter : CollectionConverter
+    internal class ArrayConverter : IMultipleValueConverter
     {
-        public ArrayConverter(Type elementType, IValueConverter valueConverter)
-            : base(elementType, valueConverter) { }
+        private readonly Type elementType;
+        private readonly ISingleValueConverter elementConverter;
 
-        public override ParsingResult Convert(IReadOnlyList<string> values, IFormatProvider formatProvider)
+        public ArrayConverter(Type elementType, ISingleValueConverter elementConverter)
+        {
+            this.elementType = elementType;
+            this.elementConverter = elementConverter;
+        }
+
+        public ParsingResult Convert(IReadOnlyList<string> values, IFormatProvider formatProvider)
         {
             var array = Array.CreateInstance(elementType, values.Count);
             for (var i = 0; i < array.Length; i++){

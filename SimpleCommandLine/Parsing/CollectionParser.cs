@@ -9,18 +9,18 @@ namespace SimpleCommandLine.Parsing
     internal class CollectionParser : IArgumentParser
     {
         protected readonly ArgumentInfo argumentInfo;
-        protected readonly CollectionConverter collectionConverter;
+        protected readonly IMultipleValueConverter collectionConverter;
         private readonly IFormatProvider formatProvider;
         protected readonly List<ValueToken> values = new List<ValueToken>();
 
-        public CollectionParser(ArgumentInfo argumentInfo, CollectionConverter converter, IFormatProvider formatProvider)
+        public CollectionParser(ArgumentInfo argumentInfo, IMultipleValueConverter converter, IFormatProvider formatProvider)
         {
             this.argumentInfo = argumentInfo;
             collectionConverter = converter;
             this.formatProvider = formatProvider;
         }
 
-        public bool RequiresValue => argumentInfo is OptionInfo opt && values.Count < opt.Minimum;
+        public bool RequiresValue => values.Count < argumentInfo.Minimum;
         public bool AcceptsValue => values.Count < argumentInfo.Maximum;
 
         public void AddValue(ValueToken valueToken)
@@ -28,6 +28,8 @@ namespace SimpleCommandLine.Parsing
 
         public ParsingResult Parse(object target)
         {
+            if (RequiresValue) return ParsingResult.Error("Insufficient args given.");
+
             var result = collectionConverter.Convert(values.Select(v => v.Value).ToArray(), formatProvider);
             if (result.IsError) return result;
             argumentInfo.SetValue(target, result.ResultObject);

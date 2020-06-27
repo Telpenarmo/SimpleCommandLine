@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SimpleCommandLine.Parsing
 {
@@ -10,7 +11,7 @@ namespace SimpleCommandLine.Parsing
     /// <summary>
     /// Provides a method for converting a string to a specified type.
     /// </summary>
-    public interface IValueConverter : IConverter
+    public interface ISingleValueConverter : IConverter
     {
         /// <summary>
         /// Converts a given string to a specified type.
@@ -20,5 +21,10 @@ namespace SimpleCommandLine.Parsing
         /// <returns>A converted object.</returns>
         ParsingResult Convert(string value, IFormatProvider formatProvider);
         ParsingResult DefaultValue => null;
+    }
+
+    internal interface IMultipleValueConverter : IConverter
+    {
+        ParsingResult Convert(IReadOnlyList<string> values, IFormatProvider formatProvider);
     }
 }

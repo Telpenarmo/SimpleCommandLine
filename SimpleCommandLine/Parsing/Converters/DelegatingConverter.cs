@@ -2,7 +2,7 @@ using System;
 
 namespace SimpleCommandLine.Parsing.Converters
 {
-    public class DelegatingConverter<T> : IValueConverter
+    public class DelegatingConverter<T> : ISingleValueConverter
     {
         private readonly Func<string, IFormatProvider, ParsingResult> converter;
 

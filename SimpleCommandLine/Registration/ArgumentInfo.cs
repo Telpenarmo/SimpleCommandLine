@@ -17,15 +17,39 @@ namespace SimpleCommandLine.Registration
         /// </summary>
         /// <param name="propertyInfo">A property to encapsulate.</param>
         protected ArgumentInfo(PropertyInfo propertyInfo)
-            => this.propertyInfo = propertyInfo ?? throw new ArgumentNullException(nameof(propertyInfo));
+        {
+            this.propertyInfo = propertyInfo;
+            if (PropertyType.IsTuple())
+            {
+                var num = PropertyType.GetTupleElementTypes().Length;
+                Maximum = num;
+                Minimum = num;
+            }
+            else
+            {
+                Maximum = attribute.Maximum;
+                Minimum = attribute.Minimum;
+            }
+        }
 
         protected Type PropertyType => propertyInfo.PropertyType;
 
         /// <summary>
         /// Determines whether this argument may get multiple arguments.
         /// </summary>
-        public bool IsCollection => PropertyType.IsCollection();
-        public int Maximum => attribute.Maximum;
+        public bool IsMulltiValued => PropertyType.IsCollection() || PropertyType.IsTuple();
+
+        /// <summary>
+        /// For a collection argument, gets the maximal number of values it may get;
+        /// For a tuple it is the number of its values; otherwise ignored.
+        /// </summary>
+        public int Maximum { get; }
+
+        /// <summary>
+        /// For a collection argument, gets the minimal number of values it may get;
+        /// For a tuple it is the number of its values; otherwise ignored.
+        /// </summary>
+        public int Minimum { get; }
 
         /// <summary>
         /// Sets the property value for a specified object.

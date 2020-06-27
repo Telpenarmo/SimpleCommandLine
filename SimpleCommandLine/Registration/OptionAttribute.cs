@@ -36,33 +36,5 @@ namespace SimpleCommandLine
             set => longName = !value.Any(x => char.IsWhiteSpace(x)) ? value
                 : throw new ArgumentException($"{nameof(LongName)} value must not contain any white spaces.");
         }
-
-        private int minimum = 1;
-        /// <summary>
-        /// When this argument is a collection, gets or sets the minimal number of values it may get; otherwise ignored.
-        /// </summary>
-        public int Minimum
-        {
-            get => minimum;
-            set
-            {
-                if (value > Maximum)
-                    throw new ArgumentOutOfRangeException(nameof(value), value,
-                        $"The {nameof(Minimum)} value must not be greater than the {nameof(Maximum)} value");
-                else minimum = value;
-            }
-        }
-
-        public override int Maximum
-        {
-            get => base.Maximum;
-            set
-            {
-                if (value < Minimum)
-                    throw new ArgumentOutOfRangeException(nameof(value), value,
-                        $"The {nameof(Maximum)} value must not be lower than the {nameof(Minimum)} value");
-                else base.Maximum = value;
-            }
-        }
     }
 }

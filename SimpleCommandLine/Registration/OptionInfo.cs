@@ -18,7 +18,6 @@ namespace SimpleCommandLine.Registration
             => this.attribute = attribute;
 
         private OptionAttribute Attribute => attribute as OptionAttribute;
-        public int Minimum => Attribute.Minimum;
 
         /// <summary>
         /// Checks if given token matches current option.

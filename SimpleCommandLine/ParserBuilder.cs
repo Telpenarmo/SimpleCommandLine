@@ -85,7 +85,7 @@ namespace SimpleCommandLine
         /// <typeparam name="T">Type to which string values are converted.</typeparam>
         /// <param name="converter">Object that will convert string values to <typeparamref name="T"/>.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="converter"/> is null.</exception>
-        public void RegisterConverter(IValueConverter converter, Type type)
+        public void RegisterConverter(ISingleValueConverter converter, Type type)
         {
             if (converter == null)
                 throw new ArgumentNullException(nameof(converter));

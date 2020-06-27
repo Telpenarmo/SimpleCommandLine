@@ -13,7 +13,7 @@ namespace SimpleCommandLine.Parsing
             => converters.ContainsKey(type) || TryFind(type) || TryCreating(type)
                 ? converters[type] : null;
 
-        public void RegisterConverter(IValueConverter converter, Type type)
+        public void RegisterConverter(ISingleValueConverter converter, Type type)
             => converters.Add(type, converter);
 
         private bool TryFind(Type type)
@@ -23,13 +23,29 @@ namespace SimpleCommandLine.Parsing
             converters[type] = convs.First().Value;
             return true;
         }
+        
         private bool TryCreating(Type type)
         {
             if (type.IsCollection())
                 return TryCreatingCollectionConverter(type);
+            if (type.IsTuple())
+                return TryCreatingTupleConverter(type);
             var fallbackConverter = new FallbackValueConverter(type);
             if (!fallbackConverter.CanConvert) return false;
             converters.Add(type, fallbackConverter);
+            return true;
+        }
+
+        private bool TryCreatingTupleConverter(Type type)
+        {
+            Type[] typeParams = type.GetTupleElementTypes();
+            int valuesNumber = typeParams.Length;
+            ISingleValueConverter[] elementConverters = new ISingleValueConverter[valuesNumber];
+            for (int i = 0; i < valuesNumber; i++)
+            {
+                elementConverters[i] = GetConverter(typeParams[i]) as ISingleValueConverter;
+            }
+            converters[type] = new TupleConverter(elementConverters, type, valuesNumber);
             return true;
         }
 
@@ -37,7 +53,7 @@ namespace SimpleCommandLine.Parsing
         {
             Type elementType = type.GetCollectionElementType();
             if (!(converters.ContainsKey(elementType)
-                && converters[elementType] is IValueConverter valueConverter))
+                && converters[elementType] is ISingleValueConverter valueConverter))
                 return false; // failure when element's type is not convertable
 
             if (type.IsArray || type.IsAssignableFrom(typeof(Array)))
