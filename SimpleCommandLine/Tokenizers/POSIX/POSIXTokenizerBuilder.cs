@@ -29,14 +29,13 @@
             var sAssignedValueTokenizer
                 = new AssignedValueTokenizer(Separators, new ShortOptionTokenizer(), valueTokenizer);
             var lAssignedValueTokenizer
-                = new AssignedValueTokenizer(Separators, new LongOptionTokenizer(), valueTokenizer);
-
-            lAssignedValueTokenizer.Next = sAssignedValueTokenizer;
+                = new AssignedValueTokenizer(Separators, new LongOptionTokenizer(), valueTokenizer)
+                { Next = sAssignedValueTokenizer };
             sAssignedValueTokenizer.Next = optionsGroupTokenizer;
             optionsGroupTokenizer.Next = longOptionTokenizer;
             longOptionTokenizer.Next = shortOptionTokenizer;
             shortOptionTokenizer.Next = valueTokenizer;
-            
+
             return lAssignedValueTokenizer;
         }
     }

@@ -6,22 +6,20 @@ namespace SimpleCommandLine.Parsing.Converters
     internal class ArrayConverter : IMultipleValueConverter
     {
         private readonly Type elementType;
-        private readonly ISingleValueConverter elementConverter;
 
-        public ArrayConverter(Type elementType, ISingleValueConverter elementConverter)
+        public ArrayConverter(Type elementType, IEnumerable<IConverter> elementConverters)
         {
             this.elementType = elementType;
-            this.elementConverter = elementConverter;
+            ElementConverters = elementConverters;
         }
 
-        public ParsingResult Convert(IReadOnlyList<string> values, IFormatProvider formatProvider)
+        public IEnumerable<IConverter> ElementConverters { get; }
+
+        public ParsingResult Convert(IReadOnlyList<object> values)
         {
             var array = Array.CreateInstance(elementType, values.Count);
-            for (var i = 0; i < array.Length; i++){
-                var res = elementConverter.Convert(values[i], formatProvider);
-                if (res.IsError) return res;
-                array.SetValue(res.ResultObject, i);
-            }
+            for (var i = 0; i < array.Length; i++)
+                array.SetValue(values[i], i);
             return ParsingResult.Success(array);
         }
     }

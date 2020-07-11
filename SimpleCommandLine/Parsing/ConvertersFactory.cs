@@ -23,7 +23,7 @@ namespace SimpleCommandLine.Parsing
             converters[type] = convs.First().Value;
             return true;
         }
-        
+
         private bool TryCreating(Type type)
         {
             if (type.IsCollection())
@@ -45,34 +45,36 @@ namespace SimpleCommandLine.Parsing
             {
                 elementConverters[i] = GetConverter(typeParams[i]) as ISingleValueConverter;
             }
-            converters[type] = new TupleConverter(elementConverters, type, valuesNumber);
+            converters[type] = new TupleConverter(type, valuesNumber, elementConverters);
             return true;
         }
 
         private bool TryCreatingCollectionConverter(Type type)
         {
             Type elementType = type.GetCollectionElementType();
-            if (!(converters.ContainsKey(elementType)
-                && converters[elementType] is ISingleValueConverter valueConverter))
+            if (!converters.ContainsKey(elementType)
+                || !(converters[elementType] is ISingleValueConverter valueConverter))
                 return false; // failure when element's type is not convertable
 
+            var elementConverters = EnumerableExtensions.Repeat(valueConverter);
             if (type.IsArray || type.IsAssignableFrom(typeof(Array)))
             {
-                converters[type] = new ArrayConverter(elementType, valueConverter);
+                converters[type] = new ArrayConverter(elementType, elementConverters);
                 return true;
             }
 
             else if (!type.IsGenericType) return false;
             var typeDef = type.GetGenericTypeDefinition();
 
-            if (typeof(IList<>) == typeDef
-                || typeof(IEnumerable<>) == typeDef
-                || typeof(ICollection<>) == typeDef
-                || typeof(IReadOnlyCollection<>) == typeDef
-                || typeof(IReadOnlyList<>) == typeDef)
+            if (type.IsInterface &&
+               (typeof(IList<>) == typeDef
+               || typeof(IEnumerable<>) == typeDef
+               || typeof(ICollection<>) == typeDef
+               || typeof(IReadOnlyCollection<>) == typeDef
+               || typeof(IReadOnlyList<>) == typeDef))
             {
                 converters[type] = new GenericCollectionConverter(typeof(List<>)
-                    .MakeGenericType(elementType), valueConverter);
+                    .MakeGenericType(elementType), elementType, elementConverters);
                 return true;
             }
 
@@ -81,16 +83,17 @@ namespace SimpleCommandLine.Parsing
                 || typeof(Stack<>) == typeDef
                 || typeof(List<>) == typeDef
                 || typeof(HashSet<>) == typeDef
-                || typeof(SortedSet<>) == typeDef)
+                || typeof(SortedSet<>) == typeDef
+                || typeof(Dictionary<,>) == typeDef)
             {
-                converters[type] = new GenericCollectionConverter(type, valueConverter);
+                converters[type] = new GenericCollectionConverter(type, elementType, elementConverters);
                 return true;
             }
 
             var enumerableDef = typeof(IEnumerable<>).MakeGenericType(elementType);
             var constructor = type.GetConstructor(new[] { enumerableDef });
             if (constructor == null) return false;
-            converters[type] = new GenericCollectionConverter(type, valueConverter);
+            converters[type] = new GenericCollectionConverter(type, elementType, elementConverters);
             return true;
         }
     }

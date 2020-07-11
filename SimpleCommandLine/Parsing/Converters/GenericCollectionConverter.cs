@@ -8,18 +8,19 @@ namespace SimpleCommandLine.Parsing.Converters
         private readonly Type type;
         private readonly ArrayConverter arrayConverter;
 
-        public GenericCollectionConverter(Type type, ISingleValueConverter elementConverter)
+        public GenericCollectionConverter(Type type, Type elementType, IEnumerable<IConverter> elementConverters)
         {
-            arrayConverter = new ArrayConverter(type.GenericTypeArguments[0], elementConverter);
+            arrayConverter = new ArrayConverter(elementType, elementConverters);
             this.type = type;
         }
 
-        public ParsingResult Convert(IReadOnlyList<string> values, IFormatProvider formatProvider)
+        public IEnumerable<IConverter> ElementConverters => arrayConverter.ElementConverters;
+
+        public ParsingResult Convert(IReadOnlyList<object> values)
         {
-            var result = arrayConverter.Convert(values, formatProvider);
+            var result = arrayConverter.Convert(values);
             if (result.IsError) return result;
-            return ParsingResult.Success(
-                Activator.CreateInstance(type, new object[] { result.ResultObject }));
+            return ParsingResult.Success(Activator.CreateInstance(type, result.ResultObject));
         }
     }
 }

@@ -60,7 +60,7 @@ namespace SimpleCommandLine
                         break;
                     case AssignedValueToken assignedValue:
                         HandleOption(assignedValue.Option);
-                        builder.LastAssignedOption.AddValue(assignedValue.Value);
+                        builder.LastAssignedOption.SetValue(assignedValue.Value);
                         break;
 
                 }

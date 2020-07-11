@@ -25,6 +25,7 @@ namespace SimpleCommandLine.Parsing
 
     internal interface IMultipleValueConverter : IConverter
     {
-        ParsingResult Convert(IReadOnlyList<string> values, IFormatProvider formatProvider);
+        ParsingResult Convert(IReadOnlyList<object> values);
+        IEnumerable<IConverter> ElementConverters { get; }
     }
 }

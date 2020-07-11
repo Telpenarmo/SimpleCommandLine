@@ -43,7 +43,7 @@ namespace SimpleCommandLine.Parsing
             if (info is null) return false;
             else if (info.IsMulltiValued)
                 assignedOptions.Add(new CollectionParser(info,
-                info.ChooseConverter(convertersFactory) as CollectionConverter, formatProvider));
+                info.ChooseConverter(convertersFactory) as IMultipleValueConverter, formatProvider));
             else
                 assignedOptions.Add(new SingleValueParser(info,
                     info.ChooseConverter(convertersFactory) as ISingleValueConverter, formatProvider));

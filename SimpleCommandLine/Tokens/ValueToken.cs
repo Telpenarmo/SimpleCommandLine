@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SimpleCommandLine.Tokens
+﻿namespace SimpleCommandLine.Tokens
 {
     /// <summary>
     /// Represents a command-line value.
@@ -18,7 +16,7 @@ namespace SimpleCommandLine.Tokens
         /// </summary>
         public string Value { get; }
 
-        public bool Equals(IArgumentToken other)
+        public virtual bool Equals(IArgumentToken other)
             => other is ValueToken token && token.Value == Value;
 
         public override string ToString() => Value;

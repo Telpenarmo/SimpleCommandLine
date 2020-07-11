@@ -15,7 +15,7 @@ namespace SimpleCommandLine
             if (type.IsArray)
                 return type.GetElementType();
             else if (typeof(IEnumerable).IsAssignableFrom(type))
-                return type.IsGenericType ? type.GenericTypeArguments[0] : typeof(object);
+                return type.GetInterface("IEnumerable`1")?.GenericTypeArguments[0] ?? typeof(object);
             else throw new InvalidOperationException("Non-collection type.");
         }
 
@@ -42,6 +42,12 @@ namespace SimpleCommandLine
             foreach (var element in collection)
                 action(element);
             return collection;
+        }
+
+        public static IEnumerable<T> Repeat<T>(T value)
+        {
+            while (true)
+                yield return value;
         }
     }
 }

@@ -22,11 +22,17 @@ namespace SimpleCommandLine.Parsing
         public virtual bool AcceptsValue => result == null;
         public virtual bool RequiresValue => result == null;
 
-        public void AddValue(ValueToken valueToken)
-            => result = valueConverter.Convert(valueToken.Value, formatProvider);
+        public void AddValue(ValueToken token) => SetValue(token);
+
+        public void SetValue(ValueToken token)
+        {
+            if (!AcceptsValue) throw new InvalidOperationException("Value already set.");
+            result = valueConverter.Convert(token.Value, formatProvider);
+        }
 
         public virtual ParsingResult Parse(object target)
         {
+            if (RequiresValue) throw new InvalidOperationException("Value not set.");
             if (result.IsError) return result;
             argumentInfo.SetValue(target, result.ResultObject);
             return null;
