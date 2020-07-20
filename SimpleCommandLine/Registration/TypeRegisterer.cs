@@ -64,10 +64,6 @@ namespace SimpleCommandLine.Registration
             var propertyType = propertyInfo.PropertyType;
             if (!propertyInfo.CanWrite)
                 throw new InvalidOperationException("Argument property must have \"set\" accesor.");
-            if (propertyType.IsCollection() && (propertyType.GetCollectionElementType()?.IsCollection() ?? false))
-                throw new NotSupportedException("Nested collections are not supported.");
-            if (propertyType.GetCustomAttribute<FlagsAttribute>() != null)
-                throw new NotSupportedException("Flag enumerations are not supported.");
             if (convertersFactory.GetConverter(propertyType) is null)
                 throw new InvalidOperationException("No converter registered for:" + propertyType.Name);
         }

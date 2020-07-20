@@ -16,15 +16,15 @@ namespace SimpleCommandLine
     {
         private readonly List<TypeInfo> types = new List<TypeInfo>();
         private readonly TypeRegisterer typeRegisterer;
-        private readonly ConvertersFactory convertersFactory = new ConvertersFactory();
-        private ITokenizerBuilder tokenizerBuilder;
+        private readonly ConvertersFactory convertersFactory;
         private IFormatProvider formatProvider;
         private bool globalTypeSet;
 
+
         public ParserBuilder()
         {
+            convertersFactory = new ConvertersFactory(Settings);
             LoadDefaultConverters();
-            RegisterTokenization(new POSIXTokenizerBuilder() { AllowShortOptionGroups = true });
             typeRegisterer = new TypeRegisterer(convertersFactory);
         }
 
@@ -34,8 +34,21 @@ namespace SimpleCommandLine
         /// <exception cref="InvalidOperationException">Thrown when registration was invalid.</exception>
         public Parser Build()
         {
+            TokenizerBuilder ??= new POSIXTokenizerBuilder() { AllowShortOptionGroups = true };
             return new Parser(PrepareTokenizer(), PrepareObjectBuilderFactory());
         }
+
+        /// <summary>
+        /// Gets the parsing settings.
+        /// </summary>
+        /// <returns></returns>
+        public ParsingSettings Settings { get; } = new ParsingSettings();
+
+        /// <summary>
+        /// Gets or sets an <see cref="ITokenizerBuilder"/> that will be used to
+        /// construct a tokenizer following a tokenization convention, by default POSIX-like.
+        /// </summary>
+        public ITokenizerBuilder TokenizerBuilder { get; set; }
 
         /// <summary>
         /// Registers a type that has a parameterless constructor.
@@ -70,16 +83,6 @@ namespace SimpleCommandLine
         }
 
         /// <summary>
-        /// Registers a custom convention, eg. POSIX- or PowerShell-like.
-        /// </summary>
-        /// <typeparam name="T">Type of <see cref="ITokenizerBuilder"/> to be constructed.</typeparam>
-        /// <param name="tokenizationBuilder">Action configuring the given builder.</param>
-        public void RegisterTokenization(ITokenizerBuilder tokenizerBuilder)
-        {
-            this.tokenizerBuilder = tokenizerBuilder;
-        }
-
-        /// <summary>
         /// Registers converter of specifed type.
         /// </summary>
         /// <typeparam name="T">Type to which string values are converted.</typeparam>
@@ -108,7 +111,7 @@ namespace SimpleCommandLine
         private ChainTokenizer PrepareTokenizer()
         {
             var commandsNames = types.Select(x => x.Name);
-            var tokenizer = tokenizerBuilder.BuildTokenizer();
+            var tokenizer = TokenizerBuilder.BuildTokenizer();
             return new CommandTokenizer(commandsNames) { Next = tokenizer };
         }
 

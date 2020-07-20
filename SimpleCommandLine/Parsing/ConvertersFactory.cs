@@ -8,6 +8,9 @@ namespace SimpleCommandLine.Parsing
     internal class ConvertersFactory
     {
         private readonly IDictionary<Type, IConverter> converters = new Dictionary<Type, IConverter>();
+        private readonly ParsingSettings settings;
+
+        public ConvertersFactory(ParsingSettings settings) => this.settings = settings;
 
         public IConverter GetConverter(Type type)
             => converters.ContainsKey(type) || TryFind(type) || TryCreating(type)
@@ -30,9 +33,14 @@ namespace SimpleCommandLine.Parsing
                 return TryCreatingCollectionConverter(type);
             if (type.IsTuple())
                 return TryCreatingTupleConverter(type);
+            if (type.IsEnum)
+            {
+                converters[type] = new EnumConverter(type, settings.IgnoreCaseOnEnumConversion, settings.AcceptNumericalEnumValues);
+                return true;
+            }
             var fallbackConverter = new FallbackValueConverter(type);
             if (!fallbackConverter.CanConvert) return false;
-            converters.Add(type, fallbackConverter);
+            converters[type] = fallbackConverter;
             return true;
         }
 
@@ -42,9 +50,8 @@ namespace SimpleCommandLine.Parsing
             int valuesNumber = typeParams.Length;
             ISingleValueConverter[] elementConverters = new ISingleValueConverter[valuesNumber];
             for (int i = 0; i < valuesNumber; i++)
-            {
                 elementConverters[i] = GetConverter(typeParams[i]) as ISingleValueConverter;
-            }
+
             converters[type] = new TupleConverter(type, valuesNumber, elementConverters);
             return true;
         }
@@ -52,11 +59,10 @@ namespace SimpleCommandLine.Parsing
         private bool TryCreatingCollectionConverter(Type type)
         {
             Type elementType = type.GetCollectionElementType();
-            if (!converters.ContainsKey(elementType)
-                || !(converters[elementType] is ISingleValueConverter valueConverter))
+            if (!(GetConverter(elementType) is IConverter elementConverter))
                 return false; // failure when element's type is not convertable
 
-            var elementConverters = EnumerableExtensions.Repeat(valueConverter);
+            var elementConverters = EnumerableExtensions.Repeat(elementConverter);
             if (type.IsArray || type.IsAssignableFrom(typeof(Array)))
             {
                 converters[type] = new ArrayConverter(elementType, elementConverters);

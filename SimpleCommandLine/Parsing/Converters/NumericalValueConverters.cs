@@ -8,9 +8,10 @@ namespace SimpleCommandLine.Parsing.Converters
         private delegate bool NumberConverter<T>(string s, NumberStyles styles, IFormatProvider provider, out T result);
 
         private static ISingleValueConverter CreateNumberConverter<T>(NumberConverter<T> converter,
-            Func<string, string> errorSelector) => new DelegatingConverter<T>((str, format)
-                => converter(str, NumberStyles.Any,
-                format, out T result) ? (true, result) : default, errorSelector);
+            Func<string, string> errorSelector)
+            => new DelegatingConverter<T>(
+                (str, format) => converter(str, NumberStyles.Any, format, out T result)
+                    ? (true, result) : default, errorSelector);
 
         private static ISingleValueConverter IntegerConverter<T>(NumberConverter<T> converter)
             => CreateNumberConverter(converter,

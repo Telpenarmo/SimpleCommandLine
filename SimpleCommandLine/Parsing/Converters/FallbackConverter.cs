@@ -16,8 +16,7 @@ namespace SimpleCommandLine.Parsing.Converters
         public FallbackValueConverter(Type type)
         {
             converter = TypeDescriptor.GetConverter(type);
-            if (CanConvert)
-                return;
+            if (CanConvert) return;
 
             converter = null;
             reflectionConverter = new ReflectionConverter(type);
