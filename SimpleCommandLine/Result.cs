@@ -8,16 +8,23 @@ namespace SimpleCommandLine
     /// </summary>
     public abstract class Result
     {
-        internal static Result Success(IEnumerable<object> parsed) => new SuccessResult(parsed);
+        internal static Result Success(Dictionary<string, object> parsed) => new SuccessResult(parsed);
         internal static Result Error(IEnumerable<string> messages) => new ErrorResult(messages);
         public bool IsError => this is ErrorResult;
         public T GetResult<T>() where T : class
         {
             if (this is SuccessResult s)
             {
-                foreach (var type in s.Parsed)
+                foreach (var type in s.Parsed.Values)
                     if (type is T t) return t;
             }
+            return null;
+        }
+
+        public object GetResult(string command)
+        {
+            if (this is SuccessResult s && s.Parsed.ContainsKey(command))
+                return s.Parsed[command];
             return null;
         }
 
@@ -45,8 +52,8 @@ namespace SimpleCommandLine
 
         private class SuccessResult : Result
         {
-            public IEnumerable<object> Parsed { get; }
-            internal SuccessResult(IEnumerable<object> parsed) => Parsed = parsed;
+            public Dictionary<string, object> Parsed { get; }
+            internal SuccessResult(Dictionary<string, object> parsed) => Parsed = parsed;
         }
     }
 }

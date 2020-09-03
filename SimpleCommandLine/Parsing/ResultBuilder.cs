@@ -6,7 +6,7 @@ using SimpleCommandLine.Tokens;
 
 namespace SimpleCommandLine.Parsing
 {
-    internal class ObjectBuilder
+    internal class ResultBuilder
     {
         private readonly TypeInfo typeInfo;
         private readonly ConvertersFactory convertersFactory;
@@ -16,7 +16,7 @@ namespace SimpleCommandLine.Parsing
         private readonly IFormatProvider formatProvider;
         private int usedValuesNumber = 0;
 
-        public ObjectBuilder(TypeInfo typeInfo, ConvertersFactory convertersFactory, IFormatProvider formatProvider)
+        public ResultBuilder(TypeInfo typeInfo, ConvertersFactory convertersFactory, IFormatProvider formatProvider)
         {
             this.typeInfo = typeInfo;
             this.convertersFactory = convertersFactory;
@@ -45,7 +45,7 @@ namespace SimpleCommandLine.Parsing
                 assignedOptions.Add(new CollectionParser(info,
                 info.ChooseConverter(convertersFactory) as IMultipleValueConverter, formatProvider));
             else
-                assignedOptions.Add(new SingleValueParser(info,
+                assignedOptions.Add(new UnaryParser(info,
                     info.ChooseConverter(convertersFactory) as ISingleValueConverter, formatProvider));
             return true;
         }
@@ -59,7 +59,7 @@ namespace SimpleCommandLine.Parsing
                     assignedValues.Add(new CollectionParser(next,
                         next.ChooseConverter(convertersFactory) as IMultipleValueConverter, formatProvider));
                 else
-                    assignedValues.Add(new SingleValueParser(next,
+                    assignedValues.Add(new UnaryParser(next,
                         next.ChooseConverter(convertersFactory) as ISingleValueConverter, formatProvider));
                 usedValuesNumber++;
             }

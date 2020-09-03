@@ -4,38 +4,42 @@ using SimpleCommandLine.Tokens;
 
 namespace SimpleCommandLine.Parsing
 {
-    internal class SingleValueParser : IArgumentParser
+    internal class UnaryParser : IArgumentParser
     {
         protected readonly ArgumentInfo argumentInfo;
         protected readonly ISingleValueConverter valueConverter;
         protected readonly IFormatProvider formatProvider;
         protected ParsingResult result;
 
-        public SingleValueParser(ArgumentInfo argumentInfo, ISingleValueConverter valueConverter, IFormatProvider formatProvider)
+        public UnaryParser(ArgumentInfo argumentInfo, ISingleValueConverter valueConverter, IFormatProvider formatProvider)
         {
             this.argumentInfo = argumentInfo;
             this.valueConverter = valueConverter;
             this.formatProvider = formatProvider;
-            result = valueConverter.DefaultValue;
+            var def = valueConverter.DefaultValue;
+            if (def != null) result = ParsingResult.Success(def);
         }
 
         public virtual bool AcceptsValue => result == null;
         public virtual bool RequiresValue => result == null;
 
-        public void AddValue(ValueToken token) => SetValue(token);
+        public void AddValue(ValueToken token)
+        {
+            if (!AcceptsValue) throw new InvalidOperationException("Value already set.");
+            SetValue(token);
+        }
 
         public void SetValue(ValueToken token)
         {
-            if (!AcceptsValue) throw new InvalidOperationException("Value already set.");
             result = valueConverter.Convert(token.Value, formatProvider);
         }
 
         public virtual ParsingResult Parse(object target)
         {
-            if (RequiresValue) throw new InvalidOperationException("Value not set.");
-            if (result.IsError) return result;
-            argumentInfo.SetValue(target, result.ResultObject);
-            return null;
+            if (RequiresValue) return ParsingResult.Error("Value not set.");
+            if (!result.IsError)
+                argumentInfo.SetValue(target, result.ResultObject);
+            return result;
         }
     }
 }

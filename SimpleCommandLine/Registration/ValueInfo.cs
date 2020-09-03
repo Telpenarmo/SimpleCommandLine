@@ -2,7 +2,7 @@
 using System.Reflection;
 
 namespace SimpleCommandLine.Registration
-{   
+{
     /// <summary>
     /// Encapsulates a <see cref="PropertyInfo"/> representing a command-line value.
     /// </summary>
@@ -13,8 +13,8 @@ namespace SimpleCommandLine.Registration
         /// </summary>
         /// <param name="propertyInfo">A property to encapsulate.</param>
         /// <param name="attribute">Attribute containing configuration of the value.</param>
-        public ValueInfo(PropertyInfo propertyInfo, ValueAttribute attribute) : base(propertyInfo)
-            => this.attribute = attribute;
+        public ValueInfo(Type type, Action<object, object> valueSetter, ValueAttribute attribute)
+            : base(type, valueSetter, attribute) { }
 
         private ValueAttribute Attribute => attribute as ValueAttribute;
 

@@ -21,7 +21,7 @@ namespace SimpleCommandLine.Tokenizers
         {
             if (string.IsNullOrWhiteSpace(arg)) return null;
             if (CanHandle(arg)) return Handle(arg);
-            else return Next.TokenizeArgument(arg);
+            else return Next?.TokenizeArgument(arg) ?? new ValueToken(arg);
         }
 
         /// <summary>

@@ -8,21 +8,16 @@ namespace SimpleCommandLine
     /// </summary>
     public class OptionAttribute : ArgumentAttribute
     {
-        private string shortName;
+        private char shortName;
         /// <summary>
         /// Defines the character by providing which the user can refer to the current option.
         /// </summary>
         /// <exception cref="ArgumentException">Thrown when the given value is invalid.</exception>
-        public string ShortName
+        public char ShortName
         {
             get => shortName;
-            set => shortName = value switch
-            {
-                string _ when value.Length != 1 =>
-                    throw new ArgumentException($"{nameof(ShortName)} value must be exactly one sign."),
-                string _ when char.IsLetterOrDigit(value[0]) => value,
-                _ => throw new ArgumentException($"{nameof(ShortName)} value must be a letter or a digit.")
-            };
+            set => shortName = char.IsLetterOrDigit(value) ? value
+                : throw new ArgumentException($"{nameof(ShortName)} value must be a letter or a digit.");
         }
 
         private string longName;

@@ -8,7 +8,8 @@ namespace SimpleCommandLine
     internal static class TypeExtensions
     {
         public static bool IsCollection(this Type type)
-            => type != typeof(string) && (type.IsArray || typeof(IEnumerable).IsAssignableFrom(type));
+            => (type.IsEnum && Attribute.IsDefined(type, typeof(FlagsAttribute))) ||
+                type != typeof(string) && (type.IsArray || typeof(IEnumerable).IsAssignableFrom(type));
 
         public static Type GetCollectionElementType(this Type type)
         {
@@ -24,7 +25,23 @@ namespace SimpleCommandLine
             if (type == typeof(DictionaryEntry)) return true;
             if (!type.IsGenericType) return false;
             var def = type.GetGenericTypeDefinition();
-            return def == typeof(Tuple) || def == typeof(KeyValuePair<,>) || def == typeof(ValueTuple);
+            return def == typeof(KeyValuePair<,>)
+                || def == typeof(ValueTuple<>)
+                || def == typeof(ValueTuple<,>)
+                || def == typeof(ValueTuple<,,>)
+                || def == typeof(ValueTuple<,,,>)
+                || def == typeof(ValueTuple<,,,,>)
+                || def == typeof(ValueTuple<,,,,,>)
+                || def == typeof(ValueTuple<,,,,,,>)
+                || (def == typeof(ValueTuple<,,,,,,,>) && IsTuple(type.GetGenericArguments()[7]))
+                || def == typeof(Tuple<>)
+                || def == typeof(Tuple<,>)
+                || def == typeof(Tuple<,,>)
+                || def == typeof(Tuple<,,,>)
+                || def == typeof(Tuple<,,,,>)
+                || def == typeof(Tuple<,,,,,>)
+                || def == typeof(Tuple<,,,,,,>)
+                || (def == typeof(Tuple<,,,,,,,>) && IsTuple(type.GetGenericArguments()[7]));
         }
 
         public static Type[] GetTupleElementTypes(this Type type)
@@ -49,5 +66,8 @@ namespace SimpleCommandLine
             while (true)
                 yield return value;
         }
+
+        public static bool IsEmpty<T>(this IEnumerable<T> collection)
+            => !collection.Any();
     }
 }

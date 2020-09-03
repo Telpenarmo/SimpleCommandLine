@@ -8,9 +8,7 @@ namespace SimpleCommandLine.Parsing
     internal class ConvertersFactory
     {
         private readonly IDictionary<Type, IConverter> converters = new Dictionary<Type, IConverter>();
-        private readonly ParsingSettings settings;
-
-        public ConvertersFactory(ParsingSettings settings) => this.settings = settings;
+        public ParsingSettings Settings { get; set; }
 
         public IConverter GetConverter(Type type)
             => converters.ContainsKey(type) || TryFind(type) || TryCreating(type)
@@ -35,7 +33,9 @@ namespace SimpleCommandLine.Parsing
                 return TryCreatingTupleConverter(type);
             if (type.IsEnum)
             {
-                converters[type] = new EnumConverter(type, settings.IgnoreCaseOnEnumConversion, settings.AcceptNumericalEnumValues);
+                converters[type] = new EnumConverter(type,
+                    Settings.IgnoreCaseOnEnumConversion,
+                    Settings.AcceptNumericalEnumValues);
                 return true;
             }
             var fallbackConverter = new FallbackValueConverter(type);
@@ -58,14 +58,21 @@ namespace SimpleCommandLine.Parsing
 
         private bool TryCreatingCollectionConverter(Type type)
         {
+            if (type.IsEnum)
+            {
+                converters[type] = new FlagsEnumConverter(type,
+                    Settings.IgnoreCaseOnEnumConversion,
+                    Settings.AcceptNumericalEnumValues);
+                return true;
+            }
+            
             Type elementType = type.GetCollectionElementType();
             if (!(GetConverter(elementType) is IConverter elementConverter))
                 return false; // failure when element's type is not convertable
 
-            var elementConverters = EnumerableExtensions.Repeat(elementConverter);
             if (type.IsArray || type.IsAssignableFrom(typeof(Array)))
             {
-                converters[type] = new ArrayConverter(elementType, elementConverters);
+                converters[type] = new ArrayConverter(elementType, elementConverter);
                 return true;
             }
 
@@ -80,7 +87,7 @@ namespace SimpleCommandLine.Parsing
                || typeof(IReadOnlyList<>) == typeDef))
             {
                 converters[type] = new GenericCollectionConverter(typeof(List<>)
-                    .MakeGenericType(elementType), elementType, elementConverters);
+                    .MakeGenericType(elementType), elementType, elementConverter);
                 return true;
             }
 
@@ -92,14 +99,14 @@ namespace SimpleCommandLine.Parsing
                 || typeof(SortedSet<>) == typeDef
                 || typeof(Dictionary<,>) == typeDef)
             {
-                converters[type] = new GenericCollectionConverter(type, elementType, elementConverters);
+                converters[type] = new GenericCollectionConverter(type, elementType, elementConverter);
                 return true;
             }
 
             var enumerableDef = typeof(IEnumerable<>).MakeGenericType(elementType);
             var constructor = type.GetConstructor(new[] { enumerableDef });
             if (constructor == null) return false;
-            converters[type] = new GenericCollectionConverter(type, elementType, elementConverters);
+            converters[type] = new GenericCollectionConverter(type, elementType, elementConverter);
             return true;
         }
     }

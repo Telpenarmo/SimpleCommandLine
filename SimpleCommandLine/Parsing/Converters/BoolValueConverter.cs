@@ -34,6 +34,6 @@ namespace SimpleCommandLine.Parsing.Converters
             return result;
         }
 
-        public ParsingResult DefaultValue => ParsingResult.Success(true);
+        public object DefaultValue => true;
     }
 }

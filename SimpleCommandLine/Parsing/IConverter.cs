@@ -20,12 +20,12 @@ namespace SimpleCommandLine.Parsing
         /// <param name="formatProvider"></param>
         /// <returns>A converted object.</returns>
         ParsingResult Convert(string value, IFormatProvider formatProvider);
-        ParsingResult DefaultValue => null;
+        object DefaultValue => null;
     }
 
     internal interface IMultipleValueConverter : IConverter
     {
-        ParsingResult Convert(IReadOnlyList<object> values);
+        ParsingResult Convert(IReadOnlyList<dynamic> values);
         IEnumerable<IConverter> ElementConverters { get; }
     }
 }

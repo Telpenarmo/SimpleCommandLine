@@ -1,9 +1,14 @@
 namespace SimpleCommandLine
 {
-    public class ParsingSettings
+    public struct ParsingSettings
     {
+        public ParsingSettings(bool ignoreCaseOnEnumConversion, bool acceptNumericalEnumValues)
+        {
+            IgnoreCaseOnEnumConversion = ignoreCaseOnEnumConversion;
+            AcceptNumericalEnumValues = acceptNumericalEnumValues;
+        }
 
-        public bool IgnoreCaseOnEnumConversion { get; set; }
-        public bool AcceptNumericalEnumValues { get; set; }
+        public bool IgnoreCaseOnEnumConversion { get; }
+        public bool AcceptNumericalEnumValues { get; }
     }
 }

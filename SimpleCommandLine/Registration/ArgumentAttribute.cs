@@ -8,7 +8,7 @@ namespace SimpleCommandLine
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public abstract class ArgumentAttribute : Attribute
     {
-        private int minimum = 1;
+        private int minimum = 0;
         /// <summary>
         /// When this argument is a collection, gets or sets the minimal number of values it may get; otherwise ignored.
         /// </summary>

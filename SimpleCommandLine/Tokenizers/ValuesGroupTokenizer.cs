@@ -46,7 +46,7 @@ namespace SimpleCommandLine.Tokenizers
         {
             var splitted = arg.Split(separators[sepIndex]);
 
-            var tokens = separators.Length == sepIndex
+            var tokens = separators.Length == sepIndex + 1
                 ? splitted.Select(arg => valueTokenizer.TokenizeArgument(arg) as ValueToken)
                 : splitted.Select(arg => HandleRecursively(arg, sepIndex + 1));
 

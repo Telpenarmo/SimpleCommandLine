@@ -26,7 +26,7 @@ namespace SimpleCommandLine.Parsing.Converters
             => CanConvert
                 ? ParsingResult.Success(converter?.ConvertFromString(str)
                     ?? reflectionConverter.Convert(str, formatProvider))
-                : (ParsingResult)ParsingResult.Error("Given type cannot be converted implicitly.");
+                : ParsingResult.Error("Given type cannot be converted implicitly.");
 
         private class ReflectionConverter
         {

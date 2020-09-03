@@ -51,25 +51,25 @@ namespace SimpleCommandLine.Parsing
 
         private ParsingResult ParseRecursively(ValueToken token, IConverter converter)
         {
-            if (converter is ISingleValueConverter s)
-                return s.Convert(token.Value, formatProvider);
-            if (converter is IMultipleValueConverter n)
+            if (converter is ISingleValueConverter singleConverter)
+                return singleConverter.Convert(token.Value, formatProvider);
+            if (converter is IMultipleValueConverter multipleConverter)
             {
                 if (token is ValuesGroupToken g)
                 {
-                    using var enumerator = n.ElementConverters.GetEnumerator();
+                    using var enumerator = multipleConverter.ElementConverters.GetEnumerator();
                     var values = new object[g.Tokens.Count];
                     for (int i = 0; i < g.Tokens.Count && enumerator.MoveNext(); i++)
                     {
-                        var r = ParseRecursively(g.Tokens[i], enumerator.Current);
-                        if (r.IsError) return r;
-                        else values[i] = r.ResultObject;
+                        var result = ParseRecursively(g.Tokens[i], enumerator.Current);
+                        if (result.IsError) return result;
+                        else values[i] = result.ResultObject;
                     }
-                    return n.Convert(values);
+                    return multipleConverter.Convert(values);
                 }
-                var res = ParseRecursively(token, n.ElementConverters.First());
+                var res = ParseRecursively(token, multipleConverter.ElementConverters.First());
                 if (res.IsError) return res;
-                return n.Convert(new[] { res.ResultObject });
+                return multipleConverter.Convert(new[] { res.ResultObject });
             }
             return ParsingResult.Error("Invalid values grouping.");
         }

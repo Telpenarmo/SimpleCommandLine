@@ -14,8 +14,8 @@ namespace SimpleCommandLine.Registration
         /// </summary>
         /// <param name="propertyInfo">A property to encapsulate.</param>
         /// <param name="attribute">Attribute containing configuration of the option.</param>
-        public OptionInfo(PropertyInfo propertyInfo, OptionAttribute attribute) : base(propertyInfo)
-            => this.attribute = attribute;
+        public OptionInfo(Type type, Action<object, object> valueSetter, OptionAttribute attribute)
+            : base(type, valueSetter, attribute) { }
 
         private OptionAttribute Attribute => attribute as OptionAttribute;
 
@@ -25,6 +25,6 @@ namespace SimpleCommandLine.Registration
         /// <param name="token">The token to match.</param>
         /// <returns>True, if given token matches this option; false otherwise.</returns>
         public bool MatchToken(OptionToken token)
-            => token.Value == Attribute.LongName || token.Value == Attribute.ShortName;
+            => token.Value == Attribute.LongName || token.Value == Attribute.ShortName.ToString();
     }
 }

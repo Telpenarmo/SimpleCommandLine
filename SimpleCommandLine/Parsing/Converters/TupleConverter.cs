@@ -21,10 +21,7 @@ namespace SimpleCommandLine.Parsing.Converters
         {
             if (values.Count != valuesNumber)
                 return ParsingResult.Error($"{values.Count} values given, while exactly {valuesNumber} expected.");
-            ParsingResult[] results = new ParsingResult[valuesNumber];
-            for (int i = 0; i < valuesNumber; i++)
-                if (results[i].IsError) return results[i];
-            return ParsingResult.Success(Activator.CreateInstance(type, results));
+            return ParsingResult.Success(Activator.CreateInstance(type, values));
         }
     }
 }

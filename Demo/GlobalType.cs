@@ -5,7 +5,7 @@ namespace Demo
 {
     internal class GlobalOptions
     {
-        [Option(ShortName = "i")]
+        [Option(ShortName = 'i')]
         public int IntOption { get; set; }
 
         [Option(LongName = "sopt")]

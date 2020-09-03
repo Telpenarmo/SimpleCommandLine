@@ -8,15 +8,15 @@ namespace SimpleCommandLine.Parsing.Converters
         private readonly Type type;
         private readonly ArrayConverter arrayConverter;
 
-        public GenericCollectionConverter(Type type, Type elementType, IEnumerable<IConverter> elementConverters)
+        public GenericCollectionConverter(Type type, Type elementType, IConverter elementConverter)
         {
-            arrayConverter = new ArrayConverter(elementType, elementConverters);
+            arrayConverter = new ArrayConverter(elementType, elementConverter);
             this.type = type;
         }
 
         public IEnumerable<IConverter> ElementConverters => arrayConverter.ElementConverters;
 
-        public ParsingResult Convert(IReadOnlyList<object> values)
+        public ParsingResult Convert(IReadOnlyList<dynamic> values)
         {
             var result = arrayConverter.Convert(values);
             if (result.IsError) return result;

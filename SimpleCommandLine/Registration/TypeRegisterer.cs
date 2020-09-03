@@ -19,9 +19,9 @@ namespace SimpleCommandLine.Registration
         {
             var type = typeof(T);
             var options = ExtractArgs<OptionAttribute, OptionInfo>(type,
-                pair => new OptionInfo(pair.Item1, pair.Item2), CheckOption);
+                pair => new OptionInfo(pair.Item1.PropertyType, pair.Item1.SetValue, pair.Item2), CheckOption);
             var values = ExtractArgs<ValueAttribute, ValueInfo>(type,
-                pair => new ValueInfo(pair.Item1, pair.Item2), CheckValue);
+                pair => new ValueInfo(pair.Item1.PropertyType, pair.Item1.SetValue, pair.Item2), CheckValue);
 
             var info = CreateTypeInfo(type, options, values, factory);
             Reset();
@@ -41,7 +41,7 @@ namespace SimpleCommandLine.Registration
         {
             var commandAttribute = type.GetTypeInfo().GetCustomAttribute<CommandAttribute>();
             return commandAttribute != null
-                ? new TypeInfo(valueInfos, optionInfos, factory, commandAttribute.Name)
+                ? new TypeInfo(valueInfos, optionInfos, factory, commandAttribute.Aliases)
                 : new TypeInfo(valueInfos, optionInfos, factory);
         }
 
@@ -71,7 +71,7 @@ namespace SimpleCommandLine.Registration
         private void CheckOption(OptionAttribute attr)
         {
             if (!(AddIfNotNull(longOptions, attr.LongName)
-                && AddIfNotNull(shortOptions, attr.ShortName)))
+                && AddIfNotNull(shortOptions, attr.ShortName.ToString())))
                 throw new InvalidOperationException("Options must have different names.");
         }
 

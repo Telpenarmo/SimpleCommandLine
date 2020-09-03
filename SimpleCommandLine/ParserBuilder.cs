@@ -14,18 +14,15 @@ namespace SimpleCommandLine
     /// </summary>
     public class ParserBuilder
     {
-        private readonly List<TypeInfo> types = new List<TypeInfo>();
+        private readonly List<Func<TypeInfo>> typeFactories = new List<Func<TypeInfo>>();
+        private readonly ConvertersFactory convertersFactory = new ConvertersFactory();
         private readonly TypeRegisterer typeRegisterer;
-        private readonly ConvertersFactory convertersFactory;
-        private IFormatProvider formatProvider;
-        private bool globalTypeSet;
 
 
         public ParserBuilder()
         {
-            convertersFactory = new ConvertersFactory(Settings);
-            LoadDefaultConverters();
             typeRegisterer = new TypeRegisterer(convertersFactory);
+            LoadDefaultConverters();
         }
 
         /// <summary>
@@ -34,15 +31,35 @@ namespace SimpleCommandLine
         /// <exception cref="InvalidOperationException">Thrown when registration was invalid.</exception>
         public Parser Build()
         {
+            convertersFactory.Settings = Settings;
+
+            var types = new List<TypeInfo>();
+            bool globalTypeSet = false;
+            foreach (var typeFactory in typeFactories)
+            {
+                var type = typeFactory();
+                if (type.Aliases.Any())
+                    types.Add(type);
+                else if (globalTypeSet)
+                    throw new InvalidOperationException("You can register only one non-command type");
+                else globalTypeSet = true;
+            }
             TokenizerBuilder ??= new POSIXTokenizerBuilder() { AllowShortOptionGroups = true };
-            return new Parser(PrepareTokenizer(), PrepareObjectBuilderFactory());
+
+            var tokenizer = PrepareTokenizer(types);
+            var objectBuilderFactory = new ResultBuilderFactory(types, convertersFactory, FormatProvider);
+            return new Parser(tokenizer, objectBuilderFactory);
         }
 
         /// <summary>
-        /// Gets the parsing settings.
+        /// Gets or sets the parsing settings.
         /// </summary>
-        /// <returns></returns>
-        public ParsingSettings Settings { get; } = new ParsingSettings();
+        public ParsingSettings Settings { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <seealso cref="IFormatProvider" /> that will be used in parsing proccess.
+        /// </summary>
+        public IFormatProvider FormatProvider { get; set; }
 
         /// <summary>
         /// Gets or sets an <see cref="ITokenizerBuilder"/> that will be used to
@@ -70,16 +87,7 @@ namespace SimpleCommandLine
             if (factory == null)
                 throw new ArgumentNullException(nameof(factory));
 
-            var type = typeRegisterer.Register(factory);
-
-            if (type.Name == string.Empty)
-            {
-                if (globalTypeSet)
-                    throw new InvalidOperationException("You can register only one non-command type");
-                globalTypeSet = true;
-            }
-
-            types.Add(type);
+            typeFactories.Add(() => typeRegisterer.Register(factory));
         }
 
         /// <summary>
@@ -98,25 +106,12 @@ namespace SimpleCommandLine
             convertersFactory.RegisterConverter(converter, type);
         }
 
-        /// <summary>
-        /// Registers a custom <see cref="IFormatProvider"/> that is being used in conversion.
-        /// </summary>
-        /// <param name="formatProvider">A custom <see cref="IFormatProvider"/> to be used.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="formatProvider"/> is null.</exception>
-        public void UseFormatProvider(IFormatProvider formatProvider)
+        private ChainTokenizer PrepareTokenizer(IEnumerable<TypeInfo> types)
         {
-            this.formatProvider = formatProvider ?? throw new ArgumentNullException(nameof(formatProvider));
-        }
-
-        private ChainTokenizer PrepareTokenizer()
-        {
-            var commandsNames = types.Select(x => x.Name);
+            var commandsNames = types.SelectMany(x => x.Aliases);
             var tokenizer = TokenizerBuilder.BuildTokenizer();
             return new CommandTokenizer(commandsNames) { Next = tokenizer };
         }
-
-        private ObjectBuilderFactory PrepareObjectBuilderFactory()
-            => new ObjectBuilderFactory(types, convertersFactory, formatProvider);
 
         private void LoadDefaultConverters()
         {

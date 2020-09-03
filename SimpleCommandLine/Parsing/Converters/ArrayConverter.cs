@@ -7,15 +7,15 @@ namespace SimpleCommandLine.Parsing.Converters
     {
         private readonly Type elementType;
 
-        public ArrayConverter(Type elementType, IEnumerable<IConverter> elementConverters)
+        public ArrayConverter(Type elementType, IConverter elementConverter)
         {
             this.elementType = elementType;
-            ElementConverters = elementConverters;
+            ElementConverters = EnumerableExtensions.Repeat(elementConverter);
         }
 
         public IEnumerable<IConverter> ElementConverters { get; }
 
-        public ParsingResult Convert(IReadOnlyList<object> values)
+        public ParsingResult Convert(IReadOnlyList<dynamic> values)
         {
             var array = Array.CreateInstance(elementType, values.Count);
             for (var i = 0; i < array.Length; i++)

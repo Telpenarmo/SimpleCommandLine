@@ -6,7 +6,7 @@ namespace Demo
     [Command("remove")]
     class RemoveCommand
     {
-        [Option(LongName = "index", ShortName = "i")]
+        [Option(LongName = "index", ShortName = 'i')]
         public int Index { get; set; }
     }
 }
