@@ -16,25 +16,27 @@ namespace SimpleCommandLine.Registration
         /// <param name="values">Collection of properties representing command-line values.</param>
         /// <param name="options">Collection of properties representing command-line options.</param>
         /// <param name="factory">Factory method that is used to create a new instance of the encapsulated type.</param>
-        public TypeInfo(IEnumerable<ValueInfo> values, IEnumerable<OptionInfo> options, Delegate factory)
+        public TypeInfo(IReadOnlyList<ParameterInfo> values, IReadOnlyDictionary<string, ParameterInfo> options,
+            Delegate factory)
         {
-            Values = values.OrderBy(x => x.Index).ToArray();
-            Options = options.ToArray();
+            Values = values;
+            Options = options;
             Factory = factory;
             Aliases = Enumerable.Empty<string>();
         }
 
-        public TypeInfo(IEnumerable<ValueInfo> values, IEnumerable<OptionInfo> options, Delegate factory, IEnumerable<string> aliases)
+        public TypeInfo(IReadOnlyList<ParameterInfo> values, IReadOnlyDictionary<string, ParameterInfo> options,
+            Delegate factory, IEnumerable<string> aliases)
         {
-            Values = values.OrderBy(x => x.Index).ToArray();
-            Options = options.ToArray();
+            Values = values;
+            Options = options;
             Factory = factory;
             Aliases = aliases;
         }
 
         public IEnumerable<string> Aliases { get; }
-        public IReadOnlyList<ValueInfo> Values { get; }
-        public IReadOnlyList<OptionInfo> Options { get; }
+        public IReadOnlyList<ParameterInfo> Values { get; }
+        public IReadOnlyDictionary<string, ParameterInfo> Options { get; }
 
         /// <summary>
         /// Factory method that is used to create a new instance of the encapsulated type.
@@ -46,7 +48,7 @@ namespace SimpleCommandLine.Registration
         /// </summary>
         /// <param name="token">Token to be matched.</param>
         /// <returns><see cref="OptionInfo"/> that matches the given token.</returns>
-        public OptionInfo GetMatchingOptionInfo(OptionToken token)
-            => Options.SingleOrDefault(x => x.MatchToken(token));
+        public ParameterInfo? GetMatchingOptionInfo(OptionToken token)
+            => Options.TryGetValue(token.Value, out var result) ? result : null;
     }
 }

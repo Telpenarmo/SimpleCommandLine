@@ -10,6 +10,6 @@
         /// </summary>
         /// <param name="arg">A value to be tokenized.</param>
         /// <returns>Constructed token.</returns>
-        Tokens.IArgumentToken TokenizeArgument(string arg);
+        Tokens.IArgumentToken? TokenizeArgument(string arg);
     }
 }

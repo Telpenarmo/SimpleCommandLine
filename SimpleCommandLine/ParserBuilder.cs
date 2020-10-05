@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using SimpleCommandLine.Parsing;
 using SimpleCommandLine.Parsing.Converters;
@@ -46,7 +47,9 @@ namespace SimpleCommandLine
             }
             TokenizerBuilder ??= new POSIXTokenizerBuilder() { AllowShortOptionGroups = true };
 
-            var tokenizer = PrepareTokenizer(types);
+            var commandsNames = types.SelectMany(x => x.Aliases);
+            var tokenizer = TokenizerBuilder.BuildTokenizer();
+            tokenizer = new CommandTokenizer(commandsNames) { Next = tokenizer };
             var objectBuilderFactory = new ResultBuilderFactory(types, convertersFactory, FormatProvider);
             return new Parser(tokenizer, objectBuilderFactory);
         }
@@ -59,13 +62,13 @@ namespace SimpleCommandLine
         /// <summary>
         /// Gets or sets the <seealso cref="IFormatProvider" /> that will be used in parsing proccess.
         /// </summary>
-        public IFormatProvider FormatProvider { get; set; }
+        public IFormatProvider FormatProvider { get; set; } = CultureInfo.CurrentUICulture;
 
         /// <summary>
         /// Gets or sets an <see cref="ITokenizerBuilder"/> that will be used to
         /// construct a tokenizer following a tokenization convention, by default POSIX-like.
         /// </summary>
-        public ITokenizerBuilder TokenizerBuilder { get; set; }
+        public ITokenizerBuilder? TokenizerBuilder { get; set; }
 
         /// <summary>
         /// Registers a type that has a parameterless constructor.
@@ -104,13 +107,6 @@ namespace SimpleCommandLine
                 throw new ArgumentNullException(nameof(type));
 
             convertersFactory.RegisterConverter(converter, type);
-        }
-
-        private ChainTokenizer PrepareTokenizer(IEnumerable<TypeInfo> types)
-        {
-            var commandsNames = types.SelectMany(x => x.Aliases);
-            var tokenizer = TokenizerBuilder.BuildTokenizer();
-            return new CommandTokenizer(commandsNames) { Next = tokenizer };
         }
 
         private void LoadDefaultConverters()

@@ -3,7 +3,7 @@
     /// <summary>
     /// Marks a property as a command-line value.
     /// </summary>
-    public class ValueAttribute : ArgumentAttribute
+    public class ValueAttribute : ParameterAttribute
     {
         /// <summary>
         /// Initializes the <see cref="ValueAttribute"/> with a specified index.

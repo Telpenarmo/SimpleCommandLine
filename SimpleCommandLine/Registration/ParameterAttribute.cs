@@ -6,7 +6,7 @@ namespace SimpleCommandLine
     /// Base class for attributes defining arguments of command.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-    public abstract class ArgumentAttribute : Attribute
+    public abstract class ParameterAttribute : Attribute
     {
         private int minimum = 0;
         /// <summary>

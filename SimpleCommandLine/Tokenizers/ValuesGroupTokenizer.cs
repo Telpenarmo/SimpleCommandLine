@@ -7,14 +7,12 @@ namespace SimpleCommandLine.Tokenizers
     /// <summary>
     /// Builds the <see cref="ValuesGroupToken"/>.
     /// </summary>
-    public class ValuesGroupTokenizer : ChainTokenizer
+    public class ValuesGroupTokenizer : ChainTokenizer, IValueTokenizer
     {
         private readonly char[] separators;
-        private readonly ValueTokenizer valueTokenizer;
 
-        public ValuesGroupTokenizer(char[] separators, ValueTokenizer valueTokenizer)
+        public ValuesGroupTokenizer(char[] separators)
         {
-            this.valueTokenizer = valueTokenizer ?? throw new ArgumentNullException(nameof(valueTokenizer));
             if (separators.Length == 0)
                 throw new ArgumentException("At least one separator must be defined.");
             this.separators = separators;
@@ -30,7 +28,9 @@ namespace SimpleCommandLine.Tokenizers
         /// Tokenizes given argument assuming its correctness.
         /// </summary>
         /// <param name="arg">An argument checked by <see cref="CanHandle(string)"/> method.</param>
-        public override IArgumentToken Handle(string arg)
+        public override IArgumentToken Handle(string arg) => ProduceValueToken(arg);
+
+        public ValueToken ProduceValueToken(string arg)
         {
             int sepIndex = -1;
             for (int i = 0; i < separators.Length; i++)
@@ -42,12 +42,13 @@ namespace SimpleCommandLine.Tokenizers
             return HandleRecursively(arg, sepIndex);
         }
 
+
         private ValueToken HandleRecursively(string arg, int sepIndex)
         {
             var splitted = arg.Split(separators[sepIndex]);
 
             var tokens = separators.Length == sepIndex + 1
-                ? splitted.Select(arg => valueTokenizer.TokenizeArgument(arg) as ValueToken)
+                ? splitted.Select(arg => new ValueToken(arg))
                 : splitted.Select(arg => HandleRecursively(arg, sepIndex + 1));
 
             return splitted.Length == 1 ? tokens.Single() : new ValuesGroupToken(tokens, arg);

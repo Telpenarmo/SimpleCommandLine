@@ -16,7 +16,7 @@ namespace SimpleCommandLine.Tokens
         /// <param name="values">Tokens that form the group.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="values"/> is null.</exception>
         public ValuesGroupToken(IEnumerable<ValueToken> values, string original) : base(original)
-            => Tokens = values?.ToList();
+            => Tokens = values?.ToList() ?? new List<ValueToken>(0);
 
         /// <summary>
         /// Gets all elements of this token.

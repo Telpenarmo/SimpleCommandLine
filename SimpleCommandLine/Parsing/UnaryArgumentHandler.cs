@@ -4,17 +4,18 @@ using SimpleCommandLine.Tokens;
 
 namespace SimpleCommandLine.Parsing
 {
-    internal class UnaryParser : IArgumentParser
+    internal class UnaryArgumentHandler : IArgumentHandler
     {
-        protected readonly ArgumentInfo argumentInfo;
+        public ParameterInfo ParameterInfo { get; }
         protected readonly ISingleValueConverter valueConverter;
         protected readonly IFormatProvider formatProvider;
-        protected ParsingResult result;
+        protected ParsingResult? result;
 
-        public UnaryParser(ArgumentInfo argumentInfo, ISingleValueConverter valueConverter, IFormatProvider formatProvider)
+        public UnaryArgumentHandler(ParameterInfo parameterInfo, IConverter converter, IFormatProvider formatProvider)
         {
-            this.argumentInfo = argumentInfo;
-            this.valueConverter = valueConverter;
+            ParameterInfo = parameterInfo;
+            valueConverter = converter as ISingleValueConverter
+                ?? throw new Exception("Wrong converter given.");
             this.formatProvider = formatProvider;
             var def = valueConverter.DefaultValue;
             if (def != null) result = ParsingResult.Success(def);
@@ -34,12 +35,7 @@ namespace SimpleCommandLine.Parsing
             result = valueConverter.Convert(token.Value, formatProvider);
         }
 
-        public virtual ParsingResult Parse(object target)
-        {
-            if (RequiresValue) return ParsingResult.Error("Value not set.");
-            if (!result.IsError)
-                argumentInfo.SetValue(target, result.ResultObject);
-            return result;
-        }
+        public virtual ParsingResult GetResult()
+            => result is null ? ParsingResult.Error("Value not set.") : result;
     }
 }

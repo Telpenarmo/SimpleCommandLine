@@ -14,7 +14,7 @@ namespace SimpleCommandLine
     public class Parser
     {
         private readonly IResultBuilderFactory objectBuilderFactory;
-        
+
         private readonly IArgumentTokenizer tokenizer;
 
         internal Parser(IArgumentTokenizer tokenizer, IResultBuilderFactory objectBuilderFactory)
@@ -34,8 +34,10 @@ namespace SimpleCommandLine
         {
             var parser = new TokensParser(objectBuilderFactory);
             var tokens = (args ?? Enumerable.Empty<string>())
-                .Select(arg => tokenizer.TokenizeArgument(arg));
+                .Select(arg => tokenizer.TokenizeArgument(arg)).Where(t => t != null);
+#nullable disable // tokens are nonnullable, as we did a check in a LINQ expression
             return parser.Parse(tokens);
+#nullable enable
         }
     }
 }

@@ -20,7 +20,7 @@ namespace SimpleCommandLine.Parsing
         /// <param name="formatProvider"></param>
         /// <returns>A converted object.</returns>
         ParsingResult Convert(string value, IFormatProvider formatProvider);
-        object DefaultValue => null;
+        object? DefaultValue => null;
     }
 
     internal interface IMultipleValueConverter : IConverter

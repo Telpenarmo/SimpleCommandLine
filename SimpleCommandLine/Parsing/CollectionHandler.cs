@@ -6,23 +6,23 @@ using SimpleCommandLine.Tokens;
 
 namespace SimpleCommandLine.Parsing
 {
-    internal class CollectionParser : IArgumentParser
+    internal class CollectionHandler : IArgumentHandler
     {
-        protected readonly ArgumentInfo argumentInfo;
-        protected readonly IMultipleValueConverter converter;
+        public ParameterInfo ParameterInfo { get; }
+        protected readonly IConverter converter;
         private readonly IFormatProvider formatProvider;
         protected readonly List<ValueToken> tokens = new List<ValueToken>();
-        protected ValuesGroupToken group;
+        protected ValuesGroupToken? group;
 
-        public CollectionParser(ArgumentInfo argumentInfo, IMultipleValueConverter converter, IFormatProvider formatProvider)
+        public CollectionHandler(ParameterInfo parameterInfo, IConverter converter, IFormatProvider formatProvider)
         {
-            this.argumentInfo = argumentInfo;
+            ParameterInfo = parameterInfo;
             this.converter = converter;
             this.formatProvider = formatProvider;
         }
 
-        public bool RequiresValue => group is null && tokens.Count < argumentInfo.Minimum;
-        public bool AcceptsValue => group is null && tokens.Count < argumentInfo.Maximum;
+        public bool RequiresValue => group is null && tokens.Count < ParameterInfo.Minimum;
+        public bool AcceptsValue => group is null && tokens.Count < ParameterInfo.Maximum;
 
         public void AddValue(ValueToken token)
         {
@@ -38,15 +38,12 @@ namespace SimpleCommandLine.Parsing
                 : throw new InvalidOperationException("Values group expected.");
         }
 
-        public ParsingResult Parse(object target)
+        public ParsingResult GetResult()
         {
             if (RequiresValue) return ParsingResult.Error("Insufficient args given.");
             group ??= new ValuesGroupToken(tokens, string.Empty);
 
-            var result = ParseRecursively(group, converter);
-            if (result.IsError) return result;
-            argumentInfo.SetValue(target, result.ResultObject);
-            return null;
+            return ParseRecursively(group, converter);
         }
 
         private ParsingResult ParseRecursively(ValueToken token, IConverter converter)
@@ -62,14 +59,15 @@ namespace SimpleCommandLine.Parsing
                     for (int i = 0; i < g.Tokens.Count && enumerator.MoveNext(); i++)
                     {
                         var result = ParseRecursively(g.Tokens[i], enumerator.Current);
-                        if (result.IsError) return result;
-                        else values[i] = result.ResultObject;
+                        if (result.ResultObject != null) values[i] = result.ResultObject;
+                        else return result;
                     }
                     return multipleConverter.Convert(values);
                 }
                 var res = ParseRecursively(token, multipleConverter.ElementConverters.First());
-                if (res.IsError) return res;
-                return multipleConverter.Convert(new[] { res.ResultObject });
+                if (res.ResultObject != null)
+                    return multipleConverter.Convert(new[] { res.ResultObject });
+                return res;
             }
             return ParsingResult.Error("Invalid values grouping.");
         }

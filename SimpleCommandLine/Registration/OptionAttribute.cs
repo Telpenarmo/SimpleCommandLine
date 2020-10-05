@@ -6,7 +6,7 @@ namespace SimpleCommandLine
     /// <summary>
     /// Marks a property as an command-line option.
     /// </summary>
-    public class OptionAttribute : ArgumentAttribute
+    public class OptionAttribute : ParameterAttribute
     {
         private char shortName;
         /// <summary>
@@ -20,12 +20,12 @@ namespace SimpleCommandLine
                 : throw new ArgumentException($"{nameof(ShortName)} value must be a letter or a digit.");
         }
 
-        private string longName;
+        private string? longName;
         /// <summary>
         /// Defines the character by providing which the user can refer to the current option.
         /// </summary>
         /// <exception cref="ArgumentException">Thrown when the given value is invalid.</exception>
-        public string LongName
+        public string? LongName
         {
             get => longName;
             set => longName = !value.Any(x => char.IsWhiteSpace(x)) ? value

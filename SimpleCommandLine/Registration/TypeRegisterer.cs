@@ -9,35 +9,42 @@ namespace SimpleCommandLine.Registration
     internal class TypeRegisterer
     {
         private readonly ConvertersFactory convertersFactory;
-        private readonly HashSet<string> longOptions = new HashSet<string>();
-        private readonly HashSet<string> shortOptions = new HashSet<string>();
-        private readonly HashSet<uint> valuesIndices = new HashSet<uint>();
 
         public TypeRegisterer(ConvertersFactory convertersFactory) => this.convertersFactory = convertersFactory;
 
         public TypeInfo Register<T>(Func<T> factory)
         {
             var type = typeof(T);
-            var options = ExtractArgs<OptionAttribute, OptionInfo>(type,
-                pair => new OptionInfo(pair.Item1.PropertyType, pair.Item1.SetValue, pair.Item2), CheckOption);
-            var values = ExtractArgs<ValueAttribute, ValueInfo>(type,
-                pair => new ValueInfo(pair.Item1.PropertyType, pair.Item1.SetValue, pair.Item2), CheckValue);
+            var optionPairs = ExtractArgs<OptionAttribute>(type);
+            var options = new Dictionary<string, ParameterInfo>();
+            foreach (var pair in optionPairs)
+            {
+                var current = pair.attr.LongName;
+                var repeated = current != null && !options.TryAdd(current, pair.info);
+                if (!repeated)
+                {
+                    current = pair.attr.ShortName.ToString();
+                    repeated = current != "\0" && !options.TryAdd(current, pair.info);
+                }
+                if (repeated)
+                    throw new InvalidOperationException($"Repeated option: {current}");
+            }
+            var valuesIndices = new HashSet<uint>();
+            var values = ExtractArgs<ValueAttribute>(type)
+                .ForEach(p =>
+                {
+                    if (!valuesIndices.Add(p.attr.Index))
+                        throw new InvalidOperationException($"Repeated value index: {p.attr.Index}");
+                })
+                .OrderBy(p => p.attr.Index).Select(p => p.info).ToArray();
 
             var info = CreateTypeInfo(type, options, values, factory);
-            Reset();
             return info;
         }
 
-        private void Reset()
-        {
-            longOptions.Clear();
-            shortOptions.Clear();
-            valuesIndices.Clear();
-        }
-
         private TypeInfo CreateTypeInfo<T>(Type type,
-            IEnumerable<OptionInfo> optionInfos,
-            IEnumerable<ValueInfo> valueInfos, Func<T> factory)
+            IReadOnlyDictionary<string, ParameterInfo> optionInfos,
+            IReadOnlyList<ParameterInfo> valueInfos, Func<T> factory)
         {
             var commandAttribute = type.GetTypeInfo().GetCustomAttribute<CommandAttribute>();
             return commandAttribute != null
@@ -45,42 +52,21 @@ namespace SimpleCommandLine.Registration
                 : new TypeInfo(valueInfos, optionInfos, factory);
         }
 
-        private IEnumerable<TInfo> ExtractArgs<TAttr, TInfo>(Type type,
-            Func<(PropertyInfo, TAttr), TInfo> factory,
-            Action<TAttr> customCheck = null)
-            where TAttr : ArgumentAttribute where TInfo : ArgumentInfo
+        private IEnumerable<(TAttr attr, ParameterInfo info)> ExtractArgs<TAttr>(Type type)
+            where TAttr : ParameterAttribute
             => type.GetProperties()
                 .Select(property => (property, attr: property.GetCustomAttribute<TAttr>()))
                 .Where(pair => pair.attr != null)
-                .ForEach(pair =>
-                {
-                    CheckProperty(pair.property);
-                    customCheck?.Invoke(pair.attr);
-                })
-                .Select(pair => factory(pair));
+                .ForEach(pair => CheckProperty(pair.property))
+                .Select(p => (p.attr, new ParameterInfo(p.property.PropertyType, p.property.SetValue, p.attr)));
 
         private void CheckProperty(PropertyInfo propertyInfo)
         {
             var propertyType = propertyInfo.PropertyType;
             if (!propertyInfo.CanWrite)
                 throw new InvalidOperationException("Argument property must have \"set\" accesor.");
-            if (convertersFactory.GetConverter(propertyType) is null)
+            if (!convertersFactory.CheckForType(propertyType))
                 throw new InvalidOperationException("No converter registered for:" + propertyType.Name);
         }
-
-        private void CheckOption(OptionAttribute attr)
-        {
-            if (!(AddIfNotNull(longOptions, attr.LongName)
-                && AddIfNotNull(shortOptions, attr.ShortName.ToString())))
-                throw new InvalidOperationException("Options must have different names.");
-        }
-
-        private void CheckValue(ValueAttribute attr)
-        {
-            if (!valuesIndices.Add(attr.Index))
-                throw new InvalidOperationException("Values must have different indices.");
-        }
-
-        private bool AddIfNotNull(HashSet<string> set, string item) => item == null || set.Add(item);
     }
 }

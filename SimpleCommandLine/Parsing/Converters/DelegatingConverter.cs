@@ -22,8 +22,8 @@ namespace SimpleCommandLine.Parsing.Converters
                 if (string.IsNullOrEmpty(value))
                     throw new ArgumentNullException("The value must not be empty.");
                 var (isSuccess, result) = converter(value, format);
-                return isSuccess ? ParsingResult.Success(result)
-                : ParsingResult.Error(errorSelector(value)); 
+                return (isSuccess && result != null) ? ParsingResult.Success(result)
+                : ParsingResult.Error(errorSelector(value));
             };
         }
 

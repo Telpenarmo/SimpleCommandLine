@@ -10,20 +10,13 @@ namespace SimpleCommandLine.Parsing
         private readonly IDictionary<Type, IConverter> converters = new Dictionary<Type, IConverter>();
         public ParsingSettings Settings { get; set; }
 
-        public IConverter GetConverter(Type type)
-            => converters.ContainsKey(type) || TryFind(type) || TryCreating(type)
-                ? converters[type] : null;
+        public IConverter this[Type type] => converters[type];
+
+        public bool CheckForType(Type type)
+            => converters.ContainsKey(type) || TryCreating(type) || TryFallback(type);
 
         public void RegisterConverter(ISingleValueConverter converter, Type type)
             => converters.Add(type, converter);
-
-        private bool TryFind(Type type)
-        {
-            var convs = converters.Where(c => type.IsAssignableFrom(c.Key));
-            if (!convs.Any()) return false;
-            converters[type] = convs.First().Value;
-            return true;
-        }
 
         private bool TryCreating(Type type)
         {
@@ -38,9 +31,10 @@ namespace SimpleCommandLine.Parsing
                     Settings.AcceptNumericalEnumValues);
                 return true;
             }
-            var fallbackConverter = new FallbackValueConverter(type);
-            if (!fallbackConverter.CanConvert) return false;
-            converters[type] = fallbackConverter;
+            var fallback = System.ComponentModel.TypeDescriptor.GetConverter(type);
+            if (fallback.CanConvertFrom(typeof(string)))
+                converters[type] = new TypeDescriptorConverter(fallback);
+
             return true;
         }
 
@@ -48,9 +42,13 @@ namespace SimpleCommandLine.Parsing
         {
             Type[] typeParams = type.GetTupleElementTypes();
             int valuesNumber = typeParams.Length;
-            ISingleValueConverter[] elementConverters = new ISingleValueConverter[valuesNumber];
+            IConverter[] elementConverters = new IConverter[valuesNumber];
             for (int i = 0; i < valuesNumber; i++)
-                elementConverters[i] = GetConverter(typeParams[i]) as ISingleValueConverter;
+            {
+                if (CheckForType(typeParams[i]))
+                    elementConverters[i] = this[typeParams[i]];
+                else return false;
+            }
 
             converters[type] = new TupleConverter(type, valuesNumber, elementConverters);
             return true;
@@ -65,10 +63,11 @@ namespace SimpleCommandLine.Parsing
                     Settings.AcceptNumericalEnumValues);
                 return true;
             }
-            
+
             Type elementType = type.GetCollectionElementType();
-            if (!(GetConverter(elementType) is IConverter elementConverter))
+            if (!CheckForType(elementType))
                 return false; // failure when element's type is not convertable
+            var elementConverter = this[elementType];
 
             if (type.IsArray || type.IsAssignableFrom(typeof(Array)))
             {
@@ -108,6 +107,34 @@ namespace SimpleCommandLine.Parsing
             if (constructor == null) return false;
             converters[type] = new GenericCollectionConverter(type, elementType, elementConverter);
             return true;
+        }
+
+        private bool TryFallback(Type type)
+        {
+            var constructor = type.GetConstructor(new Type[] { typeof(string), typeof(IFormatProvider) });
+            if (constructor != null)
+            {
+                converters[type] = new DelegatingConverter<object>(
+                    (arg, format) => ParsingResult.Success(constructor.Invoke(new object[] { arg, format })));
+                return true;
+            }
+
+            constructor = type.GetConstructor(new Type[] { typeof(IFormatProvider), typeof(string) });
+            if (constructor != null)
+            {
+                converters[type] = new DelegatingConverter<object>(
+                    (arg, format) => ParsingResult.Success(constructor.Invoke(new object[] { format, arg })));
+                return true;
+            }
+
+            constructor = type.GetConstructor(new Type[] { typeof(string) });
+            if (constructor != null)
+            {
+                converters[type] = new DelegatingConverter<object>(
+                    (arg, _) => ParsingResult.Success(constructor.Invoke(new object[] { arg })));
+                return true;
+            }
+            return false;
         }
     }
 }

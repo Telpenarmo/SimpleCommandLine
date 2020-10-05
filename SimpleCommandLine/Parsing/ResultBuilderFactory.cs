@@ -7,7 +7,7 @@ namespace SimpleCommandLine.Parsing
 {
     internal interface IResultBuilderFactory
     {
-        ResultBuilder Build();
+        ResultBuilder? Build();
         ResultBuilder Build(string commandName);
     }
 
@@ -24,7 +24,7 @@ namespace SimpleCommandLine.Parsing
             this.formatProvider = formatProvider;
         }
 
-        public ResultBuilder Build()
+        public ResultBuilder? Build()
         {
             var typeInfo = registeredTypes.SingleOrDefault(t => !t.Aliases.Any());
             return typeInfo == null ? null : Create(typeInfo);

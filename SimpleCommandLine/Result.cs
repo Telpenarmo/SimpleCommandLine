@@ -11,7 +11,7 @@ namespace SimpleCommandLine
         internal static Result Success(Dictionary<string, object> parsed) => new SuccessResult(parsed);
         internal static Result Error(IEnumerable<string> messages) => new ErrorResult(messages);
         public bool IsError => this is ErrorResult;
-        public T GetResult<T>() where T : class
+        public T? GetResult<T>() where T : class
         {
             if (this is SuccessResult s)
             {
@@ -21,7 +21,7 @@ namespace SimpleCommandLine
             return null;
         }
 
-        public object GetResult(string command)
+        public object? GetResult(string command)
         {
             if (this is SuccessResult s && s.Parsed.ContainsKey(command))
                 return s.Parsed[command];
@@ -42,7 +42,7 @@ namespace SimpleCommandLine
             return this;
         }
 
-        public IEnumerable<string> Errors => (this as ErrorResult)?.Messages;
+        public IEnumerable<string>? Errors => (this as ErrorResult)?.Messages;
 
         private class ErrorResult : Result
         {

@@ -10,14 +10,14 @@ namespace SimpleCommandLine.Tokenizers
         /// <summary>
         /// Gets or sets the next tokenizer in chain.
         /// </summary>
-        public IArgumentTokenizer Next { get; set; }
+        public IArgumentTokenizer? Next { get; set; }
 
         /// <summary>
         /// Tokenizes the provided argument using the current instance or the <see cref="Next"/> tokenizer.
         /// </summary>
         /// <param name="arg">A value to be tokenized.</param>
         /// <returns>A constructed token.</returns>
-        public IArgumentToken TokenizeArgument(string arg)
+        public IArgumentToken? TokenizeArgument(string arg)
         {
             if (string.IsNullOrWhiteSpace(arg)) return null;
             if (CanHandle(arg)) return Handle(arg);

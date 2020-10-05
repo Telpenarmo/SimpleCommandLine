@@ -9,10 +9,10 @@ namespace SimpleCommandLine.Tokenizers
     public class AssignedValueTokenizer : ChainTokenizer
     {
         private readonly char[] separators;
-        private readonly ChainTokenizer optionTokenizer;
-        private readonly IArgumentTokenizer valueTokenizer;
+        private readonly IOptionTokenizer optionTokenizer;
+        private readonly IValueTokenizer valueTokenizer;
 
-        public AssignedValueTokenizer(char[] separators, ChainTokenizer optionTokenizer, IArgumentTokenizer valueTokenizer)
+        public AssignedValueTokenizer(char[] separators, IOptionTokenizer optionTokenizer, IValueTokenizer valueTokenizer)
         {
             this.separators = separators;            
             this.optionTokenizer = optionTokenizer;
@@ -26,7 +26,7 @@ namespace SimpleCommandLine.Tokenizers
         public override bool CanHandle(string arg)
         {
             var index = arg.IndexOfAny(separators);
-            return index >= 1 && optionTokenizer.CanHandle(arg.Substring(0, index));
+            return index >= 1 && optionTokenizer.IsOption(arg.Substring(0, index));
         }
 
         /// <summary>
@@ -37,8 +37,8 @@ namespace SimpleCommandLine.Tokenizers
         {
             var index = arg.IndexOfAny(separators);
             return new AssignedValueToken(
-                optionTokenizer.Handle(arg.Substring(0, index)) as OptionToken,
-                valueTokenizer.TokenizeArgument(arg.Substring(index+1)) as ValueToken);
+                optionTokenizer.ProduceOptionToken(arg.Substring(0, index)),
+                valueTokenizer.ProduceValueToken(arg.Substring(index+1)));
         }
     }
 }	

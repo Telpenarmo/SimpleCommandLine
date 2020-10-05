@@ -5,8 +5,10 @@ namespace SimpleCommandLine.Tokenizers
     /// <summary>
     /// Builds the <see cref="ValueToken"/>.
     /// </summary>
-    public class ValueTokenizer : IArgumentTokenizer
+    public class ValueTokenizer : IArgumentTokenizer, IValueTokenizer
     {
+        public ValueToken ProduceValueToken(string arg) => new ValueToken(arg);
+
         /// <summary>
         /// Creates a <see cref="ValueToken"/>.
         /// </summary>
