@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using SimpleCommandLine.Parsing;
 using SimpleCommandLine.Parsing.Converters;
 using SimpleCommandLine.Registration;
-using static System.Linq.Enumerable;
 
 namespace SimpleCommandLine.Tests.Fakes
 {
@@ -13,7 +13,8 @@ namespace SimpleCommandLine.Tests.Fakes
             convertersFactory.RegisterConverter(StockConverters.StringConverter, typeof(string));
             convertersFactory.RegisterConverter(NumericalValueConverters.Int32Converter, typeof(int));
             convertersFactory.RegisterConverter(new BoolValueConverter(), typeof(bool));
-            return new ResultBuilder(new TypeInfo(Empty<ValueInfo>(), Empty<OptionInfo>(), TestObject.Factory),
+            return new ResultBuilder(
+                new TypeInfo(new ParameterInfo[] { }, new Dictionary<string, ParameterInfo>(), TestObject.Factory),
                 new ConvertersFactory(), System.Globalization.CultureInfo.InvariantCulture);
         }
 

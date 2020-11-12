@@ -1,4 +1,4 @@
 namespace SimpleCommandLine.Tests.Fakes
 {
-    internal class FakeArgumentAttribute : ArgumentAttribute { }
+    internal class FakeArgumentAttribute : ParameterAttribute { }
 }
