@@ -8,8 +8,7 @@ namespace SimpleCommandLine
     internal static class TypeExtensions
     {
         public static bool IsCollection(this Type type)
-            => (type.IsEnum && Attribute.IsDefined(type, typeof(FlagsAttribute))) ||
-                type != typeof(string) && (type.IsArray || typeof(IEnumerable).IsAssignableFrom(type));
+            => type != typeof(string) && (type.IsArray || typeof(IEnumerable).IsAssignableFrom(type));
 
         public static Type GetCollectionElementType(this Type type)
         {

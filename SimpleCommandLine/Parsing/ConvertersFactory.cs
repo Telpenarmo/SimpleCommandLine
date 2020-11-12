@@ -13,7 +13,7 @@ namespace SimpleCommandLine.Parsing
         public IConverter this[Type type] => converters[type];
 
         public bool CheckForType(Type type)
-            => converters.ContainsKey(type) || TryCreating(type) || TryFallback(type);
+            => converters.ContainsKey(type) || TryCreating(type) || Fallback(type);
 
         public void RegisterConverter(ISingleValueConverter converter, Type type)
             => converters.Add(type, converter);
@@ -26,16 +26,19 @@ namespace SimpleCommandLine.Parsing
                 return TryCreatingTupleConverter(type);
             if (type.IsEnum)
             {
-                converters[type] = new EnumConverter(type,
-                    Settings.IgnoreCaseOnEnumConversion,
-                    Settings.AcceptNumericalEnumValues);
+                var ignoreCase = Settings.IgnoreCaseOnEnumConversion;
+                var acceptNumbers = Settings.AcceptNumericalEnumValues;
+                converters[type] = Attribute.IsDefined(type, typeof(FlagsAttribute))
+                    ? new EnumConverter(type, ignoreCase, acceptNumbers) as IConverter
+                    : new FlagsEnumConverter(type, ignoreCase, acceptNumbers);
                 return true;
             }
             var fallback = System.ComponentModel.TypeDescriptor.GetConverter(type);
-            if (fallback.CanConvertFrom(typeof(string)))
+            var success = fallback.CanConvertFrom(typeof(string));
+            if (success)
                 converters[type] = new TypeDescriptorConverter(fallback);
 
-            return true;
+            return success;
         }
 
         private bool TryCreatingTupleConverter(Type type)
@@ -56,39 +59,26 @@ namespace SimpleCommandLine.Parsing
 
         private bool TryCreatingCollectionConverter(Type type)
         {
-            if (type.IsEnum)
-            {
-                converters[type] = new FlagsEnumConverter(type,
-                    Settings.IgnoreCaseOnEnumConversion,
-                    Settings.AcceptNumericalEnumValues);
-                return true;
-            }
-
             Type elementType = type.GetCollectionElementType();
             if (!CheckForType(elementType))
                 return false; // failure when element's type is not convertable
-            var elementConverter = this[elementType];
 
-            if (type.IsArray || type.IsAssignableFrom(typeof(Array)))
-            {
-                converters[type] = new ArrayConverter(elementType, elementConverter);
-                return true;
-            }
+            return TryArray(type, elementType)
+                || (type.IsGenericType && TryGenericCollection(type, elementType))
+                || TryConstructingCollection(type, elementType);
+        }
 
-            else if (!type.IsGenericType) return false;
+        private bool TryArray(Type type, Type elementType)
+        {
+            if (!(type.IsArray || type.IsAssignableFrom(typeof(Array))))
+                return false;
+            converters[type] = new ArrayConverter(elementType, this[elementType]);
+            return true;
+        }
+
+        private bool TryGenericCollection(Type type, Type elementType)
+        {
             var typeDef = type.GetGenericTypeDefinition();
-
-            if (type.IsInterface &&
-               (typeof(IList<>) == typeDef
-               || typeof(IEnumerable<>) == typeDef
-               || typeof(ICollection<>) == typeDef
-               || typeof(IReadOnlyCollection<>) == typeDef
-               || typeof(IReadOnlyList<>) == typeDef))
-            {
-                converters[type] = new GenericCollectionConverter(typeof(List<>)
-                    .MakeGenericType(elementType), elementType, elementConverter);
-                return true;
-            }
 
             if (typeof(LinkedList<>) == typeDef
                 || typeof(Queue<>) == typeDef
@@ -98,18 +88,35 @@ namespace SimpleCommandLine.Parsing
                 || typeof(SortedSet<>) == typeDef
                 || typeof(Dictionary<,>) == typeDef)
             {
-                converters[type] = new GenericCollectionConverter(type, elementType, elementConverter);
+                converters[type] = new GenericCollectionConverter(type, elementType, this[elementType]);
                 return true;
             }
 
+            if (type.IsInterface &&
+               (typeof(IList<>) == typeDef
+               || typeof(IEnumerable<>) == typeDef
+               || typeof(ICollection<>) == typeDef
+               || typeof(IReadOnlyCollection<>) == typeDef
+               || typeof(IReadOnlyList<>) == typeDef))
+            {
+                converters[type] = new GenericCollectionConverter(typeof(List<>)
+                    .MakeGenericType(elementType), elementType, this[elementType]);
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool TryConstructingCollection(Type type, Type elementType)
+        {
             var enumerableDef = typeof(IEnumerable<>).MakeGenericType(elementType);
             var constructor = type.GetConstructor(new[] { enumerableDef });
             if (constructor == null) return false;
-            converters[type] = new GenericCollectionConverter(type, elementType, elementConverter);
+            converters[type] = new GenericCollectionConverter(type, elementType, this[elementType]);
             return true;
         }
 
-        private bool TryFallback(Type type)
+        private bool Fallback(Type type)
         {
             var constructor = type.GetConstructor(new Type[] { typeof(string), typeof(IFormatProvider) });
             if (constructor != null)
