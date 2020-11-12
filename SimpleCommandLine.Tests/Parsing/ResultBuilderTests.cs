@@ -12,87 +12,151 @@ namespace SimpleCommandLine.Tests.Parsing
     public class ResultBuilderTests
     {
         private ResultBuilder NewValuelessInstance()
-            => NewIstanceWith(Empty<ValueInfo>(), TestObject.Options);
+            => NewIstanceWith(new ParameterInfo[] { }, TestObject.Options);
         private ResultBuilder NewEmptyInstance()
-            => NewIstanceWith(Empty<ValueInfo>(), Empty<OptionInfo>());
+            => NewIstanceWith(new ParameterInfo[] { }, new Dictionary<string, ParameterInfo>());
         private ResultBuilder NewLimitedValuesInstance()
-            => NewIstanceWith(TestObject.GetValues(true), Empty<OptionInfo>());
+            => NewIstanceWith(TestObject.GetValues(true), new Dictionary<string, ParameterInfo>());
         private ResultBuilder NewUnlimitedValuesInstance()
-            => NewIstanceWith(TestObject.GetValues(false), Empty<OptionInfo>());
+            => NewIstanceWith(TestObject.GetValues(false), new Dictionary<string, ParameterInfo>());
 
-        private ResultBuilder NewIstanceWith(IEnumerable<ValueInfo> values, IEnumerable<OptionInfo> options)
+        private ResultBuilder NewIstanceWith(IReadOnlyList<ParameterInfo> values, IReadOnlyDictionary<string, ParameterInfo> options)
         {
             ConvertersFactory convertersFactory = new ConvertersFactory();
             convertersFactory.RegisterConverter(new FakeConverter(), typeof(string));
+            convertersFactory.RegisterConverter(new FakeImplicitConverter(), typeof(bool));
+            convertersFactory.CheckForType(typeof(string[]));
             return new ResultBuilder(new TypeInfo(values, options, TestObject.Factory), convertersFactory, InvariantCulture);
         }
 
-        #region TryAddOption
+        #region Options
         [Fact]
-        public void Given_valid_option_TryAddOption_returns_true()
+        public void Given_explicit_option_Returns_error()
         {
-            var result = NewValuelessInstance().TryAddOption(singleOption);
-            Assert.True(result);
+            var obj = NewValuelessInstance();
+            obj.HandleToken(singleOption);
+            var result = obj.Build();
+            Assert.Equal("Value not set.", result.ErrorMessages.Single());
         }
 
         [Fact]
-        public void Given_invalid_option_TryAddOption_returns_false()
+        public void Given_implicit_option_Sets_default()
         {
-            var result = NewValuelessInstance().TryAddOption(invalidOption);
-            Assert.False(result);
+            var obj = NewValuelessInstance();
+            obj.HandleToken(boolOption);
+            var result = obj.Build();
+            Assert.IsType<TestObject>(result.ResultObject);
+            Assert.True((result.ResultObject as TestObject).BoolOption1);
         }
 
         [Fact]
-        public void Given_the_same_valid_option_twice_TryAddOption_returns_true()
+        public void Given_explicit_option_and_value_Returns_success()
         {
-            var instance = NewValuelessInstance();
-            instance.TryAddOption(singleOption);
-            Assert.True(instance.TryAddOption(singleOption));
+            var obj = NewValuelessInstance();
+            obj.HandleToken(singleOption);
+            obj.HandleToken(new ValueToken(""));
+            var result = obj.Build();
+            Assert.False(result.IsError);
+        }
+
+        [Fact]
+        public void Given_assigned_implicit_option_Sets_assignment()
+        {
+            var obj = NewValuelessInstance();
+            obj.HandleToken(new AssignedValueToken(boolOption, new ValueToken("false")));
+            var result = obj.Build();
+            Assert.IsType<TestObject>(result.ResultObject);
+            Assert.False((result.ResultObject as TestObject).BoolOption1);
+        }
+
+        [Fact]
+        public void Given_assigned_option_and_value_sets_assignment_and_first_value()
+        {
+            var obj = NewIstanceWith(TestObject.GetValues(false), TestObject.Options);
+            obj.HandleToken(new AssignedValueToken(boolOption, new ValueToken("true")));
+            obj.HandleToken(new ValueToken("abc"));
+            var result = obj.Build();
+            Assert.IsType<TestObject>(result.ResultObject);
+            Assert.True((result.ResultObject as TestObject).BoolOption1);
+            Assert.Equal("abc", (result.ResultObject as TestObject).FirstValue);
+        }
+
+        [Fact]
+        public void Given_group_of_implicit_options_Sets_them_all()
+        {
+            var obj = NewValuelessInstance();
+            obj.HandleToken(new OptionsGroupToken(
+                new[] { new OptionToken("1"), new OptionToken("2"), new OptionToken("3") }));
+            var result = obj.Build();
+            Assert.IsType<TestObject>(result.ResultObject);
+            Assert.True((result.ResultObject as TestObject).BoolOption1);
+            Assert.True((result.ResultObject as TestObject).BoolOption2);
+            Assert.True((result.ResultObject as TestObject).BoolOption3);
+        }
+
+        [Fact]
+        public void Given_invalid_option_Returns_error()
+        {
+            var obj = NewEmptyInstance();
+            obj.HandleToken(invalidOption);
+            var result = obj.Build();
+            Assert.Equal($"The current type does not contain the \"{invalidOption.Value}\" option.",
+                         result.ErrorMessages.Single());
+        }
+
+        [Fact]
+        public void Given_the_same_valid_option_twice_Sets_the_latter()
+        {
+            var obj = NewValuelessInstance();
+            obj.HandleToken(singleOption);
+            obj.HandleToken(new ValueToken("aa"));
+            obj.HandleToken(singleOption);
+            obj.HandleToken(new ValueToken("bb"));
+            var result = obj.Build();
+            Assert.IsType<TestObject>(result.ResultObject);
+            Assert.Equal("bb", (result.ResultObject as TestObject).StringOption);
+        }
+
+        [Fact]
+        public void Setting_the_same_valid_option_twice_Returns_one_error()
+        {
+            var obj = NewValuelessInstance();
+            obj.HandleToken(singleOption);
+            obj.HandleToken(singleOption);
+            var result = obj.Build();
+            Assert.Equal(2, result.ErrorMessages.Count());
         }
         #endregion
 
-        #region LastAssignedOption
+        #region Values
         [Fact]
-        public void Given_fresh_instance_LastAssignedOption_is_null()
+        public void Given_maximal_values_number_Returns_success()
         {
-            var result = NewValuelessInstance().LastAssignedOption;
-            Assert.Null(result);
+            var obj = NewLimitedValuesInstance();
+            for (int i = 0; i < TestObject.ValuesLimit; i++)
+                obj.HandleToken(new ValueToken(""));
+            var result = obj.Build();
+            Assert.False(result.IsError);
         }
 
         [Fact]
-        public void After_successfull_option_addition_LastAssignedOption_is_not_null()
+        public void With_limited_values_number_Given_too_many_values_Returns_failure()
         {
-            var instance = NewValuelessInstance();
-            instance.TryAddOption(singleOption);
-            Assert.NotNull(instance.LastAssignedOption);
+            var obj = NewLimitedValuesInstance();
+            for (int i = 0; i < TestObject.ValuesLimit + 1; i++)
+                obj.HandleToken(new ValueToken(""));
+            var result = obj.Build();
+            Assert.True(result.IsError);
         }
 
         [Fact]
-        public void After_only_value_addition_LastAssignedOption_is_null()
+        public void With_unlimited_values_number_Given_many_values_Returns_success()
         {
-            var instance = NewUnlimitedValuesInstance();
-            instance.AddValue(new ValueToken("val"));
-            var result = instance.LastAssignedOption;
-            Assert.Null(result);
-        }
-        #endregion
-
-        #region AwaitsValue 
-        [Fact]
-        public void With_type_without_values_AwaitsValue_is_false()
-        {
-            var instance = NewEmptyInstance();
-            var result = instance.AwaitsValue;
-            Assert.False(result);
-        }
-
-        [Fact]
-        public void After_reaching_maximal_values_number_AwaitsValue_is_false()
-        {
-            var instance = NewLimitedValuesInstance();
-            for (int i = 0; i < 4; i++)
-                instance.AddValue(new ValueToken(""));
-            Assert.False(instance.AwaitsValue);
+            var obj = NewUnlimitedValuesInstance();
+            for (int i = 0; i < 30; i++)
+                obj.HandleToken(new ValueToken(""));
+            var result = obj.Build();
+            Assert.False(result.IsError);
         }
         #endregion
 

@@ -76,10 +76,18 @@ namespace SimpleCommandLine.Parsing
         private void HandleValue(ValueToken token)
         {
             if (unknownOption) return;
-            if (assignedOptions.Last()?.AcceptsValue ?? false)
+            if (assignedOptions.LastOrDefault()?.AcceptsValue ?? false)
                 assignedOptions.Last().AddValue(token);
             else if (AwaitsValue)
-                AddValue(token);
+            {
+                if (!CollectionValueAwaits)
+                {
+                    var next = typeInfo.Values[usedValuesNumber];
+                    AddNewParser(assignedValues, next);
+                    usedValuesNumber++;
+                }
+                assignedValues.Last().AddValue(token);
+            }
             else
                 errors.Add("The current type does not accept any more values.");
         }
@@ -107,7 +115,7 @@ namespace SimpleCommandLine.Parsing
                     applications.Add(() => handler.ParameterInfo.SetValue(result, argResult.ResultObject));
             }
 
-            if (errors.IsEmpty()) return ParsingResult.Error(errors);
+            if (errors.Any()) return ParsingResult.Error(errors);
             applications.ForEach(app => app());
             return ParsingResult.Success(result);
         }
