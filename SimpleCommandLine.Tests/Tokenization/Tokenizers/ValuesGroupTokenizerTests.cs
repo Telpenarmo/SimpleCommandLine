@@ -10,7 +10,7 @@ namespace SimpleCommandLine.Tests.Tokenization.Tokenizers
 {
     public class ValuesGroupTokenizerTests
     {
-        public ValuesGroupTokenizer Tokenizer => new ValuesGroupTokenizer(new []{';', ',', '&'}, new ValueTokenizer()){Next = new FakeTokenizer()};
+        public ValuesGroupTokenizer Tokenizer => new ValuesGroupTokenizer(new[] { ';', ',', '&' }) { Next = new FakeTokenizer() };
 
         [Fact]
         public void Given_single_word_invokes_Next()
@@ -55,7 +55,7 @@ namespace SimpleCommandLine.Tests.Tokenization.Tokenizers
             var tokenResult = result as ValuesGroupToken;
             Assert.IsType<ValuesGroupToken>(tokenResult);
             Assert.Equal(2, tokenResult.Tokens.Count);
-            
+
             // first&second,third,fourth&fifth&sixth,
             var member = tokenResult.Tokens[0] as ValuesGroupToken;
             Assert.Equal(4, member.Tokens.Count);

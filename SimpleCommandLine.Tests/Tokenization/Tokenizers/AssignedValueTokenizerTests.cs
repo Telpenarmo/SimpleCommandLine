@@ -12,10 +12,10 @@ namespace SimpleCommandLine.Tests.Tokenization.Tokenizers
         private AssignedValueTokenizer GetTokenizer()
             => new AssignedValueTokenizer(new[] { ':' }, new FakeOptionTokenizer(), new ValueTokenizer()) { Next = new FakeTokenizer() };
 
-        private class FakeOptionTokenizer : ChainTokenizer
+        private class FakeOptionTokenizer : IOptionTokenizer
         {
-            public override bool CanHandle(string arg) => arg == "valid_option";
-            public override IArgumentToken Handle(string arg) => new OptionToken(arg);
+            public bool IsOption(string arg) => arg == "valid_option";
+            public OptionToken ProduceOptionToken(string arg) => new OptionToken(arg);
         }
 
         [Fact]
