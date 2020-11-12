@@ -10,22 +10,45 @@ namespace SimpleCommandLine.Tests.Parsing
 
     public class ConvertersFactoryTests
     {
+        private readonly IFormatProvider culture = System.Globalization.CultureInfo.InvariantCulture;
+        
         [Fact]
         public void With_registered_converter_requested_returns_it()
         {
             var instance = new ConvertersFactory();
             var converter = new FakeConverter();
             instance.RegisterConverter(converter, typeof(object));
-            var result = instance.GetConverter(typeof(object));
+            var result = instance[typeof(object)];
             Assert.Same(converter, result);
         }
 
         [Fact]
-        public void With_non_registered_and_not_supported_type_requested_returns_null()
+        public void When_requested_type_is_supported_by_TypeDescriptor_returns_valid()
         {
             var instance = new ConvertersFactory();
-            var result = instance.GetConverter(typeof(object));
-            Assert.Null(result);
+            Assert.True(instance.CheckForType(typeof(int)));
+            var converter = instance[typeof(int)];
+            Assert.IsAssignableFrom<ISingleValueConverter>(converter);
+            var conversionResult = (converter as ISingleValueConverter).Convert("42", culture);
+            Assert.Equal(42, conversionResult.ResultObject);
+        }
+
+        [Fact]
+        public void When_requested_type_has_string_constructor_returns_valid()
+        {
+            var instance = new ConvertersFactory();
+            Assert.True(instance.CheckForType(typeof(StringConstruct)));
+            var converter = instance[typeof(StringConstruct)];
+            Assert.IsAssignableFrom<ISingleValueConverter>(converter);
+            var conversionResult = (converter as ISingleValueConverter).Convert("fourty-two", culture);
+            Assert.Equal("fourty-two", (conversionResult.ResultObject as StringConstruct)?.S);
+        }
+
+        [Fact]
+        public void With_non_registered_and_not_supported_type_CheckForType_returns_false()
+        {
+            var instance = new ConvertersFactory();
+            Assert.False(instance.CheckForType(typeof(object[])));
         }
 
         [Fact]
@@ -33,8 +56,9 @@ namespace SimpleCommandLine.Tests.Parsing
         {
             var instance = new ConvertersFactory();
             instance.RegisterConverter(new FakeConverter(), typeof(object));
-            var result = instance.GetConverter(typeof(Tuple<object, object>));
-            Assert.True(typeof(Tuple<object, object>).IsTuple() );
+            Assert.True(instance.CheckForType(typeof(Tuple<object, object>)));
+            var result = instance[typeof(Tuple<object, object>)];
+            Assert.True(typeof(Tuple<object, object>).IsTuple());
             Assert.IsType<SimpleCommandLine.Parsing.Converters.TupleConverter>(result);
         }
 
@@ -43,7 +67,8 @@ namespace SimpleCommandLine.Tests.Parsing
         {
             var instance = new ConvertersFactory();
             instance.RegisterConverter(new FakeConverter(), typeof(object));
-            var result = instance.GetConverter(type);
+            Assert.True(instance.CheckForType(type));
+            var result = instance[type];
             Assert.IsAssignableFrom<IMultipleValueConverter>(result);
             var converted = (result as IMultipleValueConverter).Convert(new[] { "one", "two", "three" }).ResultObject;
             Assert.IsAssignableFrom(type, converted);
@@ -54,7 +79,8 @@ namespace SimpleCommandLine.Tests.Parsing
         {
             var instance = new ConvertersFactory();
             instance.RegisterConverter(new FakeConverter(), typeof(object));
-            var result = instance.GetConverter(typeof(Dictionary<object, object>));
+            Assert.True(instance.CheckForType(typeof(Dictionary<object, object>)));
+            var result = instance[typeof(Dictionary<object, object>)];
             Assert.IsAssignableFrom<IMultipleValueConverter>(result);
             var array = (result as IMultipleValueConverter).Convert(
                 new object[] {
@@ -64,12 +90,10 @@ namespace SimpleCommandLine.Tests.Parsing
         }
 
         [Fact]
-        public void With_array_of_unregistered_type_requested_returns_null()
+        public void With_array_of_unregistered_type_CheckForType_returns_false()
         {
-
             var instance = new ConvertersFactory();
-            var result = instance.GetConverter(typeof(object[]));
-            Assert.Null(result);
+            Assert.False(instance.CheckForType(typeof(object[])));
         }
 
         public static IEnumerable<object[]> SupportedCollections()
@@ -82,17 +106,16 @@ namespace SimpleCommandLine.Tests.Parsing
 
         private class CustomCollection : IEnumerable<object>
         {
-            public CustomCollection(IEnumerable<object> args) { }
+            readonly IEnumerable<object> underlying;
+            public CustomCollection(IEnumerable<object> underlying) => this.underlying = underlying;
+            public IEnumerator<object> GetEnumerator() => underlying.GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)underlying).GetEnumerator();
+        }
 
-            public IEnumerator<object> GetEnumerator()
-            {
-                throw new NotImplementedException();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                throw new NotImplementedException();
-            }
+        private class StringConstruct
+        {
+            public StringConstruct(string s) { S = s; }
+            public string S { get; }
         }
     }
 }
