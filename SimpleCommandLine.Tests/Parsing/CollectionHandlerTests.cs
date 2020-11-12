@@ -1,16 +1,18 @@
 using System;
 using Xunit;
 using SimpleCommandLine.Parsing;
+using SimpleCommandLine.Registration;
 using SimpleCommandLine.Tokens;
 using SimpleCommandLine.Tests.Fakes;
 using static System.Globalization.CultureInfo;
 
 namespace SimpleCommandLine.Tests.Parsing
 {
-    public class CollectionParserTests
+    public class CollectionHandlerTests
     {
-        private CollectionParser NewInstance(ArgumentAttribute attribute)
-            => new CollectionParser(new FakeArgumentInfo(typeof(object[]), attribute), new FakeCollectionConverter(), InvariantCulture);
+        private CollectionHandler NewInstance(ParameterAttribute attribute)
+            => new CollectionHandler(new ParameterInfo(typeof(object[]), (x, y) => { }, attribute),
+                new FakeCollectionConverter(), InvariantCulture);
 
         [Fact]
         public void With_no_minimal_values_number_RequiresValue_is_always_false()
@@ -85,13 +87,13 @@ namespace SimpleCommandLine.Tests.Parsing
             Assert.Throws<InvalidOperationException>(() => instance.AddValue(new ValueToken("")));
         }
 
-        /*[Fact]
+        [Fact]
         public void After_setting_value_SetValue_throws()
         {
             var instance = NewInstance(new FakeArgumentAttribute());
-            instance.SetValue(new ValuesGroupToken(new[] { new ValueToken("a"), new ValueToken("b") }, ""));
-            Assert.Throws<InvalidOperationException>(() =>
-                instance.SetValue(new ValuesGroupToken(new[] { new ValueToken("a"), new ValueToken("b") }, "")));
-        }*/
+            var token = new ValuesGroupToken(new[] { new ValueToken("a"), new ValueToken("b") }, "");
+            instance.SetValue(token);
+            Assert.Throws<InvalidOperationException>(() => instance.SetValue(token));
+        }
     }
 }

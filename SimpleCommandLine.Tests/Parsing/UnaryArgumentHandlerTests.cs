@@ -1,16 +1,19 @@
 using Xunit;
 using SimpleCommandLine.Parsing;
+using SimpleCommandLine.Registration;
 using SimpleCommandLine.Tests.Fakes;
 using static System.Globalization.CultureInfo;
 
 namespace SimpleCommandLine.Tests.Parsing
 {
-    public class UnaryParserTests
+    public class UnaryArgumentHandlerTests
     {
-        private UnaryParser NewParserWithoutDefaultValue()
-            => new UnaryParser(new FakeArgumentInfo(typeof(object)), new FakeConverter(), InvariantCulture);
-        private UnaryParser NewParserWithDefaultValue()
-            => new UnaryParser(new FakeArgumentInfo(typeof(object)), new SwitchConverter(), InvariantCulture);
+        private UnaryArgumentHandler NewParserWithoutDefaultValue()
+            => new UnaryArgumentHandler(
+                new ParameterInfo(typeof(object), (x, y) => { }), new FakeConverter(), InvariantCulture);
+        private UnaryArgumentHandler NewParserWithDefaultValue()
+            => new UnaryArgumentHandler(
+                new ParameterInfo(typeof(object), (x, y) => { }), new SwitchConverter(), InvariantCulture);
 
         [Fact]
         public void With_converter_not_implementing_DefaultValue_new_instance_has_both_AcceptValue_and_RequiresValue_true()
@@ -35,7 +38,7 @@ namespace SimpleCommandLine.Tests.Parsing
             instance.SetValue(new Tokens.ValueToken(""));
             Assert.False(instance.AcceptsValue);
             Assert.False(instance.RequiresValue);
-            
+
             instance = NewParserWithDefaultValue();
             instance.SetValue(new Tokens.ValueToken(""));
             Assert.False(instance.AcceptsValue);
@@ -46,7 +49,7 @@ namespace SimpleCommandLine.Tests.Parsing
         public void With_value_not_given_nor_default_Parse_returns_error()
         {
             var instance = NewParserWithoutDefaultValue();
-            var result = instance.Parse(new object());
+            var result = instance.GetResult();
             Assert.True(result.IsError);
             Assert.Null(result.ResultObject);
         }
@@ -56,13 +59,12 @@ namespace SimpleCommandLine.Tests.Parsing
         {
             var instance = NewParserWithoutDefaultValue();
             instance.AddValue(new Tokens.ValueToken(""));
-            var target = new object();
-            var result = instance.Parse(target);
+            var result = instance.GetResult();
             Assert.False(result.IsError);
 
             instance = NewParserWithoutDefaultValue();
             instance.SetValue(new Tokens.ValueToken(""));
-            result = instance.Parse(target);
+            result = instance.GetResult();
             Assert.False(result.IsError);
         }
 
@@ -70,8 +72,7 @@ namespace SimpleCommandLine.Tests.Parsing
         public void With_value_default_Parse_returns_success()
         {
             var instance = NewParserWithDefaultValue();
-            var target = new object();
-            var result = instance.Parse(target);
+            var result = instance.GetResult();
 
             Assert.False(result.IsError);
         }
@@ -82,7 +83,7 @@ namespace SimpleCommandLine.Tests.Parsing
             var instance = NewParserWithDefaultValue();
             var arg = "non-default";
             instance.SetValue(new Tokens.ValueToken(arg));
-            var result = instance.Parse(new object());
+            var result = instance.GetResult();
 
             Assert.Equal(arg, result.ResultObject as string);
         }

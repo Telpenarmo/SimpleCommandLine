@@ -33,7 +33,7 @@ namespace SimpleCommandLine.Parsing
 
         public void SetValue(ValueToken token)
         {
-            if (tokens.Any()) throw new InvalidOperationException("Value already set.");
+            if (tokens.Any() || group != null) throw new InvalidOperationException("Value already set.");
             group = token is ValuesGroupToken g ? g
                 : throw new InvalidOperationException("Values group expected.");
         }
