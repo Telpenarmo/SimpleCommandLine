@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleCommandLine.Parsing.Converters
 {
@@ -21,7 +22,7 @@ namespace SimpleCommandLine.Parsing.Converters
         {
             if (values.Count != valuesNumber)
                 return ParsingResult.Error($"{values.Count} values given, while exactly {valuesNumber} expected.");
-            return ParsingResult.Success(Activator.CreateInstance(type, values));
+            return ParsingResult.Success(Activator.CreateInstance(type, values.ToArray()));
         }
     }
 }
