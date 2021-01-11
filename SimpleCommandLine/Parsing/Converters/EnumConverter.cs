@@ -22,10 +22,14 @@ namespace SimpleCommandLine.Parsing.Converters
         public ParsingResult Convert(string value, IFormatProvider formatProvider)
         {
             string s = ignoreCase ? value.ToLower() : value;
-            if (Enum.IsDefined(type, s))
-                return ParsingResult.Success(Enum.Parse(type, s, ignoreCase));
-            if (acceptNumerical && value.All(c => char.IsDigit(c)))
-                return ParsingResult.Success(Enum.ToObject(type, System.Convert.ChangeType(s, underlyingType)));
+            if (value.All(c => char.IsDigit(c)))
+            {
+                if (acceptNumerical)
+                    return ParsingResult.Success(Enum.ToObject(type, System.Convert.ChangeType(s, underlyingType)));
+                else return ParsingResult.Error("Numerical values are not accepted.");
+            }
+            if (Enum.TryParse(type, s, ignoreCase, out object result))
+                return ParsingResult.Success(result);
             return ParsingResult.Error("Value invalid.");
         }
     }
