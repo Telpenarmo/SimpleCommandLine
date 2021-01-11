@@ -109,11 +109,14 @@ namespace SimpleCommandLine
             convertersFactory.RegisterConverter(converter, type);
         }
 
+        public List<string> TrueAliases { get; set; } = new List<string> { "true" };
+        public List<string> FalseAliases { get; set; } = new List<string> { "false" };
+
         private void LoadDefaultConverters()
         {
             RegisterConverter(StockConverters.StringConverter, typeof(string));
             RegisterConverter(StockConverters.StringConverter, typeof(object));
-            RegisterConverter(new BoolValueConverter(), typeof(bool));
+            RegisterConverter(new BoolValueConverter(TrueAliases.ToArray(), FalseAliases.ToArray()), typeof(bool));
             RegisterConverter(NumericalValueConverters.ByteConverter, typeof(byte));
             RegisterConverter(NumericalValueConverters.SByteConverter, typeof(sbyte));
             RegisterConverter(NumericalValueConverters.DoubleConverter, typeof(double));
