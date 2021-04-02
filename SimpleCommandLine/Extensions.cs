@@ -49,6 +49,16 @@ namespace SimpleCommandLine
             if (!type.IsGenericType) throw new InvalidOperationException("Non-tuple type.");
             return type.GetGenericArguments();
         }
+
+        public static bool IsInteger(this Type value)
+            => value == typeof(sbyte)
+            || value == typeof(byte)
+            || value == typeof(short)
+            || value == typeof(ushort)
+            || value == typeof(int)
+            || value == typeof(uint)
+            || value == typeof(long)
+            || value == typeof(ulong);
     }
 
     internal static class EnumerableExtensions

@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using Converter = System.Convert;
+using static SimpleCommandLine.Parsing.ParsingResult;
 
 namespace SimpleCommandLine.Parsing.Converters
 {
@@ -24,13 +26,17 @@ namespace SimpleCommandLine.Parsing.Converters
             string s = ignoreCase ? value.ToLower() : value;
             if (value.All(c => char.IsDigit(c)))
             {
-                if (acceptNumerical)
-                    return ParsingResult.Success(Enum.ToObject(type, System.Convert.ChangeType(s, underlyingType)));
-                else return ParsingResult.Error("Numerical values are not accepted.");
+                if (!acceptNumerical)
+                    return Error("Numerical values are not accepted.");
+
+                var num = Converter.ChangeType(s, underlyingType);
+                if (Enum.IsDefined(type, num))
+                    return Success(Enum.ToObject(type, num));
+                return Error($"Value {num} is not defined in {type} enumeration.");
             }
             if (Enum.TryParse(type, s, ignoreCase, out object result))
-                return ParsingResult.Success(result);
-            return ParsingResult.Error("Value invalid.");
+                return Success(result);
+            return Error("Value invalid.");
         }
     }
 }

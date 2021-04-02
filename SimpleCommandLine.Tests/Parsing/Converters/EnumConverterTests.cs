@@ -40,12 +40,11 @@ namespace SimpleCommandLine.Tests.Parsing.Converters
         }
 
         [Fact]
-        public void With_number_being_a_sum_converts_to_union()
+        public void With_undefined_number_fails()
         {
             var conv = GetInstance(false, true);
-            var res = conv.Convert("3", culture);
-            Assert.False(res.IsError);
-            Assert.Equal(TestEnum.Second | TestEnum.Third, res.ResultObject);
+            var res = conv.Convert("5", culture);
+            Assert.True(res.IsError);
         }
 
         [Fact]
@@ -67,7 +66,9 @@ namespace SimpleCommandLine.Tests.Parsing.Converters
     enum TestEnum
     {
         First,
-        Second,
-        Third
+        Second = 1,
+        Third = 2,
+        Union = 3,
+        Four = 4
     }
 }
