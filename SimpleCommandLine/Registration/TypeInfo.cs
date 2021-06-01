@@ -17,16 +17,12 @@ namespace SimpleCommandLine.Registration
         /// <param name="options">Collection of properties representing command-line options.</param>
         /// <param name="factory">Factory method that is used to create a new instance of the encapsulated type.</param>
         public TypeInfo(IReadOnlyList<ParameterInfo> values, IReadOnlyDictionary<string, ParameterInfo> options,
-            Delegate factory)
+            Func<object?> factory) : this(values, options, factory, Enumerable.Empty<string>())
         {
-            Values = values;
-            Options = options;
-            Factory = factory;
-            Aliases = Enumerable.Empty<string>();
         }
 
         public TypeInfo(IReadOnlyList<ParameterInfo> values, IReadOnlyDictionary<string, ParameterInfo> options,
-            Delegate factory, IEnumerable<string> aliases)
+            Func<object?> factory, IEnumerable<string> aliases)
         {
             Values = values;
             Options = options;
@@ -41,7 +37,7 @@ namespace SimpleCommandLine.Registration
         /// <summary>
         /// Factory method that is used to create a new instance of the encapsulated type.
         /// </summary>
-        public Delegate Factory { get; }
+        public Func<object?> Factory { get; }
 
         /// <summary>
         /// Gets <see cref="OptionInfo"/> that matches the given token.

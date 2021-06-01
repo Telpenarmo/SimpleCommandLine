@@ -15,15 +15,12 @@ namespace SimpleCommandLine
     /// </summary>
     public class ParserBuilder
     {
-        private readonly List<Func<TypeInfo>> typeFactories = new List<Func<TypeInfo>>();
+        private readonly List<TypeInfoBuilder> typeFactories = new List<TypeInfoBuilder>();
         private readonly ConvertersFactory convertersFactory = new ConvertersFactory();
-        private readonly TypeRegisterer typeRegisterer;
-
 
         public ParserBuilder()
         {
-            typeRegisterer = new TypeRegisterer(convertersFactory);
-            LoadDefaultConverters();
+            LoadDefaultConverters(); // TODO: what if a converter is configurable (eg. BoolConverter)?
         }
 
         /// <summary>
@@ -75,7 +72,7 @@ namespace SimpleCommandLine
         /// </summary>
         /// <typeparam name="T">Type to be registered.</typeparam>
         /// <exception cref="InvalidOperationException">Thrown when the type to be registered is invalid.</exception>
-        public void RegisterType<T>() where T : new()
+        public ITypeRegisterer<T> RegisterType<T>() where T : new()
             => RegisterType(() => new T());
 
         /// <summary>
@@ -85,12 +82,13 @@ namespace SimpleCommandLine
         /// <param name="factory">Returns type to be registered.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="factory"/> is null.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the type to be registered is invalid.</exception>
-        public void RegisterType<T>(Func<T> factory)
+        public ITypeRegisterer<T> RegisterType<T>(Func<T> factory)
         {
             if (factory == null)
                 throw new ArgumentNullException(nameof(factory));
-
-            typeFactories.Add(() => typeRegisterer.Register(factory));
+            var registerer = new TypeRegisterer<T>(factory, convertersFactory);
+            typeFactories.Add(registerer.Build);
+            return registerer;
         }
 
         /// <summary>

@@ -13,7 +13,7 @@ namespace SimpleCommandLine.Parsing
         private readonly List<IArgumentHandler> assignedOptions = new List<IArgumentHandler>();
         private readonly List<IArgumentHandler> assignedValues = new List<IArgumentHandler>();
         private readonly List<string> errors = new List<string>();
-        private readonly object result;
+        private readonly object? result;
         private readonly IFormatProvider formatProvider;
         private int usedValuesNumber = 0;
         private bool unknownOption = false;
@@ -23,7 +23,7 @@ namespace SimpleCommandLine.Parsing
             this.typeInfo = typeInfo;
             this.converters = converters;
             this.formatProvider = formatProvider;
-            result = typeInfo.Factory.DynamicInvoke();
+            result = typeInfo.Factory();
         }
 
         private bool CollectionValueAwaits => assignedValues.LastOrDefault()?.AcceptsValue ?? false;
