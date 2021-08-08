@@ -11,13 +11,13 @@ namespace SimpleCommandLine.Registration
     internal class TypeRegisterer<T> : ITypeRegisterer<T>
     {
         private readonly Func<T> factory;
-        private readonly ConvertersFactory convertersFactory;
-        private readonly Dictionary<uint, ParameterInfo> values = new Dictionary<uint, ParameterInfo>();
-        private readonly Dictionary<string, ParameterInfo> options = new Dictionary<string, ParameterInfo>();
+        private readonly IConvertersFactory convertersFactory;
+        private readonly Dictionary<uint, ParameterInfo> values = new();
+        private readonly Dictionary<string, ParameterInfo> options = new();
         private IEnumerable<string>? aliases;
         private bool loadFromAttributes = true;
 
-        public TypeRegisterer(Func<T> factory, ConvertersFactory convertersFactory)
+        public TypeRegisterer(Func<T> factory, IConvertersFactory convertersFactory)
         {
             this.factory = factory;
             this.convertersFactory = convertersFactory;
@@ -25,11 +25,26 @@ namespace SimpleCommandLine.Registration
 
         public TypeInfo Build()
         {
-            if (loadFromAttributes) LoadWithReflection();
-            var valuesList = values.OrderBy(p => p.Key).Select(p => p.Value).ToArray();
+            var finalValues = values;
+            var finalOptions = options;
+            if (loadFromAttributes)
+            {
+                var loader = new ReflectionLoader<T>();
+                loader.Load();
+                if (aliases is null) aliases = loader.Aliases;
+                foreach (var item in values)
+                    loader.Values[item.Key] = item.Value;
+                finalValues = loader.Values;
+                foreach (var item in options)
+                    loader.Options[item.Key] = item.Value;
+                finalOptions = loader.Options;
+            }
+            finalOptions.Values.ForEach(CheckParameter);
+            finalValues.Values.ForEach(CheckParameter);
+            var valuesList = finalValues.OrderBy(p => p.Key).Select(p => p.Value).ToArray();
             return aliases != null
-                ? new TypeInfo(valuesList, options, () => factory(), aliases)
-                : new TypeInfo(valuesList, options, () => factory());
+                ? new TypeInfo(valuesList, finalOptions, () => factory(), aliases)
+                : new TypeInfo(valuesList, finalOptions, () => factory());
         }
 
         public ITypeRegisterer<T> DiscardAttributes()
@@ -83,21 +98,11 @@ namespace SimpleCommandLine.Registration
 
         private void SaveOption(OptionAttribute attribute, ParameterInfo info)
         {
-            var current = attribute.LongName;
-            var repeated = current != null && !options.TryAdd(current, info);
-            if (!repeated)
-            {
-                current = attribute.ShortName.ToString();
-                repeated = current != "\0" && !options.TryAdd(current, info);
-            }
-            else throw new InvalidOperationException($"Repeated option: {current}");
+            if (attribute.LongName != null) options[attribute.LongName] = info;
+            if (attribute.ShortName != '\0') options[attribute.ShortName.ToString()] = info;
         }
 
-        private void SaveValue(ValueAttribute attribute, ParameterInfo info)
-        {
-            if (!values.TryAdd(attribute.Index, info))
-                throw new InvalidOperationException($"Repeated value index: {attribute.Index}");
-        }
+        private void SaveValue(ValueAttribute attribute, ParameterInfo info) => values[attribute.Index] = info;
 
         private Action<object?, object?> GetSetter<TArg>(Action<T?, TArg?> valueSetter)
         {
@@ -111,32 +116,11 @@ namespace SimpleCommandLine.Registration
             return Setter;
         }
 
-        private void LoadWithReflection()
+        private void CheckParameter(ParameterInfo info)
         {
-            var type = typeof(T);
-            ExtractArgs<OptionAttribute>(type).ForEach(pair => SaveOption(pair.attr, pair.info));
-            ExtractArgs<ValueAttribute>(type).ForEach(p => SaveValue(p.attr, p.info));
-
-            var commandAttribute = type.GetTypeInfo().GetCustomAttribute<CommandAttribute>();
-            if (aliases == null && commandAttribute != null)
-                aliases = commandAttribute.Aliases;
-        }
-
-        private IEnumerable<(TAttr attr, ParameterInfo info)> ExtractArgs<TAttr>(Type type)
-            where TAttr : ParameterAttribute
-            => type.GetProperties()
-                .Select(property => (property, attr: property.GetCustomAttribute<TAttr>()))
-                .Where(pair => pair.attr != null)
-                .ForEach(pair => CheckProperty(pair.property))
-                .Select(p => (p.attr, new ParameterInfo(p.property.PropertyType, p.property.SetValue, p.attr)));
-
-        private void CheckProperty(PropertyInfo propertyInfo)
-        {
-            if (!propertyInfo.CanWrite)
-                throw new InvalidOperationException("Argument property must have \"set\" accesor.");
-            var propertyType = propertyInfo.PropertyType;
-            if (!convertersFactory.CheckForType(propertyType))
-                throw new InvalidOperationException("No converter registered for:" + propertyType.Name);
+            var type = info.Type;
+            if (!convertersFactory.CheckForType(type))
+                throw new InvalidOperationException("No converter registered for:" + type.Name);
         }
     }
 }

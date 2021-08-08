@@ -63,11 +63,10 @@ namespace SimpleCommandLine
 
     internal static class EnumerableExtensions
     {
-        public static IEnumerable<T> ForEach<T>(this IEnumerable<T> collection, Action<T> action)
+        public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action)
         {
             foreach (var element in collection)
                 action(element);
-            return collection;
         }
 
         public static IEnumerable<T> Repeat<T>(T value)

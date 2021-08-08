@@ -5,7 +5,17 @@ using SimpleCommandLine.Parsing.Converters;
 
 namespace SimpleCommandLine.Parsing
 {
-    internal class ConvertersFactory
+    internal interface IConvertersFactory
+    {
+        IConverter this[Type type] { get; }
+
+        ParsingSettings Settings { get; set; }
+
+        bool CheckForType(Type type);
+        void RegisterConverter(ISingleValueConverter converter, Type type);
+    }
+
+    internal class ConvertersFactory : IConvertersFactory
     {
         private readonly IDictionary<Type, IConverter> converters = new Dictionary<Type, IConverter>();
         public ParsingSettings Settings { get; set; }
