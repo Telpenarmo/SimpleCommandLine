@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
-using Xunit;
 using SimpleCommandLine.Parsing.Converters;
+using Xunit;
 
 namespace SimpleCommandLine.Tests.Parsing.Converters
 {
     public class EnumConverterTests
     {
         EnumConverter GetInstance(bool ignoreCase, bool acceptNumerical)
-            => new EnumConverter(typeof(TestEnum), ignoreCase, acceptNumerical);
+            => new(typeof(TestEnum), ignoreCase, acceptNumerical);
 
         IFormatProvider culture = System.Globalization.CultureInfo.InvariantCulture;
 

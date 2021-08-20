@@ -1,9 +1,9 @@
 using System;
-using Xunit;
 using SimpleCommandLine.Parsing;
 using SimpleCommandLine.Registration;
-using SimpleCommandLine.Tokens;
 using SimpleCommandLine.Tests.Fakes;
+using SimpleCommandLine.Tokens;
+using Xunit;
 using static System.Globalization.CultureInfo;
 
 namespace SimpleCommandLine.Tests.Parsing
@@ -11,7 +11,7 @@ namespace SimpleCommandLine.Tests.Parsing
     public class CollectionHandlerTests
     {
         private CollectionHandler NewInstance(ParameterAttribute attribute)
-            => new CollectionHandler(new ParameterInfo(typeof(object[]), (x, y) => { }, attribute),
+            => new(new ParameterInfo(typeof(object[]), (x, y) => { }, attribute),
                 new FakeCollectionConverter(), InvariantCulture);
 
         [Fact]

@@ -11,7 +11,7 @@ namespace SimpleCommandLine.Parsing
         public ParameterInfo ParameterInfo { get; }
         protected readonly IConverter converter;
         private readonly IFormatProvider formatProvider;
-        protected readonly List<ValueToken> tokens = new List<ValueToken>();
+        protected readonly List<ValueToken> tokens = new();
         protected ValuesGroupToken? group;
 
         public CollectionHandler(ParameterInfo parameterInfo, IConverter converter, IFormatProvider formatProvider)

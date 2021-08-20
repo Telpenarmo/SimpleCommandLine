@@ -1,7 +1,7 @@
-using Xunit;
 using SimpleCommandLine.Parsing;
 using SimpleCommandLine.Registration;
 using SimpleCommandLine.Tests.Fakes;
+using Xunit;
 using static System.Globalization.CultureInfo;
 
 namespace SimpleCommandLine.Tests.Parsing
@@ -9,11 +9,9 @@ namespace SimpleCommandLine.Tests.Parsing
     public class UnaryArgumentHandlerTests
     {
         private UnaryArgumentHandler NewParserWithoutDefaultValue()
-            => new UnaryArgumentHandler(
-                new ParameterInfo(typeof(object), (x, y) => { }), new FakeConverter(), InvariantCulture);
+            => new(new ParameterInfo(typeof(object), (x, y) => { }), new FakeConverter(), InvariantCulture);
         private UnaryArgumentHandler NewParserWithDefaultValue()
-            => new UnaryArgumentHandler(
-                new ParameterInfo(typeof(object), (x, y) => { }), new SwitchConverter(), InvariantCulture);
+            => new(new ParameterInfo(typeof(object), (x, y) => { }), new SwitchConverter(), InvariantCulture);
 
         [Fact]
         public void With_converter_not_implementing_DefaultValue_new_instance_has_both_AcceptValue_and_RequiresValue_true()

@@ -8,6 +8,6 @@ namespace SimpleCommandLine.Tests.Fakes
         public ParsingResult Convert(string value, IFormatProvider formatProvider)
             => ParsingResult.Success(value);
 
-        public object DefaultValue => new object();
+        public object DefaultValue => new();
     }
 }

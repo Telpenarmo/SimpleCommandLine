@@ -1,14 +1,14 @@
 using System;
-using Xunit;
-using SimpleCommandLine.Parsing.Converters;
 using System.Collections.Generic;
+using SimpleCommandLine.Parsing.Converters;
+using Xunit;
 
 namespace SimpleCommandLine.Tests.Parsing.Converters
 {
     public class FlagsEnumConverterTests
     {
         FlagsEnumConverter GetInstance(bool ignoreCase, bool acceptNumerical)
-            => new FlagsEnumConverter(typeof(TestEnum), ignoreCase, acceptNumerical);
+            => new(typeof(TestEnum), ignoreCase, acceptNumerical);
 
         [Fact]
         public void With_two_valid_enums_converts_to_union()

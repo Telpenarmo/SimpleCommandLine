@@ -38,6 +38,6 @@ namespace SimpleCommandLine.Parsing
         }
 
         private ResultBuilder Create(TypeInfo typeInfo)
-            => new ResultBuilder(typeInfo, convertersFactory, formatProvider);
+            => new(typeInfo, convertersFactory, formatProvider);
     }
 }

@@ -9,9 +9,9 @@ namespace SimpleCommandLine.Tests.Tokenization.Tokenizers.POSIX
 {
     public class OptionsGroupTokenizerTests
     {
-        private OptionsGroupTokenizer GetTokenizerWithNext() => new OptionsGroupTokenizer() { Next = new FakeTokenizer() };
-        private OptionsGroupTokenizer GetTokenizerWithoutNext() => new OptionsGroupTokenizer();
-    
+        private OptionsGroupTokenizer GetTokenizerWithNext() => new() { Next = new FakeTokenizer() };
+        private OptionsGroupTokenizer GetTokenizerWithoutNext() => new();
+
         [Fact]
         public void Given_Next_When_correct_string_Then_returns_correct_token()
         {

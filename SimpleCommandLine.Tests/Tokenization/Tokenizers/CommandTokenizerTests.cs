@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Xunit;
+using SimpleCommandLine.Tests.Fakes;
 using SimpleCommandLine.Tokenizers;
 using SimpleCommandLine.Tokens;
-using SimpleCommandLine.Tests.Fakes;
+using Xunit;
 
 namespace SimpleCommandLine.Tests.Tokenization.Tokenizers
 {
     public class CommandTokenizerTests
     {
         private CommandTokenizer GetTokenizerWithNext()
-            => new CommandTokenizer(GetCommands().Select(x => x.Single() as string)) { Next = new FakeTokenizer() };
+            => new(GetCommands().Select(x => x.Single() as string)) { Next = new FakeTokenizer() };
 
         private CommandTokenizer GetTokenizerWithoutNext()
-            => new CommandTokenizer(GetCommands().Select(x => x.Single() as string));
+            => new(GetCommands().Select(x => x.Single() as string));
 
         [Theory, MemberData(nameof(GetCommands))]
         public void Given_Next_When_command_Then_returns_correct_CommandToken(string arg)

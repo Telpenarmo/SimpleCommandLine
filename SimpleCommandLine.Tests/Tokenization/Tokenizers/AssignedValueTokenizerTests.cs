@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using SimpleCommandLine.Tests.Fakes;
 using SimpleCommandLine.Tokenizers;
 using SimpleCommandLine.Tokens;
 using Xunit;
-using SimpleCommandLine.Tests.Fakes;
 
 namespace SimpleCommandLine.Tests.Tokenization.Tokenizers
 {
     public class AssignedValueTokenizerTests
     {
         private AssignedValueTokenizer GetTokenizer()
-            => new AssignedValueTokenizer(new[] { ':' }, new FakeOptionTokenizer(), new ValueTokenizer()) { Next = new FakeTokenizer() };
+            => new(new[] { ':' }, new FakeOptionTokenizer(), new ValueTokenizer()) { Next = new FakeTokenizer() };
 
         private class FakeOptionTokenizer : IOptionTokenizer
         {
             public bool IsOption(string arg) => arg == "valid_option";
-            public OptionToken ProduceOptionToken(string arg) => new OptionToken(arg);
+            public OptionToken ProduceOptionToken(string arg) => new(arg);
         }
 
         [Fact]

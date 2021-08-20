@@ -11,8 +11,8 @@ namespace SimpleCommandLine.Parsing
     public class TokensParser
     {
         private readonly IResultBuilderFactory objectBuilderFactory;
-        private readonly Dictionary<string, object> results = new Dictionary<string, object>();
-        private readonly List<string> errors = new List<string>();
+        private readonly Dictionary<string, object> results = new();
+        private readonly List<string> errors = new();
         private ResultBuilder? builder;
         private string lastCommandUsed = "";
         private bool ErrorOccured => errors.Count != 0;

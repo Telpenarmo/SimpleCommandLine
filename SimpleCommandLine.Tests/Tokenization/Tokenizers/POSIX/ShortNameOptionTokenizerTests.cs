@@ -8,8 +8,8 @@ namespace SimpleCommandLine.Tests.Tokenization.Tokenizers.POSIX
 {
     public class ShortOptionTokenizerTests
     {
-        private ShortOptionTokenizer GetTokenizerWithNext() => new ShortOptionTokenizer() { Next = new FakeTokenizer() };
-        private ShortOptionTokenizer GetTokenizerWithoutNext() => new ShortOptionTokenizer();
+        private ShortOptionTokenizer GetTokenizerWithNext() => new() { Next = new FakeTokenizer() };
+        private ShortOptionTokenizer GetTokenizerWithoutNext() => new();
 
         [Fact]
         public void Given_Next_When_correct_string_Then_returns_correct_token()

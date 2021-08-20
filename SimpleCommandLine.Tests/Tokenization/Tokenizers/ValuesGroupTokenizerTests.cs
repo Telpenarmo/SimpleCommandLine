@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Xunit;
+using SimpleCommandLine.Tests.Fakes;
 using SimpleCommandLine.Tokenizers;
 using SimpleCommandLine.Tokens;
-using SimpleCommandLine.Tests.Fakes;
+using Xunit;
 
 namespace SimpleCommandLine.Tests.Tokenization.Tokenizers
 {
     public class ValuesGroupTokenizerTests
     {
-        public ValuesGroupTokenizer Tokenizer => new ValuesGroupTokenizer(new[] { ';', ',', '&' }) { Next = new FakeTokenizer() };
+        public ValuesGroupTokenizer Tokenizer => new(new[] { ';', ',', '&' }) { Next = new FakeTokenizer() };
 
         [Fact]
         public void Given_single_word_invokes_Next()

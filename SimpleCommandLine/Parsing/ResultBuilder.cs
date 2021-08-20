@@ -10,9 +10,9 @@ namespace SimpleCommandLine.Parsing
     {
         private readonly TypeInfo typeInfo;
         private readonly ConvertersFactory converters;
-        private readonly List<IArgumentHandler> assignedOptions = new List<IArgumentHandler>();
-        private readonly List<IArgumentHandler> assignedValues = new List<IArgumentHandler>();
-        private readonly List<string> errors = new List<string>();
+        private readonly List<IArgumentHandler> assignedOptions = new();
+        private readonly List<IArgumentHandler> assignedValues = new();
+        private readonly List<string> errors = new();
         private readonly object? result;
         private readonly IFormatProvider formatProvider;
         private int usedValuesNumber = 0;
