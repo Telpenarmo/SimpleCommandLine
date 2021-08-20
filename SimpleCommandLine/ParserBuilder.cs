@@ -15,8 +15,8 @@ namespace SimpleCommandLine
     /// </summary>
     public class ParserBuilder
     {
-        private readonly List<TypeInfoBuilder> typeFactories = new List<TypeInfoBuilder>();
-        private readonly ConvertersFactory convertersFactory = new ConvertersFactory();
+        private readonly List<TypeInfoBuilder> typeFactories = new();
+        private readonly ConvertersFactory convertersFactory = new();
 
         public ParserBuilder()
         {
@@ -32,15 +32,13 @@ namespace SimpleCommandLine
             convertersFactory.Settings = Settings;
 
             var types = new List<TypeInfo>();
-            bool globalTypeSet = false;
-            foreach (var typeFactory in typeFactories)
+            var globalTypeSet = false;
+            foreach (var factory in typeFactories)
             {
-                var type = typeFactory();
-                if (type.Aliases.Any())
-                    types.Add(type);
-                else if (globalTypeSet)
-                    throw new InvalidOperationException("You can register only one non-command type");
-                else globalTypeSet = true;
+                var type = factory();
+                if (type.Aliases.IsEmpty())
+                    globalTypeSet = !globalTypeSet ? true : throw new InvalidOperationException("You can register only one non-command type");
+                types.Add(type);
             }
             TokenizerBuilder ??= new POSIXTokenizerBuilder() { AllowShortOptionGroups = true };
 
