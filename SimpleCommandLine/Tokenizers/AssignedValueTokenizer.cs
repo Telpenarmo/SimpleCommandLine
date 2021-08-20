@@ -14,11 +14,11 @@ namespace SimpleCommandLine.Tokenizers
 
         public AssignedValueTokenizer(char[] separators, IOptionTokenizer optionTokenizer, IValueTokenizer valueTokenizer)
         {
-            this.separators = separators;            
+            this.separators = separators;
             this.optionTokenizer = optionTokenizer;
             this.valueTokenizer = valueTokenizer;
         }
-        
+
         /// <summary>
         /// Checks if this tokenizer is able to handle given argument.
         /// </summary>
@@ -38,7 +38,7 @@ namespace SimpleCommandLine.Tokenizers
             var index = arg.IndexOfAny(separators);
             return new AssignedValueToken(
                 optionTokenizer.ProduceOptionToken(arg.Substring(0, index)),
-                valueTokenizer.ProduceValueToken(arg.Substring(index+1)));
+                valueTokenizer.ProduceValueToken(arg[(index + 1)..]));
         }
     }
-}	
+}

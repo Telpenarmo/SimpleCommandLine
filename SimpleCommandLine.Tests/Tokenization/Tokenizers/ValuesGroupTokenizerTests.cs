@@ -10,7 +10,7 @@ namespace SimpleCommandLine.Tests.Tokenization.Tokenizers
 {
     public class ValuesGroupTokenizerTests
     {
-        public ValuesGroupTokenizer Tokenizer => new(new[] { ';', ',', '&' }) { Next = new FakeTokenizer() };
+        public static ValuesGroupTokenizer Tokenizer => new(new[] { ';', ',', '&' }) { Next = new FakeTokenizer() };
 
         [Fact]
         public void Given_single_word_invokes_Next()

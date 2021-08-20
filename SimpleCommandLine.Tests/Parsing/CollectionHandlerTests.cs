@@ -10,7 +10,7 @@ namespace SimpleCommandLine.Tests.Parsing
 {
     public class CollectionHandlerTests
     {
-        private CollectionHandler NewInstance(ParameterAttribute attribute)
+        private static CollectionHandler NewInstance(ParameterAttribute attribute)
             => new(new ParameterInfo(typeof(object[]), (x, y) => { }, attribute),
                 new FakeCollectionConverter(), InvariantCulture);
 

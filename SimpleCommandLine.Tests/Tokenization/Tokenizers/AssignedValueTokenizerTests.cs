@@ -9,7 +9,7 @@ namespace SimpleCommandLine.Tests.Tokenization.Tokenizers
 {
     public class AssignedValueTokenizerTests
     {
-        private AssignedValueTokenizer GetTokenizer()
+        private static AssignedValueTokenizer GetTokenizer()
             => new(new[] { ':' }, new FakeOptionTokenizer(), new ValueTokenizer()) { Next = new FakeTokenizer() };
 
         private class FakeOptionTokenizer : IOptionTokenizer

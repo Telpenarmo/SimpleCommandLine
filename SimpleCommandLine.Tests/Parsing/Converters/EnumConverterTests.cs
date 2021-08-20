@@ -7,10 +7,10 @@ namespace SimpleCommandLine.Tests.Parsing.Converters
 {
     public class EnumConverterTests
     {
-        EnumConverter GetInstance(bool ignoreCase, bool acceptNumerical)
+        private static EnumConverter GetInstance(bool ignoreCase, bool acceptNumerical)
             => new(typeof(TestEnum), ignoreCase, acceptNumerical);
 
-        IFormatProvider culture = System.Globalization.CultureInfo.InvariantCulture;
+        private readonly IFormatProvider culture = System.Globalization.CultureInfo.InvariantCulture;
 
         [Fact]
         public void With_exact_value_converts_well()

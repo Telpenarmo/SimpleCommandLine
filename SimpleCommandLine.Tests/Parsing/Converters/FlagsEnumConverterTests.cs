@@ -7,7 +7,7 @@ namespace SimpleCommandLine.Tests.Parsing.Converters
 {
     public class FlagsEnumConverterTests
     {
-        FlagsEnumConverter GetInstance(bool ignoreCase, bool acceptNumerical)
+        private static FlagsEnumConverter GetInstance(bool ignoreCase, bool acceptNumerical)
             => new(typeof(TestEnum), ignoreCase, acceptNumerical);
 
         [Fact]

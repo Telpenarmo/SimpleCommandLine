@@ -22,7 +22,7 @@ namespace SimpleCommandLine.Parsing.Converters
             {
                 if (!elementType.IsAssignableFrom(values[i].GetType()))
                     throw new ArgumentException($"Value of index {i} is not assignable" +
-                        $" to the expected type {elementType.ToString()}.");
+                        $" to the expected type {elementType}.");
                 array.SetValue(values[i], i);
             }
             return ParsingResult.Success(array);

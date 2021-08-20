@@ -8,9 +8,9 @@ namespace SimpleCommandLine.Tests.Parsing
 {
     public class UnaryArgumentHandlerTests
     {
-        private UnaryArgumentHandler NewParserWithoutDefaultValue()
+        private static UnaryArgumentHandler NewParserWithoutDefaultValue()
             => new(new ParameterInfo(typeof(object), (x, y) => { }), new FakeConverter(), InvariantCulture);
-        private UnaryArgumentHandler NewParserWithDefaultValue()
+        private static UnaryArgumentHandler NewParserWithDefaultValue()
             => new(new ParameterInfo(typeof(object), (x, y) => { }), new SwitchConverter(), InvariantCulture);
 
         [Fact]

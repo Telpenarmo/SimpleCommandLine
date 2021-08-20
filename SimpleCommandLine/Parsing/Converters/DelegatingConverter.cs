@@ -1,4 +1,5 @@
 using System;
+using static SimpleCommandLine.Parsing.ParsingResult;
 
 namespace SimpleCommandLine.Parsing.Converters
 {
@@ -22,8 +23,7 @@ namespace SimpleCommandLine.Parsing.Converters
                 if (string.IsNullOrEmpty(value))
                     throw new ArgumentNullException("The value must not be empty.");
                 var (isSuccess, result) = converter(value, format);
-                return (isSuccess && result != null) ? ParsingResult.Success(result)
-                : ParsingResult.Error(errorSelector(value));
+                return (isSuccess && result != null) ? Success(result) : Error(errorSelector(value));
             };
         }
 

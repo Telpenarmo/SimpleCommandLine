@@ -8,7 +8,7 @@ namespace SimpleCommandLine.Tests.Parsing.Converters
 {
     public class ArrayConverterTests
     {
-        private ArrayConverter NewInstance<T>() => new(typeof(T), new FakeConverter());
+        private static ArrayConverter NewInstance<T>() => new(typeof(T), new FakeConverter());
 
         [Fact]
         public void Given_array_of_valid_objects_returns_success()

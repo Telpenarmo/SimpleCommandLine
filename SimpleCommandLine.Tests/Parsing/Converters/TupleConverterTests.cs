@@ -1,15 +1,15 @@
 using System;
-using System.Collections.Generic;
-using Xunit;
-using SimpleCommandLine.Parsing.Converters;
 using System.Collections;
+using System.Collections.Generic;
+using SimpleCommandLine.Parsing;
+using SimpleCommandLine.Parsing.Converters;
+using Xunit;
 
 namespace SimpleCommandLine.Tests.Parsing.Converters
 {
     public class TupleConverterTests
     {
-        readonly SimpleCommandLine.Parsing.IConverter[] elementConverters
-            = new SimpleCommandLine.Parsing.IConverter[] { };
+        private readonly IConverter[] elementConverters = Array.Empty<IConverter>();
 
         [Theory, MemberData(nameof(SupportedTypes))]
         public void Given_supported_type_converts_well(Type type, Predicate<object> check)

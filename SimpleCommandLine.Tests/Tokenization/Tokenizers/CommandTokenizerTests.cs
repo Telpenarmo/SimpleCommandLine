@@ -10,10 +10,10 @@ namespace SimpleCommandLine.Tests.Tokenization.Tokenizers
 {
     public class CommandTokenizerTests
     {
-        private CommandTokenizer GetTokenizerWithNext()
+        private static CommandTokenizer GetTokenizerWithNext()
             => new(GetCommands().Select(x => x.Single() as string)) { Next = new FakeTokenizer() };
 
-        private CommandTokenizer GetTokenizerWithoutNext()
+        private static CommandTokenizer GetTokenizerWithoutNext()
             => new(GetCommands().Select(x => x.Single() as string));
 
         [Theory, MemberData(nameof(GetCommands))]
